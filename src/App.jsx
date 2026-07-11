@@ -1,4 +1,5 @@
 
+
 // import React, { useState, useEffect } from "react";
 // import { PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, CheckCircle, Briefcase, Globe } from "lucide-react";
 // import logoImg from "./assets/logo.jpeg";
@@ -18,8 +19,8 @@
 //   const [notification, setNotification] = useState("");
   
 //   // FILTER STATES & ACTIVE TAB
-//   const [activeTab, setActiveTab] = useState("all"); // "all" | "remote"
-//   const [selectedJobType, setSelectedJobType] = useState(""); // "Full Time" | "Internship"
+//   const [activeTab, setActiveTab] = useState("all"); 
+//   const [selectedJobType, setSelectedJobType] = useState(""); 
 //   const [selectedExperience, setSelectedExperience] = useState([]);
 //   const [selectedSalary, setSelectedSalary] = useState([]);
 //   const [selectedDomain, setSelectedDomain] = useState("");
@@ -138,7 +139,7 @@
 //     setSelectedDomain("");
 //   };
 
-//   // SAFE METADATA FILTERING ENGINE WITH FALLBACKS FOR EXISTING DOCUMENTS
+//   // SAFE METADATA FILTERING ENGINE WITH NEW SALARY SUPPORT
 //   const matchingJobs = jobs.filter((job) => {
 //     const matchesSearch = 
 //       job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -249,11 +250,22 @@
 //               </div>
 //             </div>
 
-//             {/* Salary Grid Box Checksets */}
+//             {/* Salary Grid Box Checksets (LPA & Dollar Rates Integrated) */}
 //             <div>
 //               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Salary</h3>
 //               <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
-//                 {["Competitive", "2-4 LPA", "4-6 LPA", "6-10 LPA", "10-20 LPA", "20-30 LPA", "30-40 LPA", "40+ LPA"].map((sal) => (
+//                 {[
+//                   "Competitive", 
+//                   "2-4 LPA", 
+//                   "4-6 LPA", 
+//                   "6-10 LPA", 
+//                   "10-20 LPA", 
+//                   "20-30 LPA", 
+//                   "$10 - $20 /hr",
+//                   "$20 - $30 /hr",
+//                   "$30 - $40 /hr",
+//                   "$40+ /hr"
+//                 ].map((sal) => (
 //                   <label key={sal} className="flex items-center space-x-2.5 cursor-pointer">
 //                     <input type="checkbox" checked={selectedSalary.includes(sal)} onChange={() => handleCheckboxChange(sal, selectedSalary, setSelectedSalary)} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
 //                     <span>{sal}</span>
@@ -271,6 +283,7 @@
 //                 <option value="Design">Product Design</option>
 //                 <option value="Marketing">Marketing</option>
 //                 <option value="Management">Product Management</option>
+//                 <option value="Data Entry">Operations / Data Entry</option>
 //               </select>
 //             </div>
 //           </aside>
@@ -346,7 +359,6 @@
 //                     <tbody className="divide-y divide-slate-100 text-sm">
 //                       {matchingJobs.map((job) => (
 //                         <tr key={job.id} className="hover:bg-slate-50/60 transition-colors group">
-//                           {/* COMPANY */}
 //                           <td className="py-4 px-4 pl-6 font-bold text-slate-900 whitespace-nowrap">
 //                             <div className="flex items-center space-x-2">
 //                               <span>{job.company}</span>
@@ -357,13 +369,9 @@
 //                               )}
 //                             </div>
 //                           </td>
-
-//                           {/* ROLE */}
 //                           <td className="py-4 px-4 font-semibold text-slate-700 max-w-[180px] truncate">
 //                             {job.title}
 //                           </td>
-
-//                           {/* METADATA BADGES */}
 //                           <td className="py-4 px-4 hidden md:table-cell">
 //                             <div className="flex flex-wrap gap-1">
 //                               <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded whitespace-nowrap">
@@ -374,13 +382,9 @@
 //                               </span>
 //                             </div>
 //                           </td>
-
-//                           {/* DATE ADDED */}
 //                           <td className="py-4 px-4 text-xs text-slate-400 font-semibold whitespace-nowrap">
 //                             {job.date}
 //                           </td>
-
-//                           {/* ACTION BUTTONS */}
 //                           <td className="py-4 px-4 pr-6 text-right whitespace-nowrap">
 //                             <div className="inline-flex items-center space-x-2">
 //                               <a 
@@ -422,15 +426,15 @@
 //                 <form onSubmit={handleFormSubmit} className="space-y-3.5 text-sm">
 //                   <div>
 //                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Job Title *</label>
-//                     <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} placeholder="e.g. Software Engineer" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
+//                     <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} placeholder="e.g. Data Entry Support" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
 //                   </div>
 //                   <div>
 //                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Company *</label>
-//                     <input type="text" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} placeholder="e.g. WEX" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
+//                     <input type="text" value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} placeholder="e.g. Viasat" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
 //                   </div>
 //                   <div>
 //                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Raw Job URL *</label>
-//                     <input type="url" value={formData.url} onChange={(e) => setFormData({...formData, url: e.target.value})} placeholder="https://careers.company.com/..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
+//                     <input type="url" value={formData.url} onChange={(e) => setFormData({...formData, url: e.target.value})} placeholder="https://get-job-link.web.app/" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl" required />
 //                   </div>
                   
 //                   <div className="grid grid-cols-2 gap-2">
@@ -463,8 +467,10 @@
 //                         <option>6-10 LPA</option>
 //                         <option>10-20 LPA</option>
 //                         <option>20-30 LPA</option>
-//                         <option>30-40 LPA</option>
-//                         <option>40+ LPA</option>
+//                         <option>$10 - $20 /hr</option>
+//                         <option>$20 - $30 /hr</option>
+//                         <option>$30 - $40 /hr</option>
+//                         <option>$40+ /hr</option>
 //                       </select>
 //                     </div>
 //                     <div>
@@ -474,6 +480,7 @@
 //                         <option value="Design">Design</option>
 //                         <option value="Marketing">Marketing</option>
 //                         <option value="Management">Management</option>
+//                         <option value="Data Entry">Data Entry</option>
 //                       </select>
 //                     </div>
 //                   </div>
@@ -507,21 +514,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, CheckCircle, Briefcase, Globe } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
@@ -529,6 +521,38 @@ import logoImg from "./assets/logo.jpeg";
 import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+
+function GoogleAdSenseBanner() {
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src*="pagead2.googlesyndication.com"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9438102359723143";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.error("AdSense initialization error: ", e);
+    }
+  }, []);
+
+  return (
+    <div className="w-full flex justify-center my-6 overflow-hidden min-h-[90px]">
+      <ins 
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client="ca-pub-9438102359723143"
+        data-ad-slot="4553594304"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
+  );
+}
 
 export default function App() {
   const ADMIN_EMAIL = "sdivyanshu352@gmail.com"; 
@@ -540,14 +564,12 @@ export default function App() {
   const [viewMode, setViewMode] = useState("grid");
   const [notification, setNotification] = useState("");
   
-  // FILTER STATES & ACTIVE TAB
   const [activeTab, setActiveTab] = useState("all"); 
   const [selectedJobType, setSelectedJobType] = useState(""); 
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedSalary, setSelectedSalary] = useState([]);
   const [selectedDomain, setSelectedDomain] = useState("");
 
-  // Extended creator form state for Admin
   const [formData, setFormData] = useState({ 
     title: "", 
     company: "", 
@@ -661,7 +683,6 @@ export default function App() {
     setSelectedDomain("");
   };
 
-  // SAFE METADATA FILTERING ENGINE WITH NEW SALARY SUPPORT
   const matchingJobs = jobs.filter((job) => {
     const matchesSearch = 
       job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -687,6 +708,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased">
+
       {notification && (
         <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 border border-slate-800">
           <CheckCircle className="w-5 h-5 text-emerald-400" />
@@ -725,6 +747,10 @@ export default function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        
+        {/* PHYSICAL AD CONTAINER DISPLAYED IMMEDIATELY UNDER HEADER */}
+        <GoogleAdSenseBanner />
+
         {/* WORKPLACE ENVIRONMENTS TAB HEADER */}
         <div className="flex items-center space-x-2 mb-6 border-b border-slate-200 pb-px">
           <button onClick={() => setActiveTab("all")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "all" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
@@ -737,7 +763,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* THREE-COLUMN RESPONSIVE LAYOUT MATRIX */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT SIDEBAR PANEL: FILTERS MATRIX */}
@@ -747,7 +772,6 @@ export default function App() {
               <button onClick={clearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Clear All</button>
             </div>
 
-            {/* Job Type Pill Filter */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Job Type</h3>
               <div className="flex flex-wrap gap-2">
@@ -759,7 +783,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Experience Checkbox Set */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Experience</h3>
               <div className="space-y-2 text-sm text-slate-600">
@@ -772,7 +795,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Salary Grid Box Checksets (LPA & Dollar Rates Integrated) */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Salary</h3>
               <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
@@ -796,7 +818,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Domain Dropdown Filter */}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Domain</h3>
               <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20">
@@ -865,7 +886,6 @@ export default function App() {
                 ))}
               </div>
             ) : (
-              /* HIGH-DENSITY, NON-SQUEEZED TABLE VIEW */
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[620px]">
