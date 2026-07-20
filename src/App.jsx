@@ -1,5 +1,6 @@
 
 
+
 // import React, { useState, useEffect } from "react";
 // import { PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, CheckCircle, Briefcase, Globe } from "lucide-react";
 // import logoImg from "./assets/logo.jpeg";
@@ -7,6 +8,38 @@
 // import { auth, googleProvider, db } from "./firebase";
 // import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 // import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+
+// function GoogleAdSenseBanner() {
+//   useEffect(() => {
+//     const existingScript = document.querySelector('script[src*="pagead2.googlesyndication.com"]');
+//     if (!existingScript) {
+//       const script = document.createElement("script");
+//       script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9438102359723143";
+//       script.async = true;
+//       script.crossOrigin = "anonymous";
+//       document.head.appendChild(script);
+//     }
+
+//     try {
+//       (window.adsbygoogle = window.adsbygoogle || []).push({});
+//     } catch (e) {
+//       console.error("AdSense initialization error: ", e);
+//     }
+//   }, []);
+
+//   return (
+//     <div className="w-full flex justify-center my-6 overflow-hidden min-h-[90px]">
+//       <ins 
+//         className="adsbygoogle"
+//         style={{ display: "block" }}
+//         data-ad-client="ca-pub-9438102359723143"
+//         data-ad-slot="4553594304"
+//         data-ad-format="auto"
+//         data-full-width-responsive="true"
+//       />
+//     </div>
+//   );
+// }
 
 // export default function App() {
 //   const ADMIN_EMAIL = "sdivyanshu352@gmail.com"; 
@@ -18,14 +51,12 @@
 //   const [viewMode, setViewMode] = useState("grid");
 //   const [notification, setNotification] = useState("");
   
-//   // FILTER STATES & ACTIVE TAB
 //   const [activeTab, setActiveTab] = useState("all"); 
 //   const [selectedJobType, setSelectedJobType] = useState(""); 
 //   const [selectedExperience, setSelectedExperience] = useState([]);
 //   const [selectedSalary, setSelectedSalary] = useState([]);
 //   const [selectedDomain, setSelectedDomain] = useState("");
 
-//   // Extended creator form state for Admin
 //   const [formData, setFormData] = useState({ 
 //     title: "", 
 //     company: "", 
@@ -139,7 +170,6 @@
 //     setSelectedDomain("");
 //   };
 
-//   // SAFE METADATA FILTERING ENGINE WITH NEW SALARY SUPPORT
 //   const matchingJobs = jobs.filter((job) => {
 //     const matchesSearch = 
 //       job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -165,6 +195,7 @@
 
 //   return (
 //     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased">
+
 //       {notification && (
 //         <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 border border-slate-800">
 //           <CheckCircle className="w-5 h-5 text-emerald-400" />
@@ -203,6 +234,10 @@
 //       </header>
 
 //       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        
+//         {/* PHYSICAL AD CONTAINER DISPLAYED IMMEDIATELY UNDER HEADER */}
+//         <GoogleAdSenseBanner />
+
 //         {/* WORKPLACE ENVIRONMENTS TAB HEADER */}
 //         <div className="flex items-center space-x-2 mb-6 border-b border-slate-200 pb-px">
 //           <button onClick={() => setActiveTab("all")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "all" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
@@ -215,7 +250,6 @@
 //           </button>
 //         </div>
 
-//         {/* THREE-COLUMN RESPONSIVE LAYOUT MATRIX */}
 //         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
 //           {/* LEFT SIDEBAR PANEL: FILTERS MATRIX */}
@@ -225,7 +259,6 @@
 //               <button onClick={clearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Clear All</button>
 //             </div>
 
-//             {/* Job Type Pill Filter */}
 //             <div>
 //               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Job Type</h3>
 //               <div className="flex flex-wrap gap-2">
@@ -237,7 +270,6 @@
 //               </div>
 //             </div>
 
-//             {/* Experience Checkbox Set */}
 //             <div>
 //               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Experience</h3>
 //               <div className="space-y-2 text-sm text-slate-600">
@@ -250,7 +282,6 @@
 //               </div>
 //             </div>
 
-//             {/* Salary Grid Box Checksets (LPA & Dollar Rates Integrated) */}
 //             <div>
 //               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Salary</h3>
 //               <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
@@ -274,7 +305,6 @@
 //               </div>
 //             </div>
 
-//             {/* Domain Dropdown Filter */}
 //             <div>
 //               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Domain</h3>
 //               <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20">
@@ -343,7 +373,6 @@
 //                 ))}
 //               </div>
 //             ) : (
-//               /* HIGH-DENSITY, NON-SQUEEZED TABLE VIEW */
 //               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 //                 <div className="overflow-x-auto">
 //                   <table className="w-full text-left border-collapse min-w-[620px]">
@@ -514,8 +543,25 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, CheckCircle, Briefcase, Globe } from "lucide-react";
+import { PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
 
 import { auth, googleProvider, db } from "./firebase";
@@ -569,6 +615,7 @@ export default function App() {
   const [selectedExperience, setSelectedExperience] = useState([]);
   const [selectedSalary, setSelectedSalary] = useState([]);
   const [selectedDomain, setSelectedDomain] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const [formData, setFormData] = useState({ 
     title: "", 
@@ -681,6 +728,7 @@ export default function App() {
     setSelectedExperience([]);
     setSelectedSalary([]);
     setSelectedDomain("");
+    setSelectedDate("");
   };
 
   const matchingJobs = jobs.filter((job) => {
@@ -689,7 +737,7 @@ export default function App() {
       job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.jd?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesTab = activeTab === "all" ? true : job.isRemote === true;
+    const matchesTab = activeTab === "all" ? true : activeTab === "remote" ? job.isRemote === true : true;
 
     const currentJobType = job.jobType || "Full Time";
     const matchesJobType = selectedJobType ? currentJobType === selectedJobType : true;
@@ -703,7 +751,9 @@ export default function App() {
     const currentDomain = job.domain || "Engineering";
     const matchesDomain = selectedDomain ? currentDomain === selectedDomain : true;
 
-    return matchesSearch && matchesTab && matchesJobType && matchesExperience && matchesSalary && matchesDomain;
+    const matchesDate = selectedDate ? job.date === selectedDate : true;
+
+    return matchesSearch && matchesTab && matchesJobType && matchesExperience && matchesSalary && matchesDomain && matchesDate;
   });
 
   return (
@@ -761,15 +811,39 @@ export default function App() {
             <Globe className="w-4 h-4" />
             <span>Remote Jobs</span>
           </button>
+          <button onClick={() => setActiveTab("post-job")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "post-job" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
+            <PlusCircle className="w-4 h-4" />
+            <span>Post Your Jobs Here</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT SIDEBAR PANEL: FILTERS MATRIX */}
           <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+            
+            {/* Disclaimer Announcement Panel */}
+            <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex items-start space-x-2.5">
+              <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-600 leading-relaxed">
+                <span className="font-bold text-slate-800">Important Note:</span> We are a third-party organization. We aggregate and post official job links here independently to help candidates secure career opportunities. We are not directly affiliated with the hiring companies.
+              </p>
+            </div>
+
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-base font-bold text-slate-900">Filters</h2>
               <button onClick={clearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Clear All</button>
+            </div>
+
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Date Added</h3>
+              <input 
+                type="date" 
+                value={selectedDate} 
+                onChange={(e) => setSelectedDate(e.target.value)} 
+                max={new Date().toISOString().split("T")[0]}
+                className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600"
+              />
             </div>
 
             <div>
@@ -831,129 +905,189 @@ export default function App() {
             </div>
           </aside>
 
-          {/* MAIN COLUMN: JOB MATRIX CONTENT LIST */}
+          {/* MAIN COLUMN CONTENT VIEW */}
           <section className={`${isAdmin ? "lg:col-span-5" : "lg:col-span-9"} space-y-6`}>
-            <div className="relative">
-              <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" />
-              <input type="text" placeholder="Filter by position, organization, or requirements..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm" />
-            </div>
+            {activeTab === "post-job" ? (
+              /* MATCHED PORTING OF THE TEMPLATE FOR SUBMISSIONS VIA EMAIL */
+              <div className="flex flex-col items-center text-center py-12 px-4 bg-transparent max-w-4xl mx-auto">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                  Post a Job on GetJobLink
+                </h1>
+                <p className="text-slate-500 text-base md:text-lg max-w-2xl leading-relaxed mb-10">
+                  We're currently accepting job postings directly via email. To post a job, please contact our team.
+                </p>
 
-            {matchingJobs.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                <p className="text-slate-400 font-medium text-sm">No active job listings found matching your search parameters.</p>
-              </div>
-            ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-1 gap-4">
-                {matchingJobs.map((job) => (
-                  <div key={job.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
-                    {job.isRemote && (
-                      <span className="absolute top-0 right-0 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-bl-xl border-l border-b border-emerald-100 uppercase tracking-wider">
-                        Remote
-                      </span>
-                    )}
-                    <div>
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="text-base font-bold text-slate-900 tracking-tight">{job.title}</h3>
-                          <p className="text-sm font-bold text-blue-600 mt-0.5">{job.company}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-2">
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-medium rounded">{job.jobType || "Full Time"}</span>
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-medium rounded">{job.experience || "More than 0 year"}</span>
-                            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded">{job.salary || "Competitive"}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md shrink-0">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>{job.date}</span>
-                        </div>
-                      </div>
-                      <p className="text-slate-600 text-sm leading-relaxed mb-5 whitespace-pre-line bg-slate-50/60 p-4 rounded-xl border border-slate-100">
-                        {job.jd}
-                      </p>
+                {/* Main Email Block */}
+                <div className="w-full bg-white border border-slate-200 rounded-2xl p-8 shadow-sm flex flex-col items-center mb-12">
+                  <h3 className="text-lg font-bold text-slate-900 mb-5">Contact Us to Post</h3>
+                  <a 
+                    href="mailto:getjoblink647@gmail.com" 
+                    className="inline-flex items-center space-x-3 bg-slate-950 hover:bg-slate-900 text-white font-medium py-3.5 px-8 rounded-xl transition-all shadow-md group w-full sm:w-auto justify-center"
+                  >
+                    <Mail className="w-5 h-5 text-slate-300 group-hover:text-white" />
+                    <span className="text-sm md:text-base tracking-wide">getjoblink647@gmail.com</span>
+                  </a>
+                </div>
+
+                {/* Grid Marketing Matrix Elements */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full text-left">
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-slate-900">
+                      <Zap className="w-4 h-4 text-blue-600" />
+                      <h4 className="font-bold text-base">Reach Targeted Talent</h4>
                     </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                      <a href={job.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1.5 text-xs font-bold tracking-wide uppercase text-white bg-slate-900 hover:bg-slate-800 px-4 py-2.5 rounded-xl shadow-sm">
-                        <span>Apply Directly</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                      {isAdmin && (
-                        <button onClick={() => handleRemoveJob(job.id)} className="text-slate-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                    <p className="text-sm text-slate-500 leading-relaxed">
+                      Connect with qualified candidates actively looking for opportunities.
+                    </p>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[620px]">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        <th className="py-3.5 px-4 pl-6">Company</th>
-                        <th className="py-3.5 px-4">Role</th>
-                        <th className="py-3.5 px-4 hidden md:table-cell">Metadata</th>
-                        <th className="py-3.5 px-4 whitespace-nowrap">Date Added</th>
-                        <th className="py-3.5 px-4 pr-6 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-sm">
-                      {matchingJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-slate-50/60 transition-colors group">
-                          <td className="py-4 px-4 pl-6 font-bold text-slate-900 whitespace-nowrap">
-                            <div className="flex items-center space-x-2">
-                              <span>{job.company}</span>
-                              {job.isRemote && (
-                                <span className="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-emerald-100 uppercase tracking-wide">
-                                  Remote
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 font-semibold text-slate-700 max-w-[180px] truncate">
-                            {job.title}
-                          </td>
-                          <td className="py-4 px-4 hidden md:table-cell">
-                            <div className="flex flex-wrap gap-1">
-                              <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded whitespace-nowrap">
-                                {job.jobType || "Full Time"}
-                              </span>
-                              <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded whitespace-nowrap">
-                                {job.salary || "Competitive"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 text-xs text-slate-400 font-semibold whitespace-nowrap">
-                            {job.date}
-                          </td>
-                          <td className="py-4 px-4 pr-6 text-right whitespace-nowrap">
-                            <div className="inline-flex items-center space-x-2">
-                              <a 
-                                href={job.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-blue-600 hover:text-blue-700 font-bold text-xs uppercase tracking-wider inline-flex items-center space-x-1 bg-blue-50/50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                              >
-                                <span>Apply</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                              {isAdmin && (
-                                <button 
-                                  onClick={() => handleRemoveJob(job.id)} 
-                                  className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-slate-900">
+                      <CheckSquare className="w-4 h-4 text-blue-600" />
+                      <h4 className="font-bold text-base">Simple Process</h4>
+                    </div>
+                    <p className="text-sm text-slate-500 leading-relaxed">
+                      Just send us the job details, and we'll handle the formatting and posting.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-slate-900">
+                      <Briefcase className="w-4 h-4 text-blue-600" />
+                      <h4 className="font-bold text-base">Quick Support</h4>
+                    </div>
+                    <p className="text-sm text-slate-500 leading-relaxed">
+                      Our team is available to help you with any questions about your listing.
+                    </p>
+                  </div>
                 </div>
               </div>
+            ) : (
+              /* Core Listings Workspace Layout */
+              <>
+                <div className="relative">
+                  <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" />
+                  <input type="text" placeholder="Filter by position, organization, or requirements..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm" />
+                </div>
+
+                {matchingJobs.length === 0 ? (
+                  <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    <p className="text-slate-400 font-medium text-sm">No active job listings found matching your search parameters.</p>
+                  </div>
+                ) : viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {matchingJobs.map((job) => (
+                      <div key={job.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                        {job.isRemote && (
+                          <span className="absolute top-0 right-0 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-bl-xl border-l border-b border-emerald-100 uppercase tracking-wider">
+                            Remote
+                          </span>
+                        )}
+                        <div>
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="text-base font-bold text-slate-900 tracking-tight">{job.title}</h3>
+                              <p className="text-sm font-bold text-blue-600 mt-0.5">{job.company}</p>
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-medium rounded">{job.jobType || "Full Time"}</span>
+                                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-medium rounded">{job.experience || "More than 0 year"}</span>
+                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded">{job.salary || "Competitive"}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md shrink-0">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span>{job.date}</span>
+                            </div>
+                          </div>
+                          <p className="text-slate-600 text-sm leading-relaxed mb-5 whitespace-pre-line bg-slate-50/60 p-4 rounded-xl border border-slate-100">
+                            {job.jd}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                          <a href={job.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1.5 text-xs font-bold tracking-wide uppercase text-white bg-slate-900 hover:bg-slate-800 px-4 py-2.5 rounded-xl shadow-sm">
+                            <span>Apply Directly</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                          {isAdmin && (
+                            <button onClick={() => handleRemoveJob(job.id)} className="text-slate-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse min-w-[620px]">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                            <th className="py-3.5 px-4 pl-6">Company</th>
+                            <th className="py-3.5 px-4">Role</th>
+                            <th className="py-3.5 px-4 hidden md:table-cell">Metadata</th>
+                            <th className="py-3.5 px-4 whitespace-nowrap">Date Added</th>
+                            <th className="py-3.5 px-4 pr-6 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-sm">
+                          {matchingJobs.map((job) => (
+                            <tr key={job.id} className="hover:bg-slate-50/60 transition-colors group">
+                              <td className="py-4 px-4 pl-6 font-bold text-slate-900 whitespace-nowrap">
+                                <div className="flex items-center space-x-2">
+                                  <span>{job.company}</span>
+                                  {job.isRemote && (
+                                    <span className="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-emerald-100 uppercase tracking-wide">
+                                      Remote
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 font-semibold text-slate-700 max-w-[180px] truncate">
+                                {job.title}
+                              </td>
+                              <td className="py-4 px-4 hidden md:table-cell">
+                                <div className="flex flex-wrap gap-1">
+                                  <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded whitespace-nowrap">
+                                    {job.jobType || "Full Time"}
+                                  </span>
+                                  <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded whitespace-nowrap">
+                                    {job.salary || "Competitive"}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 text-xs text-slate-400 font-semibold whitespace-nowrap">
+                                {job.date}
+                              </td>
+                              <td className="py-4 px-4 pr-6 text-right whitespace-nowrap">
+                                <div className="inline-flex items-center space-x-2">
+                                  <a 
+                                    href={job.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="text-blue-600 hover:text-blue-700 font-bold text-xs uppercase tracking-wider inline-flex items-center space-x-1 bg-blue-50/50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                                  >
+                                    <span>Apply</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                  {isAdmin && (
+                                    <button 
+                                      onClick={() => handleRemoveJob(job.id)} 
+                                      className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </section>
 
