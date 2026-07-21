@@ -1067,28 +1067,62 @@ export default function App() {
   });
 
   // Load Adcash Anti-Adblock library from Render backend and run AutoTag
-  useEffect(() => {
-    const adLibScript = document.createElement("script");
-    adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
-    adLibScript.async = true;
+  // useEffect(() => {
+  //   const adLibScript = document.createElement("script");
+  //   adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
+  //   adLibScript.async = true;
 
-    adLibScript.onload = () => {
-      if (window.aclib) {
-        window.aclib.runAutoTag({
-          zoneId: 'mgttqf1elu',
-        });
-      }
-    };
+  //   adLibScript.onload = () => {
+  //     if (window.aclib) {
+  //       window.aclib.runAutoTag({
+  //         zoneId: 'mgttqf1elu',
+  //       });
+  //     }
+  //   };
 
-    document.head.appendChild(adLibScript);
+  //   document.head.appendChild(adLibScript);
 
-    return () => {
-      if (document.head.contains(adLibScript)) {
-        document.head.removeChild(adLibScript);
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (document.head.contains(adLibScript)) {
+  //       document.head.removeChild(adLibScript);
+  //     }
+  //   };
+  // }, []);
 
+// Load Adcash Anti-Adblock library from Render backend and run all ad formats
+useEffect(() => {
+  const adLibScript = document.createElement("script");
+  adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
+  adLibScript.async = true;
+
+  adLibScript.onload = () => {
+    if (window.aclib) {
+      // 1. AutoTag Ad Format
+      window.aclib.runAutoTag({
+        zoneId: 'mgttqf1elu',
+      });
+
+      // 2. In-Page Push Ad Format (Zone: 11775618)
+      window.aclib.runInPagePush({
+        zoneId: '11775618',
+        maxAds: 2,
+      });
+
+      // 3. Pop-Under Ad Format (Zone: 11775646)
+      window.aclib.runPop({
+        zoneId: '11775646',
+      });
+    }
+  };
+
+  document.head.appendChild(adLibScript);
+
+  return () => {
+    if (document.head.contains(adLibScript)) {
+      document.head.removeChild(adLibScript);
+    }
+  };
+}, []);
   useEffect(() => {
     const randomCount = (Math.random() * (10.0 - 1.0) + 1.0).toFixed(1);
     setWeeklyUsers(`${randomCount}k+`);
