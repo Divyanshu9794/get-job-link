@@ -999,6 +999,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { 
@@ -1057,11 +1066,10 @@ export default function App() {
     isRemote: false 
   });
 
-  // Load Adcash Anti-Adblock library from server and run AutoTag
+  // Load Adcash Anti-Adblock library from Render backend and run AutoTag
   useEffect(() => {
     const adLibScript = document.createElement("script");
-    // Points to your backend server endpoint caching https://adbpage.com/adblock?v=3&format=js
-    adLibScript.src = "/api/adcash-lib.js"; 
+    adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
     adLibScript.async = true;
 
     adLibScript.onload = () => {
@@ -1072,7 +1080,6 @@ export default function App() {
       }
     };
 
-    // Append as high up in the document head as possible
     document.head.appendChild(adLibScript);
 
     return () => {
