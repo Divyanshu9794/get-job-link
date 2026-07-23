@@ -1,11 +1,10 @@
 
-
 // import React, { useState, useEffect } from "react";
 // import { Helmet } from "react-helmet-async";
 // import { 
 //   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
 //   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
-//   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles
+//   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2
 // } from "lucide-react";
 // import logoImg from "./assets/logo.jpeg";
 
@@ -24,6 +23,20 @@
 // const TwitterIcon = ({ className = "w-4 h-4" }) => (
 //   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
 //     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+//   </svg>
+// );
+
+// const InstagramIcon = ({ className = "w-4 h-4" }) => (
+//   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+//     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+//     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+//     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+//   </svg>
+// );
+
+// const WhatsappIcon = ({ className = "w-4 h-4" }) => (
+//   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+//     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
 //   </svg>
 // );
 
@@ -53,7 +66,7 @@
 //     url: "",
 //     jobType: "Full Time",
 //     experience: "More than 0 year",
-//     salary: "Competitive",
+//     salary: "",
 //     domain: "Engineering",
 //     isRemote: false 
 //   });
@@ -118,7 +131,7 @@
 //     setFormData({ 
 //       title: "", company: "", jd: "", url: "", 
 //       jobType: "Full Time", experience: "More than 0 year", 
-//       salary: "Competitive", domain: "Engineering", isRemote: false 
+//       salary: "", domain: "Engineering", isRemote: false 
 //     });
 //     setEditingJobId(null);
 //   };
@@ -132,7 +145,7 @@
 //       url: job.url || "",
 //       jobType: job.jobType || "Full Time",
 //       experience: job.experience || "More than 0 year",
-//       salary: job.salary || "Competitive",
+//       salary: job.salary || "",
 //       domain: job.domain || "Engineering",
 //       isRemote: job.isRemote || false
 //     });
@@ -157,7 +170,7 @@
 //           url: sanitizeJobUrl(formData.url),
 //           jobType: formData.jobType,
 //           experience: formData.experience,
-//           salary: formData.salary,
+//           salary: formData.salary || "Competitive",
 //           domain: formData.domain,
 //           isRemote: formData.isRemote,
 //           updatedAt: Date.now()
@@ -171,7 +184,7 @@
 //           url: sanitizeJobUrl(formData.url),
 //           jobType: formData.jobType,
 //           experience: formData.experience,
-//           salary: formData.salary,
+//           salary: formData.salary || "Competitive",
 //           domain: formData.domain,
 //           isRemote: formData.isRemote,
 //           date: new Date().toISOString().split("T")[0],
@@ -209,6 +222,35 @@
 //     setSelectedSalary([]);
 //     setSelectedDomain("");
 //     setSelectedDate("");
+//   };
+
+//   const shareToLinkedin = (job) => {
+//     const text = `Job Opening: ${job.title} at ${job.company}\n\nJD: ${job.jd || ""}\n\nApply directly here: https://get-job-link.web.app/`;
+//     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`;
+//     window.open(linkedinUrl, "_blank");
+//   };
+
+//   const shareToTwitter = (job) => {
+//     const text = `🚀 Hiring Alert: ${job.title} at ${job.company}\n\nApply Link: https://get-job-link.web.app/\n\n#TechJobs #Hiring`;
+//     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+//     window.open(twitterUrl, "_blank");
+//   };
+
+//   const shareToWhatsapp = (job) => {
+//     const text = `*Job Opening:* ${job.title} at *${job.company}*\n\n*Description:* ${job.jd || "N/A"}\n\n*Apply Link:* https://get-job-link.web.app/`;
+//     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+//     window.open(whatsappUrl, "_blank");
+//   };
+
+//   const shareToInstagram = async (job) => {
+//     const text = `Job Opening: ${job.title} at ${job.company}\n\nJD: ${job.jd || ""}\n\nApply Link: https://get-job-link.web.app/`;
+//     try {
+//       await navigator.clipboard.writeText(text);
+//       triggerNotification("Job details copied! Paste it into your Instagram Post/Story.");
+//     } catch {
+//       triggerNotification("Opening Instagram...");
+//     }
+//     window.open("https://www.instagram.com/codes_and_clouds/", "_blank");
 //   };
 
 //   const matchingJobs = jobs.filter((job) => {
@@ -290,13 +332,13 @@
 //         <meta name="description" content={pageDescription} />
 //         <meta name="keywords" content="tech jobs, software engineer jobs, direct hiring links, remote tech jobs, internship openings, SDE jobs" />
 //         <meta name="robots" content="index, follow" />
-//         <link rel="canonical" href="https://getjoblink.com" />
+//         <link rel="canonical" href="https://get-job-link.web.app/" />
 
 //         <meta property="og:type" content="website" />
 //         <meta property="og:title" content={pageTitle} />
 //         <meta property="og:description" content={pageDescription} />
 //         <meta property="og:image" content={logoImg} />
-//         <meta property="og:url" content="https://getjoblink.com" />
+//         <meta property="og:url" content="https://get-job-link.web.app/" />
 
 //         <meta name="twitter:card" content="summary_large_image" />
 //         <meta name="twitter:site" content="@GetJobLink" />
@@ -389,6 +431,16 @@
 //               >
 //                 <TwitterIcon className="w-3.5 h-3.5" />
 //                 <span>X (Twitter)</span>
+//               </a>
+//               <a 
+//                 href="https://www.instagram.com/codes_and_clouds/" 
+//                 target="_blank" 
+//                 rel="noopener noreferrer" 
+//                 aria-label="Follow GetJobLink on Instagram"
+//                 className="inline-flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+//               >
+//                 <InstagramIcon className="w-3.5 h-3.5" />
+//                 <span>Instagram</span>
 //               </a>
 //             </div>
 //           </div>
@@ -697,21 +749,57 @@
 //                             </p>
 //                           </div>
 
-//                           <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-2">
+//                           <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-slate-100 mt-2 gap-3">
 //                             <div className="flex items-center space-x-1 text-slate-400 text-xs">
 //                               <Calendar className="w-3.5 h-3.5" />
 //                               <span>{job.date || "Recently"}</span>
 //                             </div>
 
-//                             <a
-//                               href={job.url}
-//                               target="_blank"
-//                               rel="noopener noreferrer"
-//                               className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
-//                             >
-//                               <span>Apply Directly</span>
-//                               <ExternalLink className="w-3.5 h-3.5" />
-//                             </a>
+//                             <div className="flex items-center flex-wrap gap-2">
+//                               <div className="flex items-center space-x-1 border-r border-slate-200 pr-2">
+//                                 <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-0.5">
+//                                   <Share2 className="w-3 h-3" /> Share:
+//                                 </span>
+//                                 <button 
+//                                   onClick={() => shareToLinkedin(job)} 
+//                                   title="Share to LinkedIn as Post"
+//                                   className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+//                                 >
+//                                   <LinkedinIcon className="w-3.5 h-3.5" />
+//                                 </button>
+//                                 <button 
+//                                   onClick={() => shareToTwitter(job)} 
+//                                   title="Share to X (Twitter)"
+//                                   className="p-1.5 text-slate-500 hover:text-black hover:bg-slate-100 rounded-lg transition-all"
+//                                 >
+//                                   <TwitterIcon className="w-3.5 h-3.5" />
+//                                 </button>
+//                                 <button 
+//                                   onClick={() => shareToWhatsapp(job)} 
+//                                   title="Share via WhatsApp"
+//                                   className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+//                                 >
+//                                   <WhatsappIcon className="w-3.5 h-3.5" />
+//                                 </button>
+//                                 <button 
+//                                   onClick={() => shareToInstagram(job)} 
+//                                   title="Share to Instagram"
+//                                   className="p-1.5 text-slate-500 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all"
+//                                 >
+//                                   <InstagramIcon className="w-3.5 h-3.5" />
+//                                 </button>
+//                               </div>
+
+//                               <a
+//                                 href={job.url}
+//                                 target="_blank"
+//                                 rel="noopener noreferrer"
+//                                 className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
+//                               >
+//                                 <span>Apply Directly</span>
+//                                 <ExternalLink className="w-3.5 h-3.5" />
+//                               </a>
+//                             </div>
 //                           </div>
 //                         </article>
 //                       ))}
@@ -728,6 +816,7 @@
 //                               <th scope="col" className="px-4 py-3">Experience</th>
 //                               <th scope="col" className="px-4 py-3">Salary</th>
 //                               <th scope="col" className="px-4 py-3">Date</th>
+//                               <th scope="col" className="px-4 py-3">Share</th>
 //                               <th scope="col" className="px-4 py-3 text-right">Action</th>
 //                             </tr>
 //                           </thead>
@@ -740,6 +829,22 @@
 //                                 <td className="px-4 py-3">{job.experience || "More than 0 year"}</td>
 //                                 <td className="px-4 py-3">{job.salary || "Competitive"}</td>
 //                                 <td className="px-4 py-3 text-slate-400">{job.date || "Recently"}</td>
+//                                 <td className="px-4 py-3">
+//                                   <div className="flex items-center space-x-1">
+//                                     <button onClick={() => shareToLinkedin(job)} title="Share on LinkedIn" className="p-1 text-slate-400 hover:text-blue-600">
+//                                       <LinkedinIcon className="w-3.5 h-3.5" />
+//                                     </button>
+//                                     <button onClick={() => shareToTwitter(job)} title="Share on Twitter" className="p-1 text-slate-400 hover:text-black">
+//                                       <TwitterIcon className="w-3.5 h-3.5" />
+//                                     </button>
+//                                     <button onClick={() => shareToWhatsapp(job)} title="Share on WhatsApp" className="p-1 text-slate-400 hover:text-emerald-600">
+//                                       <WhatsappIcon className="w-3.5 h-3.5" />
+//                                     </button>
+//                                     <button onClick={() => shareToInstagram(job)} title="Share on Instagram" className="p-1 text-slate-400 hover:text-pink-600">
+//                                       <InstagramIcon className="w-3.5 h-3.5" />
+//                                     </button>
+//                                   </div>
+//                                 </td>
 //                                 <td className="px-4 py-3 text-right">
 //                                   <div className="flex items-center justify-end space-x-2">
 //                                     {isAdmin && (
@@ -878,23 +983,14 @@
 
 //                     <div>
 //                       <label htmlFor="form-salary" className="block font-bold text-slate-700 mb-1">Salary</label>
-//                       <select
+//                       <input
 //                         id="form-salary"
+//                         type="text"
 //                         value={formData.salary}
 //                         onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
 //                         className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-//                       >
-//                         <option value="Competitive">Competitive</option>
-//                         <option value="2-4 LPA">2-4 LPA</option>
-//                         <option value="4-6 LPA">4-6 LPA</option>
-//                         <option value="6-10 LPA">6-10 LPA</option>
-//                         <option value="10-20 LPA">10-20 LPA</option>
-//                         <option value="20-30 LPA">20-30 LPA</option>
-//                         <option value="$10 - $20 /hr">$10 - $20 /hr</option>
-//                         <option value="$20 - $30 /hr">$20 - $30 /hr</option>
-//                         <option value="$30 - $40 /hr">$30 - $40 /hr</option>
-//                         <option value="$40+ /hr">$40+ /hr</option>
-//                       </select>
+//                         placeholder="e.g. 10-20 LPA, Competitive, $40/hr"
+//                       />
 //                     </div>
 //                   </div>
 
@@ -957,6 +1053,7 @@
 //             <a href="mailto:getjoblink647@gmail.com" className="hover:text-slate-800 transition-colors">Contact</a>
 //             <a href="https://www.linkedin.com/in/getjob-link-b62169334/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">LinkedIn</a>
 //             <a href="https://x.com/intent/follow?screen_name=GetJobLink" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Twitter</a>
+//             <a href="https://www.instagram.com/codes_and_clouds/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Instagram</a>
 //           </div>
 //         </div>
 //       </footer>
@@ -964,6 +1061,15 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -989,7 +1095,7 @@ import logoImg from "./assets/logo.jpeg";
 
 import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, writeBatch, getDocs } from "firebase/firestore";
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1037,6 +1143,8 @@ export default function App() {
   const [selectedSalary, setSelectedSalary] = useState([]);
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+  const [adminDeleteDate, setAdminDeleteDate] = useState("");
 
   const [formData, setFormData] = useState({ 
     title: "", 
@@ -1185,6 +1293,46 @@ export default function App() {
       if (editingJobId === id) cancelEditing();
       triggerNotification("Job listing deleted from global network.");
     } catch (error) { triggerNotification("Error deleting post."); }
+  };
+
+  const deleteJobsBeforeSelectedDate = async () => {
+    if (!isAdmin) return;
+    if (!adminDeleteDate) {
+      triggerNotification("Please select a date first.");
+      return;
+    }
+
+    const targetDate = new Date(`${adminDeleteDate}T00:00:00`).getTime();
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "jobs"));
+      const batch = writeBatch(db);
+      let count = 0;
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        
+        const isBeforeTarget = 
+          (data.createdAt && data.createdAt < targetDate) || 
+          (data.date && data.date < adminDeleteDate);
+
+        if (isBeforeTarget) {
+          batch.delete(docSnap.ref);
+          count++;
+        }
+      });
+
+      if (count === 0) {
+        triggerNotification(`No job posts found created before ${adminDeleteDate}.`);
+        return;
+      }
+
+      await batch.commit();
+      triggerNotification(`Successfully deleted ${count} job post(s) created before ${adminDeleteDate}!`);
+    } catch (error) {
+      console.error("Error deleting old jobs:", error);
+      triggerNotification("Failed to delete older jobs.");
+    }
   };
 
   const handleCheckboxChange = (value, state, setState) => {
@@ -1870,6 +2018,29 @@ export default function App() {
                       <X className="w-4 h-4" />
                     </button>
                   )}
+                </div>
+
+                <div className="mb-5 pb-5 border-b border-slate-100 bg-red-50/50 p-3.5 rounded-xl border border-red-100">
+                  <label htmlFor="admin-delete-date" className="block text-xs font-bold text-red-900 mb-1.5">
+                    Bulk Delete Posts Prior to Date
+                  </label>
+                  <input
+                    id="admin-delete-date"
+                    type="date"
+                    value={adminDeleteDate}
+                    onChange={(e) => setAdminDeleteDate(e.target.value)}
+                    max={new Date().toISOString().split("T")[0]}
+                    className="w-full text-xs px-3 py-2 bg-white border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-700 mb-2.5"
+                  />
+                  <button
+                    type="button"
+                    onClick={deleteJobsBeforeSelectedDate}
+                    disabled={!adminDeleteDate}
+                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2 px-3 rounded-xl transition-all shadow-sm text-xs flex items-center justify-center space-x-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{adminDeleteDate ? `Delete Posts Before ${adminDeleteDate}` : "Select Date to Delete"}</span>
+                  </button>
                 </div>
 
                 <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
