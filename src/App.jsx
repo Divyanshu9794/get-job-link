@@ -13,7 +13,6 @@
 // import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 // import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
 
-// // Custom SVG Icons for social platforms
 // const LinkedinIcon = ({ className = "w-4 h-4" }) => (
 //   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 //     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -59,13 +58,11 @@
 //     isRemote: false 
 //   });
 
-//   // Generate random user count formatted as 1k+ to 10k
 //   useEffect(() => {
 //     const randomCount = (Math.random() * (10.0 - 1.0) + 1.0).toFixed(1);
 //     setWeeklyUsers(`${randomCount}k+`);
 //   }, []);
 
-//   // Track authentication state
 //   useEffect(() => {
 //     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
 //       if (user) {
@@ -79,7 +76,6 @@
 //     return () => unsubscribeAuth();
 //   }, []);
 
-//   // Fetch jobs
 //   useEffect(() => {
 //     const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
 //     const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
@@ -240,7 +236,6 @@
 //     return matchesSearch && matchesTab && matchesJobType && matchesExperience && matchesSalary && matchesDomain && matchesDate;
 //   });
 
-//   // Dynamic Metadata Construction based on Active State
 //   const pageTitle = activeTab === "remote" 
 //     ? "Remote Software & Tech Jobs | Direct Application Links | GetJobLink"
 //     : activeTab === "post-job"
@@ -249,7 +244,6 @@
 
 //   const pageDescription = "Discover top software engineering, design, and product management jobs with official direct application links. Skip recruiter black holes.";
 
-//   // Schema.org JobPosting Structured Data for Google Jobs Rich Snippets
 //   const jobSchemaList = matchingJobs.slice(0, 10).map((job) => ({
 //     "@context": "https://schema.org/",
 //     "@type": "JobPosting",
@@ -290,8 +284,6 @@
 
 //   return (
 //     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col justify-between">
-
-//       {/* SEO HEAD METADATA */}
 //       <Helmet>
 //         <html lang="en" />
 //         <title>{pageTitle}</title>
@@ -300,21 +292,18 @@
 //         <meta name="robots" content="index, follow" />
 //         <link rel="canonical" href="https://getjoblink.com" />
 
-//         {/* Open Graph / Facebook */}
 //         <meta property="og:type" content="website" />
 //         <meta property="og:title" content={pageTitle} />
 //         <meta property="og:description" content={pageDescription} />
 //         <meta property="og:image" content={logoImg} />
 //         <meta property="og:url" content="https://getjoblink.com" />
 
-//         {/* Twitter Cards */}
 //         <meta name="twitter:card" content="summary_large_image" />
 //         <meta name="twitter:site" content="@GetJobLink" />
 //         <meta name="twitter:title" content={pageTitle} />
 //         <meta name="twitter:description" content={pageDescription} />
 //         <meta name="twitter:image" content={logoImg} />
 
-//         {/* Structured Data / Google Search Schema */}
 //         <script type="application/ld+json">
 //           {JSON.stringify(jobSchemaList)}
 //         </script>
@@ -328,7 +317,6 @@
 //           </div>
 //         )}
 
-//         {/* HEADER SECTION WITH INTEGRATED SEARCH INPUT */}
 //         <header className="bg-white border-b border-slate-200 sticky top-0 z-40 backdrop-blur-md bg-white/90">
 //           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
 //             <div className="flex items-center space-x-2.5 select-none shrink-0">
@@ -338,7 +326,6 @@
 //               </span>
 //             </div>
 
-//             {/* Top Search Bar */}
 //             <div className="flex-1 max-w-2xl mx-2">
 //               <label htmlFor="search-input" className="sr-only">Search tech jobs and companies</label>
 //               <div className="relative">
@@ -376,7 +363,6 @@
 //           </div>
 //         </header>
 
-//         {/* STICKY SOCIAL MEDIA BANNER */}
 //         <div className="sticky top-[57px] z-30 max-w-7xl mx-auto px-4 sm:px-6 pt-3 pb-3">
 //           <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-950 text-white rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3 backdrop-blur-md">
 //             <div>
@@ -395,7 +381,7 @@
 //                 <span>LinkedIn</span>
 //               </a>
 //               <a 
-//                 href="https://x.com/GetJobLink" 
+//                 href="https://x.com/intent/follow?screen_name=GetJobLink" 
 //                 target="_blank" 
 //                 rel="noopener noreferrer" 
 //                 aria-label="Follow GetJobLink on Twitter"
@@ -410,7 +396,6 @@
 
 //         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
 
-//           {/* SPLIT HERO SECTION */}
 //           <section className="relative overflow-hidden bg-slate-950 text-white py-14 sm:py-16 px-6 sm:px-10 rounded-3xl border border-slate-800 shadow-2xl mb-10">
 //             <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
 //             <div className="absolute bottom-0 left-10 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -453,7 +438,6 @@
 //                 </div>
 //               </div>
 
-//               {/* USER COUNT ANALYTICS CARD */}
 //               <div className="lg:col-span-5">
 //                 <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-800 p-6 rounded-2xl shadow-xl relative overflow-hidden">
                   
@@ -515,7 +499,6 @@
 //             </div>
 //           </section>
 
-//           {/* TAB HEADER */}
 //           <div id="job-listings" className="flex items-center space-x-2 mb-6 border-b border-slate-200 pb-px">
 //             <button onClick={() => setActiveTab("all")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "all" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
 //               <Briefcase className="w-4 h-4" />
@@ -533,7 +516,6 @@
 
 //           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-//             {/* FILTERS SIDEBAR */}
 //             <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
 //               <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex items-start space-x-2.5">
 //                 <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
@@ -618,7 +600,6 @@
 //               </div>
 //             </aside>
 
-//             {/* MAIN CONTENT AREA */}
 //             <section className={`${isAdmin ? "lg:col-span-5" : "lg:col-span-9"} space-y-6`}>
 //               {activeTab === "post-job" ? (
 //                 <article className="flex flex-col items-center text-center py-12 px-4 bg-transparent max-w-4xl mx-auto">
@@ -736,7 +717,6 @@
 //                       ))}
 //                     </div>
 //                   ) : (
-//                     /* TABLE VIEW */
 //                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 //                       <div className="overflow-x-auto">
 //                         <table className="w-full text-left text-xs">
@@ -794,7 +774,6 @@
 //               )}
 //             </section>
 
-//             {/* ADMIN FORM SIDEBAR */}
 //             {isAdmin && (
 //               <aside className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-20">
 //                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
@@ -967,7 +946,6 @@
 //         </main>
 //       </div>
 
-//       {/* FOOTER */}
 //       <footer className="bg-white border-t border-slate-200 mt-16">
 //         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
 //           <div className="flex items-center space-x-2">
@@ -978,7 +956,7 @@
 //           <div className="flex items-center space-x-4">
 //             <a href="mailto:getjoblink647@gmail.com" className="hover:text-slate-800 transition-colors">Contact</a>
 //             <a href="https://www.linkedin.com/in/getjob-link-b62169334/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">LinkedIn</a>
-//             <a href="https://x.com/GetJobLink" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Twitter</a>
+//             <a href="https://x.com/intent/follow?screen_name=GetJobLink" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Twitter</a>
 //           </div>
 //         </div>
 //       </footer>
@@ -1000,20 +978,12 @@
 
 
 
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { 
   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
-  TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles
+  TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2
 } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
 
@@ -1032,6 +1002,20 @@ const LinkedinIcon = ({ className = "w-4 h-4" }) => (
 const TwitterIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
+
+const InstagramIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  </svg>
+);
+
+const WhatsappIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
   </svg>
 );
 
@@ -1061,68 +1045,11 @@ export default function App() {
     url: "",
     jobType: "Full Time",
     experience: "More than 0 year",
-    salary: "Competitive",
+    salary: "",
     domain: "Engineering",
     isRemote: false 
   });
 
-  // Load Adcash Anti-Adblock library from Render backend and run AutoTag
-  // useEffect(() => {
-  //   const adLibScript = document.createElement("script");
-  //   adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
-  //   adLibScript.async = true;
-
-  //   adLibScript.onload = () => {
-  //     if (window.aclib) {
-  //       window.aclib.runAutoTag({
-  //         zoneId: 'mgttqf1elu',
-  //       });
-  //     }
-  //   };
-
-  //   document.head.appendChild(adLibScript);
-
-  //   return () => {
-  //     if (document.head.contains(adLibScript)) {
-  //       document.head.removeChild(adLibScript);
-  //     }
-  //   };
-  // }, []);
-
-// Load Adcash Anti-Adblock library from Render backend and run all ad formats
-useEffect(() => {
-  const adLibScript = document.createElement("script");
-  adLibScript.src = "https://get-job-link.onrender.com/api/adcash-lib.js"; 
-  adLibScript.async = true;
-
-  adLibScript.onload = () => {
-    if (window.aclib) {
-      // 1. AutoTag Ad Format
-      window.aclib.runAutoTag({
-        zoneId: 'mgttqf1elu',
-      });
-
-      // 2. In-Page Push Ad Format (Zone: 11775618)
-      window.aclib.runInPagePush({
-        zoneId: '11775618',
-        maxAds: 2,
-      });
-
-      // 3. Pop-Under Ad Format (Zone: 11775646)
-      window.aclib.runPop({
-        zoneId: '11775646',
-      });
-    }
-  };
-
-  document.head.appendChild(adLibScript);
-
-  return () => {
-    if (document.head.contains(adLibScript)) {
-      document.head.removeChild(adLibScript);
-    }
-  };
-}, []);
   useEffect(() => {
     const randomCount = (Math.random() * (10.0 - 1.0) + 1.0).toFixed(1);
     setWeeklyUsers(`${randomCount}k+`);
@@ -1183,7 +1110,7 @@ useEffect(() => {
     setFormData({ 
       title: "", company: "", jd: "", url: "", 
       jobType: "Full Time", experience: "More than 0 year", 
-      salary: "Competitive", domain: "Engineering", isRemote: false 
+      salary: "", domain: "Engineering", isRemote: false 
     });
     setEditingJobId(null);
   };
@@ -1197,7 +1124,7 @@ useEffect(() => {
       url: job.url || "",
       jobType: job.jobType || "Full Time",
       experience: job.experience || "More than 0 year",
-      salary: job.salary || "Competitive",
+      salary: job.salary || "",
       domain: job.domain || "Engineering",
       isRemote: job.isRemote || false
     });
@@ -1222,7 +1149,7 @@ useEffect(() => {
           url: sanitizeJobUrl(formData.url),
           jobType: formData.jobType,
           experience: formData.experience,
-          salary: formData.salary,
+          salary: formData.salary || "Competitive",
           domain: formData.domain,
           isRemote: formData.isRemote,
           updatedAt: Date.now()
@@ -1236,7 +1163,7 @@ useEffect(() => {
           url: sanitizeJobUrl(formData.url),
           jobType: formData.jobType,
           experience: formData.experience,
-          salary: formData.salary,
+          salary: formData.salary || "Competitive",
           domain: formData.domain,
           isRemote: formData.isRemote,
           date: new Date().toISOString().split("T")[0],
@@ -1274,6 +1201,35 @@ useEffect(() => {
     setSelectedSalary([]);
     setSelectedDomain("");
     setSelectedDate("");
+  };
+
+  const shareToLinkedin = (job) => {
+    const text = `Job Opening: ${job.title} at ${job.company}\n\nJD: ${job.jd || ""}\n\nApply directly here: https://get-job-link.web.app/`;
+    const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`;
+    window.open(linkedinUrl, "_blank");
+  };
+
+  const shareToTwitter = (job) => {
+    const text = `🚀 Hiring Alert: ${job.title} at ${job.company}\n\nApply Link: https://get-job-link.web.app/\n\n#TechJobs #Hiring`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(twitterUrl, "_blank");
+  };
+
+  const shareToWhatsapp = (job) => {
+    const text = `*Job Opening:* ${job.title} at *${job.company}*\n\n*Description:* ${job.jd || "N/A"}\n\n*Apply Link:* https://get-job-link.web.app/`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const shareToInstagram = async (job) => {
+    const text = `Job Opening: ${job.title} at ${job.company}\n\nJD: ${job.jd || ""}\n\nApply Link: https://get-job-link.web.app/`;
+    try {
+      await navigator.clipboard.writeText(text);
+      triggerNotification("Job details copied! Paste it into your Instagram Post/Story.");
+    } catch {
+      triggerNotification("Opening Instagram...");
+    }
+    window.open("https://www.instagram.com/codes_and_clouds/", "_blank");
   };
 
   const matchingJobs = jobs.filter((job) => {
@@ -1355,13 +1311,13 @@ useEffect(() => {
         <meta name="description" content={pageDescription} />
         <meta name="keywords" content="tech jobs, software engineer jobs, direct hiring links, remote tech jobs, internship openings, SDE jobs" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://getjoblink.com" />
+        <link rel="canonical" href="https://get-job-link.web.app/" />
 
         <meta property="og:type" content="website" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:image" content={logoImg} />
-        <meta property="og:url" content="https://getjoblink.com" />
+        <meta property="og:url" content="https://get-job-link.web.app/" />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@GetJobLink" />
@@ -1446,7 +1402,7 @@ useEffect(() => {
                 <span>LinkedIn</span>
               </a>
               <a 
-                href="https://x.com/GetJobLink" 
+                href="https://x.com/intent/follow?screen_name=GetJobLink" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="Follow GetJobLink on Twitter"
@@ -1454,6 +1410,16 @@ useEffect(() => {
               >
                 <TwitterIcon className="w-3.5 h-3.5" />
                 <span>X (Twitter)</span>
+              </a>
+              <a 
+                href="https://www.instagram.com/codes_and_clouds/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Follow GetJobLink on Instagram"
+                className="inline-flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-90 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+              >
+                <InstagramIcon className="w-3.5 h-3.5" />
+                <span>Instagram</span>
               </a>
             </div>
           </div>
@@ -1762,21 +1728,57 @@ useEffect(() => {
                             </p>
                           </div>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-slate-100 mt-2 gap-3">
                             <div className="flex items-center space-x-1 text-slate-400 text-xs">
                               <Calendar className="w-3.5 h-3.5" />
                               <span>{job.date || "Recently"}</span>
                             </div>
 
-                            <a
-                              href={job.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
-                            >
-                              <span>Apply Directly</span>
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
+                            <div className="flex items-center flex-wrap gap-2">
+                              <div className="flex items-center space-x-1 border-r border-slate-200 pr-2">
+                                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-0.5">
+                                  <Share2 className="w-3 h-3" /> Share:
+                                </span>
+                                <button 
+                                  onClick={() => shareToLinkedin(job)} 
+                                  title="Share to LinkedIn as Post"
+                                  className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                                >
+                                  <LinkedinIcon className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => shareToTwitter(job)} 
+                                  title="Share to X (Twitter)"
+                                  className="p-1.5 text-slate-500 hover:text-black hover:bg-slate-100 rounded-lg transition-all"
+                                >
+                                  <TwitterIcon className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => shareToWhatsapp(job)} 
+                                  title="Share via WhatsApp"
+                                  className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                >
+                                  <WhatsappIcon className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => shareToInstagram(job)} 
+                                  title="Share to Instagram"
+                                  className="p-1.5 text-slate-500 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all"
+                                >
+                                  <InstagramIcon className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+
+                              <a
+                                href={job.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
+                              >
+                                <span>Apply Directly</span>
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
                           </div>
                         </article>
                       ))}
@@ -1793,6 +1795,7 @@ useEffect(() => {
                               <th scope="col" className="px-4 py-3">Experience</th>
                               <th scope="col" className="px-4 py-3">Salary</th>
                               <th scope="col" className="px-4 py-3">Date</th>
+                              <th scope="col" className="px-4 py-3">Share</th>
                               <th scope="col" className="px-4 py-3 text-right">Action</th>
                             </tr>
                           </thead>
@@ -1805,6 +1808,22 @@ useEffect(() => {
                                 <td className="px-4 py-3">{job.experience || "More than 0 year"}</td>
                                 <td className="px-4 py-3">{job.salary || "Competitive"}</td>
                                 <td className="px-4 py-3 text-slate-400">{job.date || "Recently"}</td>
+                                <td className="px-4 py-3">
+                                  <div className="flex items-center space-x-1">
+                                    <button onClick={() => shareToLinkedin(job)} title="Share on LinkedIn" className="p-1 text-slate-400 hover:text-blue-600">
+                                      <LinkedinIcon className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button onClick={() => shareToTwitter(job)} title="Share on Twitter" className="p-1 text-slate-400 hover:text-black">
+                                      <TwitterIcon className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button onClick={() => shareToWhatsapp(job)} title="Share on WhatsApp" className="p-1 text-slate-400 hover:text-emerald-600">
+                                      <WhatsappIcon className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button onClick={() => shareToInstagram(job)} title="Share on Instagram" className="p-1 text-slate-400 hover:text-pink-600">
+                                      <InstagramIcon className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
                                 <td className="px-4 py-3 text-right">
                                   <div className="flex items-center justify-end space-x-2">
                                     {isAdmin && (
@@ -1943,23 +1962,14 @@ useEffect(() => {
 
                     <div>
                       <label htmlFor="form-salary" className="block font-bold text-slate-700 mb-1">Salary</label>
-                      <select
+                      <input
                         id="form-salary"
+                        type="text"
                         value={formData.salary}
                         onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                         className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      >
-                        <option value="Competitive">Competitive</option>
-                        <option value="2-4 LPA">2-4 LPA</option>
-                        <option value="4-6 LPA">4-6 LPA</option>
-                        <option value="6-10 LPA">6-10 LPA</option>
-                        <option value="10-20 LPA">10-20 LPA</option>
-                        <option value="20-30 LPA">20-30 LPA</option>
-                        <option value="$10 - $20 /hr">$10 - $20 /hr</option>
-                        <option value="$20 - $30 /hr">$20 - $30 /hr</option>
-                        <option value="$30 - $40 /hr">$30 - $40 /hr</option>
-                        <option value="$40+ /hr">$40+ /hr</option>
-                      </select>
+                        placeholder="e.g. 10-20 LPA, Competitive, $40/hr"
+                      />
                     </div>
                   </div>
 
@@ -2021,7 +2031,8 @@ useEffect(() => {
           <div className="flex items-center space-x-4">
             <a href="mailto:getjoblink647@gmail.com" className="hover:text-slate-800 transition-colors">Contact</a>
             <a href="https://www.linkedin.com/in/getjob-link-b62169334/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">LinkedIn</a>
-            <a href="https://x.com/GetJobLink" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Twitter</a>
+            <a href="https://x.com/intent/follow?screen_name=GetJobLink" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Twitter</a>
+            <a href="https://www.instagram.com/codes_and_clouds/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-800 transition-colors">Instagram</a>
           </div>
         </div>
       </footer>
