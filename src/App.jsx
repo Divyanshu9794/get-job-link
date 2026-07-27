@@ -1,17 +1,22 @@
 
 
+
 // import React, { useState, useEffect } from "react";
 // import { Helmet } from "react-helmet-async";
 // import { 
 //   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
 //   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
-//   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2
+//   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2,
+//   BookOpen, Video, Play, Bell, Sparkle
 // } from "lucide-react";
 // import logoImg from "./assets/logo.jpeg";
 
 // import { auth, googleProvider, db } from "./firebase";
 // import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-// import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, writeBatch, getDocs } from "firebase/firestore";
+// import { 
+//   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, 
+//   updateDoc, getDocs 
+// } from "firebase/firestore";
 
 // const LinkedinIcon = ({ className = "w-4 h-4" }) => (
 //   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -45,6 +50,7 @@
 //   const ADMIN_EMAIL = "sdivyanshu352@gmail.com"; 
 
 //   const [jobs, setJobs] = useState([]);
+//   const [learningReels, setLearningReels] = useState([]);
 //   const [searchTerm, setSearchTerm] = useState("");
 //   const [currentUser, setCurrentUser] = useState(null);
 //   const [isAdmin, setIsAdmin] = useState(false);
@@ -52,6 +58,7 @@
 //   const [notification, setNotification] = useState("");
 //   const [editingJobId, setEditingJobId] = useState(null);
 //   const [weeklyUsers, setWeeklyUsers] = useState("6.1k+");
+//   const [showLearningBanner, setShowLearningBanner] = useState(false);
   
 //   const [activeTab, setActiveTab] = useState("all"); 
 //   const [selectedJobType, setSelectedJobType] = useState(""); 
@@ -59,8 +66,6 @@
 //   const [selectedSalary, setSelectedSalary] = useState([]);
 //   const [selectedDomain, setSelectedDomain] = useState("");
 //   const [selectedDate, setSelectedDate] = useState("");
-
-//   const [adminDeleteDate, setAdminDeleteDate] = useState("");
 
 //   const [formData, setFormData] = useState({ 
 //     title: "", 
@@ -73,6 +78,33 @@
 //     domain: "Engineering",
 //     isRemote: false 
 //   });
+
+//   const [reelFormData, setReelFormData] = useState({
+//     title: "",
+//     description: "",
+//     reelUrl: "",
+//     category: "Git & GitHub"
+//   });
+
+//   // 1. Check First-Time Visit Popup Banner
+//   useEffect(() => {
+//     const bannerDismissed = localStorage.getItem("learning_banner_dismissed");
+//     if (!bannerDismissed) {
+//       setShowLearningBanner(true);
+//     }
+//   }, []);
+
+//   const closeLearningBanner = () => {
+//     localStorage.setItem("learning_banner_dismissed", "true");
+//     setShowLearningBanner(false);
+//   };
+
+//   const handleBannerClick = () => {
+//     closeLearningBanner();
+//     setActiveTab("learning");
+//     const element = document.getElementById("job-listings");
+//     if (element) element.scrollIntoView({ behavior: "smooth" });
+//   };
 
 //   useEffect(() => {
 //     const randomCount = (Math.random() * (10.0 - 1.0) + 1.0).toFixed(1);
@@ -92,6 +124,7 @@
 //     return () => unsubscribeAuth();
 //   }, []);
 
+//   // 2. Real-time Firebase Job Listener
 //   useEffect(() => {
 //     const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
 //     const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
@@ -102,6 +135,42 @@
 //       setJobs(jobList);
 //     });
 //     return () => unsubscribeSnapshot();
+//   }, []);
+
+//   // 3. Real-time Firebase Learning Section Listener & Initial DB Seed
+//   useEffect(() => {
+//     const reelsRef = collection(db, "learning_reels");
+
+//     const initializeAndListen = async () => {
+//       // Seed default reel in DB if collection is empty
+//       const snapshot = await getDocs(reelsRef);
+//       if (snapshot.empty) {
+//         await addDoc(reelsRef, {
+//           title: "Day 2 of GitHub in 10 Days",
+//           description: "Explaining the foundational difference between Git vs GitHub in simple and clear language.",
+//           reelUrl: "https://www.instagram.com/reel/C8_example_link/",
+//           category: "Git & GitHub",
+//           date: new Date().toISOString().split("T")[0],
+//           createdAt: Date.now()
+//         });
+//       }
+
+//       const q = query(reelsRef, orderBy("createdAt", "desc"));
+//       return onSnapshot(q, (snaps) => {
+//         const list = snaps.docs.map((doc) => ({
+//           id: doc.id,
+//           ...doc.data()
+//         }));
+//         setLearningReels(list);
+//       });
+//     };
+
+//     let unsubscribe = () => {};
+//     initializeAndListen().then((unsub) => {
+//       if (unsub) unsubscribe = unsub;
+//     });
+
+//     return () => unsubscribe();
 //   }, []);
 
 //   const triggerNotification = (message) => {
@@ -202,6 +271,27 @@
 //     }
 //   };
 
+//   const handleReelSubmit = async (e) => {
+//     e.preventDefault();
+//     if (!isAdmin) return;
+//     if (!reelFormData.title || !reelFormData.reelUrl) return;
+
+//     try {
+//       await addDoc(collection(db, "learning_reels"), {
+//         title: reelFormData.title,
+//         description: reelFormData.description || "",
+//         reelUrl: reelFormData.reelUrl,
+//         category: reelFormData.category || "General Tech",
+//         date: new Date().toISOString().split("T")[0],
+//         createdAt: Date.now()
+//       });
+//       setReelFormData({ title: "", description: "", reelUrl: "", category: "Git & GitHub" });
+//       triggerNotification("Learning Reel successfully added to database!");
+//     } catch (error) {
+//       triggerNotification("Failed to add learning reel.");
+//     }
+//   };
+
 //   const handleRemoveJob = async (id) => {
 //     if (!isAdmin) return;
 //     try {
@@ -211,44 +301,12 @@
 //     } catch (error) { triggerNotification("Error deleting post."); }
 //   };
 
-//   const deleteJobsBeforeSelectedDate = async () => {
+//   const handleRemoveReel = async (id) => {
 //     if (!isAdmin) return;
-//     if (!adminDeleteDate) {
-//       triggerNotification("Please select a date first.");
-//       return;
-//     }
-
-//     const targetDate = new Date(`${adminDeleteDate}T00:00:00`).getTime();
-
 //     try {
-//       const querySnapshot = await getDocs(collection(db, "jobs"));
-//       const batch = writeBatch(db);
-//       let count = 0;
-
-//       querySnapshot.forEach((docSnap) => {
-//         const data = docSnap.data();
-        
-//         const isBeforeTarget = 
-//           (data.createdAt && data.createdAt < targetDate) || 
-//           (data.date && data.date < adminDeleteDate);
-
-//         if (isBeforeTarget) {
-//           batch.delete(docSnap.ref);
-//           count++;
-//         }
-//       });
-
-//       if (count === 0) {
-//         triggerNotification(`No job posts found created before ${adminDeleteDate}.`);
-//         return;
-//       }
-
-//       await batch.commit();
-//       triggerNotification(`Successfully deleted ${count} job post(s) created before ${adminDeleteDate}!`);
-//     } catch (error) {
-//       console.error("Error deleting old jobs:", error);
-//       triggerNotification("Failed to delete older jobs.");
-//     }
+//       await deleteDoc(doc(db, "learning_reels", id));
+//       triggerNotification("Reel removed from database.");
+//     } catch (error) { triggerNotification("Error deleting reel."); }
 //   };
 
 //   const handleCheckboxChange = (value, state, setState) => {
@@ -321,7 +379,9 @@
 //     return matchesSearch && matchesTab && matchesJobType && matchesExperience && matchesSalary && matchesDomain && matchesDate;
 //   });
 
-//   const pageTitle = activeTab === "remote" 
+//   const pageTitle = activeTab === "learning"
+//     ? "Learning Section & Tech Reels | GetJobLink"
+//     : activeTab === "remote" 
 //     ? "Remote Software & Tech Jobs | Direct Application Links | GetJobLink"
 //     : activeTab === "post-job"
 //     ? "Post a Job | Reach Active Engineering Candidates | GetJobLink"
@@ -395,6 +455,33 @@
 //       </Helmet>
 
 //       <div>
+//         {/* FIRST VISIT POPUP / BANNER FOR LEARNING SECTION */}
+//         {showLearningBanner && (
+//           <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-50 transition-all border-b border-white/20">
+//             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+//               <div className="flex items-center space-x-2 text-xs sm:text-sm font-semibold">
+//                 <Sparkle className="w-5 h-5 text-yellow-300 animate-spin" />
+//                 <span><strong>New Update!</strong> A dedicated <strong>Learning Section</strong> has been added with byte-sized tech reels. Check it out once!</span>
+//               </div>
+//               <div className="flex items-center space-x-2 shrink-0">
+//                 <button
+//                   onClick={handleBannerClick}
+//                   className="bg-white text-purple-700 hover:bg-slate-100 font-bold text-xs px-3.5 py-1.5 rounded-lg shadow transition-all"
+//                 >
+//                   Check it out
+//                 </button>
+//                 <button
+//                   onClick={closeLearningBanner}
+//                   className="p-1 text-white/80 hover:text-white rounded-lg transition-colors"
+//                   aria-label="Dismiss banner"
+//                 >
+//                   <X className="w-4 h-4" />
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
 //         {notification && (
 //           <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 border border-slate-800">
 //             <CheckCircle className="w-5 h-5 text-emerald-400" />
@@ -594,7 +681,7 @@
 //             </div>
 //           </section>
 
-//           <div id="job-listings" className="flex items-center space-x-2 mb-6 border-b border-slate-200 pb-px">
+//           <div id="job-listings" className="flex items-center space-x-2 mb-6 border-b border-slate-200 pb-px flex-wrap">
 //             <button onClick={() => setActiveTab("all")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "all" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
 //               <Briefcase className="w-4 h-4" />
 //               <span>All Openings</span>
@@ -602,6 +689,11 @@
 //             <button onClick={() => setActiveTab("remote")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "remote" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
 //               <Globe className="w-4 h-4" />
 //               <span>Remote Jobs</span>
+//             </button>
+//             <button onClick={() => setActiveTab("learning")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all relative ${activeTab === "learning" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
+//               <BookOpen className="w-4 h-4" />
+//               <span>Learning Section</span>
+//               <span className="ml-1 bg-pink-100 text-pink-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-pink-200">New</span>
 //             </button>
 //             <button onClick={() => setActiveTab("post-job")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "post-job" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"}`}>
 //               <PlusCircle className="w-4 h-4" />
@@ -611,92 +703,221 @@
 
 //           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-//             <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-//               <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex items-start space-x-2.5">
-//                 <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-//                 <p className="text-xs text-slate-600 leading-relaxed">
-//                   <span className="font-bold text-slate-800">Important Note:</span> We are a third-party organization aggregating official job links directly to help candidates secure opportunities.
-//                 </p>
-//               </div>
-
-//               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-//                 <h2 className="text-base font-bold text-slate-900">Filters</h2>
-//                 <button onClick={clearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Clear All</button>
-//               </div>
-
-//               <div>
-//                 <label htmlFor="filter-date" className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Date Added</label>
-//                 <input 
-//                   id="filter-date"
-//                   type="date" 
-//                   value={selectedDate} 
-//                   onChange={(e) => setSelectedDate(e.target.value)} 
-//                   max={new Date().toISOString().split("T")[0]}
-//                   className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600"
-//                 />
-//               </div>
-
-//               <div>
-//                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Job Type</h3>
-//                 <div className="flex flex-wrap gap-2">
-//                   {["Full Time", "Internship"].map((type) => (
-//                     <button key={type} onClick={() => setSelectedJobType(selectedJobType === type ? "" : type)} className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedJobType === type ? "bg-blue-50 border-blue-600 text-blue-600 font-semibold" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
-//                       {type}
-//                     </button>
-//                   ))}
+//             {activeTab !== "learning" && activeTab !== "post-job" && (
+//               <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+//                 <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex items-start space-x-2.5">
+//                   <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+//                   <p className="text-xs text-slate-600 leading-relaxed">
+//                     <span className="font-bold text-slate-800">Important Note:</span> We are a third-party organization aggregating official job links directly to help candidates secure opportunities.
+//                   </p>
 //                 </div>
-//               </div>
 
-//               <div>
-//                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Experience</h3>
-//                 <div className="space-y-2 text-sm text-slate-600">
-//                   {["More than 0 year", "More than 1 year", "More than 2 years", "More than 3 years", "More than 4 years"].map((exp) => (
-//                     <label key={exp} className="flex items-center space-x-2.5 cursor-pointer">
-//                       <input type="checkbox" checked={selectedExperience.includes(exp)} onChange={() => handleCheckboxChange(exp, selectedExperience, setSelectedExperience)} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
-//                       <span>{exp}</span>
-//                     </label>
-//                   ))}
+//                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+//                   <h2 className="text-base font-bold text-slate-900">Filters</h2>
+//                   <button onClick={clearAllFilters} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Clear All</button>
 //                 </div>
-//               </div>
 
-//               <div>
-//                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Salary</h3>
-//                 <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
-//                   {[
-//                     "Competitive", 
-//                     "2-4 LPA", 
-//                     "4-6 LPA", 
-//                     "6-10 LPA", 
-//                     "10-20 LPA", 
-//                     "20-30 LPA", 
-//                     "$10 - $20 /hr",
-//                     "$20 - $30 /hr",
-//                     "$30 - $40 /hr",
-//                     "$40+ /hr"
-//                   ].map((sal) => (
-//                     <label key={sal} className="flex items-center space-x-2.5 cursor-pointer">
-//                       <input type="checkbox" checked={selectedSalary.includes(sal)} onChange={() => handleCheckboxChange(sal, selectedSalary, setSelectedSalary)} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
-//                       <span>{sal}</span>
-//                     </label>
-//                   ))}
+//                 <div>
+//                   <label htmlFor="filter-date" className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Date Added</label>
+//                   <input 
+//                     id="filter-date"
+//                     type="date" 
+//                     value={selectedDate} 
+//                     onChange={(e) => setSelectedDate(e.target.value)} 
+//                     max={new Date().toISOString().split("T")[0]}
+//                     className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-600"
+//                   />
 //                 </div>
-//               </div>
 
-//               <div>
-//                 <label htmlFor="filter-domain" className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Domain</label>
-//                 <select id="filter-domain" value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20">
-//                   <option value="">Select domain</option>
-//                   <option value="Engineering">Engineering / Tech</option>
-//                   <option value="Design">Product Design</option>
-//                   <option value="Marketing">Marketing</option>
-//                   <option value="Management">Product Management</option>
-//                   <option value="Data Entry">Operations / Data Entry</option>
-//                 </select>
-//               </div>
-//             </aside>
+//                 <div>
+//                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Job Type</h3>
+//                   <div className="flex flex-wrap gap-2">
+//                     {["Full Time", "Internship"].map((type) => (
+//                       <button key={type} onClick={() => setSelectedJobType(selectedJobType === type ? "" : type)} className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedJobType === type ? "bg-blue-50 border-blue-600 text-blue-600 font-semibold" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"}`}>
+//                         {type}
+//                       </button>
+//                     ))}
+//                   </div>
+//                 </div>
 
-//             <section className={`${isAdmin ? "lg:col-span-5" : "lg:col-span-9"} space-y-6`}>
-//               {activeTab === "post-job" ? (
+//                 <div>
+//                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Experience</h3>
+//                   <div className="space-y-2 text-sm text-slate-600">
+//                     {["More than 0 year", "More than 1 year", "More than 2 years", "More than 3 years", "More than 4 years"].map((exp) => (
+//                       <label key={exp} className="flex items-center space-x-2.5 cursor-pointer">
+//                         <input type="checkbox" checked={selectedExperience.includes(exp)} onChange={() => handleCheckboxChange(exp, selectedExperience, setSelectedExperience)} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
+//                         <span>{exp}</span>
+//                       </label>
+//                     ))}
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Salary</h3>
+//                   <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
+//                     {[
+//                       "Competitive", 
+//                       "2-4 LPA", 
+//                       "4-6 LPA", 
+//                       "6-10 LPA", 
+//                       "10-20 LPA", 
+//                       "20-30 LPA", 
+//                       "$10 - $20 /hr",
+//                       "$20 - $30 /hr",
+//                       "$30 - $40 /hr",
+//                       "$40+ /hr"
+//                     ].map((sal) => (
+//                       <label key={sal} className="flex items-center space-x-2.5 cursor-pointer">
+//                         <input type="checkbox" checked={selectedSalary.includes(sal)} onChange={() => handleCheckboxChange(sal, selectedSalary, setSelectedSalary)} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
+//                         <span>{sal}</span>
+//                       </label>
+//                     ))}
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <label htmlFor="filter-domain" className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 block">Domain</label>
+//                   <select id="filter-domain" value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+//                     <option value="">Select domain</option>
+//                     <option value="Engineering">Engineering / Tech</option>
+//                     <option value="Design">Product Design</option>
+//                     <option value="Marketing">Marketing</option>
+//                     <option value="Management">Product Management</option>
+//                     <option value="Data Entry">Operations / Data Entry</option>
+//                   </select>
+//                 </div>
+//               </aside>
+//             )}
+
+//             <section className={`${activeTab === "learning" || activeTab === "post-job" ? "lg:col-span-12" : isAdmin ? "lg:col-span-5" : "lg:col-span-9"} space-y-6`}>
+//               {activeTab === "learning" ? (
+//                 <div className="space-y-6">
+//                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+//                     <div>
+//                       <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
+//                         <Video className="w-5 h-5 text-pink-600" />
+//                         <span>Learning Section & Tech Reels</span>
+//                       </h2>
+//                       <p className="text-slate-500 text-xs sm:text-sm mt-1">
+//                         Bite-sized tech concepts, GitHub tutorials, and engineering tips saved directly in the database.
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   {/* ADMIN FORM TO ADD REELS DIRECTLY TO DB */}
+//                   {isAdmin && (
+//                     <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-md">
+//                       <h3 className="text-sm font-bold flex items-center space-x-2 mb-4">
+//                         <PlusCircle className="w-4 h-4 text-pink-400" />
+//                         <span>Admin: Add Learning Reel to Database</span>
+//                       </h3>
+//                       <form onSubmit={handleReelSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+//                         <div>
+//                           <label className="block text-slate-300 font-bold mb-1">Title *</label>
+//                           <input
+//                             type="text"
+//                             required
+//                             placeholder="e.g. Day 2 of GitHub in 10 Days"
+//                             value={reelFormData.title}
+//                             onChange={(e) => setReelFormData({ ...reelFormData, title: e.target.value })}
+//                             className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
+//                           />
+//                         </div>
+//                         <div>
+//                           <label className="block text-slate-300 font-bold mb-1">Reel / Video URL *</label>
+//                           <input
+//                             type="url"
+//                             required
+//                             placeholder="https://www.instagram.com/reel/..."
+//                             value={reelFormData.reelUrl}
+//                             onChange={(e) => setReelFormData({ ...reelFormData, reelUrl: e.target.value })}
+//                             className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
+//                           />
+//                         </div>
+//                         <div>
+//                           <label className="block text-slate-300 font-bold mb-1">Category</label>
+//                           <input
+//                             type="text"
+//                             placeholder="e.g. Git & GitHub"
+//                             value={reelFormData.category}
+//                             onChange={(e) => setReelFormData({ ...reelFormData, category: e.target.value })}
+//                             className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
+//                           />
+//                         </div>
+//                         <div>
+//                           <label className="block text-slate-300 font-bold mb-1">Description</label>
+//                           <input
+//                             type="text"
+//                             placeholder="Explaining Git vs GitHub in simple language..."
+//                             value={reelFormData.description}
+//                             onChange={(e) => setReelFormData({ ...reelFormData, description: e.target.value })}
+//                             className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
+//                           />
+//                         </div>
+//                         <div className="sm:col-span-2 pt-2">
+//                           <button
+//                             type="submit"
+//                             className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-sm text-xs"
+//                           >
+//                             Save Reel to Database
+//                           </button>
+//                         </div>
+//                       </form>
+//                     </div>
+//                   )}
+
+//                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//                     {learningReels.map((reel) => (
+//                       <article key={reel.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow relative">
+//                         <div className="p-5">
+//                           <div className="flex items-center justify-between mb-3">
+//                             <span className="px-2.5 py-1 bg-pink-50 text-pink-700 text-[11px] font-bold rounded-lg border border-pink-100 flex items-center space-x-1">
+//                               <InstagramIcon className="w-3 h-3" />
+//                               <span>{reel.category}</span>
+//                             </span>
+//                             <div className="flex items-center space-x-2">
+//                               <span className="text-slate-400 text-xs flex items-center space-x-1">
+//                                 <Calendar className="w-3 h-3" />
+//                                 <span>{reel.date}</span>
+//                               </span>
+//                               {isAdmin && (
+//                                 <button
+//                                   aria-label="Delete reel"
+//                                   onClick={() => handleRemoveReel(reel.id)}
+//                                   className="text-slate-400 hover:text-red-600 transition-colors"
+//                                 >
+//                                   <Trash2 className="w-4 h-4" />
+//                                 </button>
+//                               )}
+//                             </div>
+//                           </div>
+
+//                           <h3 className="text-base font-bold text-slate-900 tracking-tight mb-2">
+//                             {reel.title}
+//                           </h3>
+
+//                           <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+//                             {reel.description}
+//                           </p>
+//                         </div>
+
+//                         <div className="p-5 pt-0 mt-auto">
+//                           <a
+//                             href={reel.reelUrl}
+//                             target="_blank"
+//                             rel="noopener noreferrer"
+//                             className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-90 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-sm"
+//                           >
+//                             <Play className="w-3.5 h-3.5 fill-current" />
+//                             <span>Watch Reel</span>
+//                             <ExternalLink className="w-3 h-3 ml-1" />
+//                           </a>
+//                         </div>
+//                       </article>
+//                     ))}
+//                   </div>
+//                 </div>
+//               ) : activeTab === "post-job" ? (
 //                 <article className="flex flex-col items-center text-center py-12 px-4 bg-transparent max-w-4xl mx-auto">
 //                   <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
 //                     Post a Job Opening on GetJobLink
@@ -922,7 +1143,7 @@
 //               )}
 //             </section>
 
-//             {isAdmin && (
+//             {isAdmin && activeTab !== "learning" && activeTab !== "post-job" && (
 //               <aside className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-20">
 //                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
 //                   <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -934,29 +1155,6 @@
 //                       <X className="w-4 h-4" />
 //                     </button>
 //                   )}
-//                 </div>
-
-//                 <div className="mb-5 pb-5 border-b border-slate-100 bg-red-50/50 p-3.5 rounded-xl border border-red-100">
-//                   <label htmlFor="admin-delete-date" className="block text-xs font-bold text-red-900 mb-1.5">
-//                     Bulk Delete Posts Prior to Date
-//                   </label>
-//                   <input
-//                     id="admin-delete-date"
-//                     type="date"
-//                     value={adminDeleteDate}
-//                     onChange={(e) => setAdminDeleteDate(e.target.value)}
-//                     max={new Date().toISOString().split("T")[0]}
-//                     className="w-full text-xs px-3 py-2 bg-white border border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-700 mb-2.5"
-//                   />
-//                   <button
-//                     type="button"
-//                     onClick={deleteJobsBeforeSelectedDate}
-//                     disabled={!adminDeleteDate}
-//                     className="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2 px-3 rounded-xl transition-all shadow-sm text-xs flex items-center justify-center space-x-1.5"
-//                   >
-//                     <Trash2 className="w-3.5 h-3.5" />
-//                     <span>{adminDeleteDate ? `Delete Posts Before ${adminDeleteDate}` : "Select Date to Delete"}</span>
-//                   </button>
 //                 </div>
 
 //                 <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
@@ -1144,22 +1342,13 @@
 
 
 
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { 
   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2,
-  BookOpen, Video, Play, Bell, Sparkle
+  BookOpen, Video, Play, Sparkle, Eye
 } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
 
@@ -1167,7 +1356,7 @@ import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { 
   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, 
-  updateDoc, getDocs 
+  updateDoc, getDocs, increment 
 } from "firebase/firestore";
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
@@ -1238,7 +1427,6 @@ export default function App() {
     category: "Git & GitHub"
   });
 
-  // 1. Check First-Time Visit Popup Banner
   useEffect(() => {
     const bannerDismissed = localStorage.getItem("learning_banner_dismissed");
     if (!bannerDismissed) {
@@ -1276,7 +1464,6 @@ export default function App() {
     return () => unsubscribeAuth();
   }, []);
 
-  // 2. Real-time Firebase Job Listener
   useEffect(() => {
     const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"));
     const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
@@ -1289,12 +1476,10 @@ export default function App() {
     return () => unsubscribeSnapshot();
   }, []);
 
-  // 3. Real-time Firebase Learning Section Listener & Initial DB Seed
   useEffect(() => {
     const reelsRef = collection(db, "learning_reels");
 
     const initializeAndListen = async () => {
-      // Seed default reel in DB if collection is empty
       const snapshot = await getDocs(reelsRef);
       if (snapshot.empty) {
         await addDoc(reelsRef, {
@@ -1302,6 +1487,7 @@ export default function App() {
           description: "Explaining the foundational difference between Git vs GitHub in simple and clear language.",
           reelUrl: "https://www.instagram.com/reel/C8_example_link/",
           category: "Git & GitHub",
+          clicks: 0,
           date: new Date().toISOString().split("T")[0],
           createdAt: Date.now()
         });
@@ -1311,6 +1497,7 @@ export default function App() {
       return onSnapshot(q, (snaps) => {
         const list = snaps.docs.map((doc) => ({
           id: doc.id,
+          clicks: 0,
           ...doc.data()
         }));
         setLearningReels(list);
@@ -1324,6 +1511,17 @@ export default function App() {
 
     return () => unsubscribe();
   }, []);
+
+  const handleReelClick = async (reelId) => {
+    try {
+      const reelRef = doc(db, "learning_reels", reelId);
+      await updateDoc(reelRef, {
+        clicks: increment(1)
+      });
+    } catch (error) {
+      console.error("Error updating click count:", error);
+    }
+  };
 
   const triggerNotification = (message) => {
     setNotification(message);
@@ -1434,6 +1632,7 @@ export default function App() {
         description: reelFormData.description || "",
         reelUrl: reelFormData.reelUrl,
         category: reelFormData.category || "General Tech",
+        clicks: 0,
         date: new Date().toISOString().split("T")[0],
         createdAt: Date.now()
       });
@@ -1607,7 +1806,6 @@ export default function App() {
       </Helmet>
 
       <div>
-        {/* FIRST VISIT POPUP / BANNER FOR LEARNING SECTION */}
         {showLearningBanner && (
           <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-50 transition-all border-b border-white/20">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
@@ -1956,7 +2154,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* ADMIN FORM TO ADD REELS DIRECTLY TO DB */}
                   {isAdmin && (
                     <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-md">
                       <h3 className="text-sm font-bold flex items-center space-x-2 mb-4">
@@ -2053,11 +2250,25 @@ export default function App() {
                           </p>
                         </div>
 
-                        <div className="p-5 pt-0 mt-auto">
+                        <div className="p-5 pt-0 mt-auto space-y-3">
+                          {/* CLICK COUNTER DISPLAY - SHOWN ONLY TO ADMINS */}
+                          {isAdmin && (
+                            <div className="flex items-center justify-between text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                              <span className="flex items-center space-x-1 font-medium text-slate-600">
+                                <Eye className="w-3.5 h-3.5 text-pink-600" />
+                                <span>Total Views/Clicks:</span>
+                              </span>
+                              <span className="font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                                {reel.clicks || 0}
+                              </span>
+                            </div>
+                          )}
+
                           <a
                             href={reel.reelUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => handleReelClick(reel.id)}
                             className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-90 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-sm"
                           >
                             <Play className="w-3.5 h-3.5 fill-current" />
