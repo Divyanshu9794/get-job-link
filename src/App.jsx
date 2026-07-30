@@ -1,4 +1,8 @@
 
+
+
+
+
 // import React, { useState, useEffect } from "react";
 // import { Helmet } from "react-helmet-async";
 // import { 
@@ -57,7 +61,8 @@
 //   const [editingJobId, setEditingJobId] = useState(null);
 //   const [weeklyUsers, setWeeklyUsers] = useState("6.1k+");
 //   const [showLearningBanner, setShowLearningBanner] = useState(false);
-  
+//   const [showInstaModal, setShowInstaModal] = useState(false);
+
 //   const [activeTab, setActiveTab] = useState("all"); 
 //   const [selectedJobType, setSelectedJobType] = useState(""); 
 //   const [selectedExperience, setSelectedExperience] = useState([]);
@@ -83,6 +88,29 @@
 //     reelUrl: "",
 //     category: "Git & GitHub"
 //   });
+
+//   // Check first-time visitor status for Instagram follow prompt
+//   useEffect(() => {
+//     const hasFollowed = localStorage.getItem("insta_followed");
+//     if (!hasFollowed) {
+//       const timer = setTimeout(() => {
+//         setShowInstaModal(true);
+//       }, 1000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, []);
+
+//   const handleFollowInstaClick = () => {
+//     localStorage.setItem("insta_followed", "true");
+//     window.open("https://www.instagram.com/codes_and_clouds/", "_blank");
+//     setShowInstaModal(false);
+//     triggerNotification("Thank you for following us on Instagram!");
+//   };
+
+//   const handleDismissInstaModal = () => {
+//     localStorage.setItem("insta_followed", "true");
+//     setShowInstaModal(false);
+//   };
 
 //   useEffect(() => {
 //     const bannerDismissed = localStorage.getItem("learning_banner_dismissed");
@@ -463,6 +491,50 @@
 //       </Helmet>
 
 //       <div>
+//         {/* Instagram Follow First-Time Modal */}
+//         {showInstaModal && (
+//           <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+//             <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200">
+//               <button
+//                 onClick={handleDismissInstaModal}
+//                 className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100"
+//                 aria-label="Close"
+//               >
+//                 <X className="w-5 h-5" />
+//               </button>
+
+//               <div className="w-16 h-16 bg-gradient-to-tr from-purple-600 via-pink-600 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-pink-500/20">
+//                 <InstagramIcon className="w-8 h-8" />
+//               </div>
+
+//               <h2 className="text-xl font-extrabold text-slate-900 tracking-tight mb-2">
+//                 Join Our Tech Community
+//               </h2>
+//               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
+//                 Follow <strong className="text-slate-900">@codes_and_clouds</strong> on Instagram to stay updated with daily direct hiring updates and learning reels!
+//               </p>
+
+//               <div className="space-y-3">
+//                 <button
+//                   onClick={handleFollowInstaClick}
+//                   className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-95 text-white font-bold text-sm py-3 px-5 rounded-xl transition-all shadow-md"
+//                 >
+//                   <InstagramIcon className="w-4 h-4" />
+//                   <span>Follow on Instagram</span>
+//                   <ExternalLink className="w-3.5 h-3.5 ml-1" />
+//                 </button>
+
+//                 <button
+//                   onClick={handleDismissInstaModal}
+//                   className="text-slate-400 hover:text-slate-600 text-xs font-semibold block w-full py-1"
+//                 >
+//                   Skip for now
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
 //         {showLearningBanner && (
 //           <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-50 transition-all border-b border-white/20">
 //             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
@@ -907,20 +979,13 @@
 //                           </p>
 //                         </div>
 
-//                         <div className="p-5 pt-0 mt-auto space-y-3">
-//                           {/* CLICK COUNTER DISPLAY - SHOWN ONLY TO ADMINS */}
-//                           {isAdmin && (
-//                             <div className="flex items-center justify-between text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-//                               <span className="flex items-center space-x-1 font-medium text-slate-600">
-//                                 <Eye className="w-3.5 h-3.5 text-pink-600" />
-//                                 <span>Total Views/Clicks:</span>
-//                               </span>
-//                               <span className="font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
-//                                 {reel.clicks || 0}
-//                               </span>
-//                             </div>
-//                           )}
-
+//                         <div className="p-5 pt-0 mt-auto flex flex-col gap-2">
+//                           <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+//                             <span className="flex items-center space-x-1 font-medium">
+//                               <Eye className="w-3.5 h-3.5 text-slate-400" />
+//                               <span>{reel.clicks || 0} views</span>
+//                             </span>
+//                           </div>
 //                           <a
 //                             href={reel.reelUrl}
 //                             target="_blank"
@@ -1366,16 +1431,13 @@
 
 
 
-
-
-
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { 
   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2,
-  BookOpen, Video, Play, Sparkle, Eye
+  BookOpen, Video, Play, Sparkle, Eye, Users
 } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
 
@@ -1383,7 +1445,7 @@ import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { 
   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, 
-  updateDoc, getDocs, increment 
+  updateDoc, getDocs, setDoc, increment 
 } from "firebase/firestore";
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
@@ -1428,6 +1490,7 @@ export default function App() {
   const [weeklyUsers, setWeeklyUsers] = useState("6.1k+");
   const [showLearningBanner, setShowLearningBanner] = useState(false);
   const [showInstaModal, setShowInstaModal] = useState(false);
+  const [instaPopupClicks, setInstaPopupClicks] = useState(0);
 
   const [activeTab, setActiveTab] = useState("all"); 
   const [selectedJobType, setSelectedJobType] = useState(""); 
@@ -1455,27 +1518,40 @@ export default function App() {
     category: "Git & GitHub"
   });
 
-  // Check first-time visitor status for Instagram follow prompt
   useEffect(() => {
-    const hasFollowed = localStorage.getItem("insta_followed");
-    if (!hasFollowed) {
-      const timer = setTimeout(() => {
-        setShowInstaModal(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
+    const statsDocRef = doc(db, "analytics", "insta_popup");
+    const unsubscribe = onSnapshot(statsDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setInstaPopupClicks(docSnap.data().clicks || 0);
+      } else {
+        setDoc(statsDocRef, { clicks: 0 }, { merge: true });
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleFollowInstaClick = () => {
-    localStorage.setItem("insta_followed", "true");
-    window.open("https://www.instagram.com/codes_and_clouds/", "_blank");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowInstaModal(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleFollowInstaClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    window.open("https://www.instagram.com/codes_and_clouds/", "_blank", "noopener,noreferrer");
+
+    const statsDocRef = doc(db, "analytics", "insta_popup");
+    setDoc(statsDocRef, { clicks: increment(1) }, { merge: true }).catch((err) => {
+      console.error("Error updating click count:", err);
+    });
+
     setShowInstaModal(false);
     triggerNotification("Thank you for following us on Instagram!");
-  };
-
-  const handleDismissInstaModal = () => {
-    localStorage.setItem("insta_followed", "true");
-    setShowInstaModal(false);
   };
 
   useEffect(() => {
@@ -1857,17 +1933,16 @@ export default function App() {
       </Helmet>
 
       <div>
-        {/* Instagram Follow First-Time Modal */}
         {showInstaModal && (
           <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200">
-              <button
-                onClick={handleDismissInstaModal}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200 z-50">
+              
+              {isAdmin && (
+                <div className="mb-4 inline-flex items-center space-x-1.5 bg-pink-50 text-pink-700 border border-pink-200 text-xs font-bold px-3.5 py-1 rounded-full shadow-sm">
+                  <Users className="w-3.5 h-3.5 text-pink-600" />
+                  <span>Admin: {instaPopupClicks} Total Clicks</span>
+                </div>
+              )}
 
               <div className="w-16 h-16 bg-gradient-to-tr from-purple-600 via-pink-600 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-pink-500/20">
                 <InstagramIcon className="w-8 h-8" />
@@ -1877,24 +1952,18 @@ export default function App() {
                 Join Our Tech Community
               </h2>
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
-                Follow <strong className="text-slate-900">@codes_and_clouds</strong> on Instagram to stay updated with daily direct hiring updates and learning reels!
+                Follow <strong className="text-slate-900">@codes_and_clouds</strong> on Instagram to unlock access and stay updated with daily direct hiring updates and learning reels!
               </p>
 
               <div className="space-y-3">
                 <button
+                  type="button"
                   onClick={handleFollowInstaClick}
-                  className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-95 text-white font-bold text-sm py-3 px-5 rounded-xl transition-all shadow-md"
+                  className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-95 text-white font-bold text-sm py-3 px-5 rounded-xl transition-all shadow-md cursor-pointer relative z-50"
                 >
                   <InstagramIcon className="w-4 h-4" />
                   <span>Follow on Instagram</span>
                   <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                </button>
-
-                <button
-                  onClick={handleDismissInstaModal}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-semibold block w-full py-1"
-                >
-                  Skip for now
                 </button>
               </div>
             </div>
@@ -1902,7 +1971,7 @@ export default function App() {
         )}
 
         {showLearningBanner && (
-          <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-50 transition-all border-b border-white/20">
+          <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-40 transition-all border-b border-white/20">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
               <div className="flex items-center space-x-2 text-xs sm:text-sm font-semibold">
                 <Sparkle className="w-5 h-5 text-yellow-300 animate-spin" />
