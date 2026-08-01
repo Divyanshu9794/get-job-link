@@ -1801,7 +1801,42 @@ export default function App() {
     }
   };
 
-  const handleUpdatePopupLink = async (e) => {
+//   const handleUpdatePopupLink = async (e) => {
+//   e.preventDefault();
+  
+//   if (!currentUser) {
+//     triggerNotification("Please sign in to make updates.");
+//     return;
+//   }
+
+//   if (!isAdmin) {
+//     triggerNotification("Access denied: Admin privileges required.");
+//     return;
+//   }
+
+//   if (!popupLink || !popupLink.trim()) {
+//     triggerNotification("Please enter a valid URL.");
+//     return;
+//   }
+
+//   try {
+//     const statsDocRef = doc(db, "analytics", "insta_popup");
+    
+//     // Using setDoc with merge: true guarantees the doc/field is created or updated
+//     await setDoc(statsDocRef, { 
+//       url: popupLink.trim(),
+//       updatedAt: Date.now()
+//     }, { merge: true });
+
+//     triggerNotification("Popup Redirect Link updated successfully!");
+//   } catch (error) {
+//     console.error("Error updating popup link in Firestore:", error);
+//     triggerNotification(`Failed to save link: ${error.message}`);
+//   }
+// };
+
+
+const handleUpdatePopupLink = async (e) => {
   e.preventDefault();
   
   if (!currentUser) {
@@ -1822,13 +1857,17 @@ export default function App() {
   try {
     const statsDocRef = doc(db, "analytics", "insta_popup");
     
-    // Using setDoc with merge: true guarantees the doc/field is created or updated
+    // Explicitly set clicks to 0 when updating the URL
     await setDoc(statsDocRef, { 
       url: popupLink.trim(),
+      clicks: 0, // <--- Resets count to 0
       updatedAt: Date.now()
     }, { merge: true });
 
-    triggerNotification("Popup Redirect Link updated successfully!");
+    // Instantly reset local state count
+    setInstaPopupClicks(0);
+
+    triggerNotification("Popup Redirect Link updated & click count reset to 0!");
   } catch (error) {
     console.error("Error updating popup link in Firestore:", error);
     triggerNotification(`Failed to save link: ${error.message}`);
