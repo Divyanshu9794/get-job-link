@@ -1,15 +1,12 @@
 
 
-
-
-
 // import React, { useState, useEffect } from "react";
 // import { Helmet } from "react-helmet-async";
 // import { 
 //   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
 //   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
 //   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2,
-//   BookOpen, Video, Play, Sparkle, Eye
+//   BookOpen, Video, Play, Sparkle, Eye, Users
 // } from "lucide-react";
 // import logoImg from "./assets/logo.jpeg";
 
@@ -17,7 +14,7 @@
 // import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 // import { 
 //   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, 
-//   updateDoc, getDocs, increment 
+//   updateDoc, getDocs, setDoc, increment 
 // } from "firebase/firestore";
 
 // const LinkedinIcon = ({ className = "w-4 h-4" }) => (
@@ -62,6 +59,7 @@
 //   const [weeklyUsers, setWeeklyUsers] = useState("6.1k+");
 //   const [showLearningBanner, setShowLearningBanner] = useState(false);
 //   const [showInstaModal, setShowInstaModal] = useState(false);
+//   const [instaPopupClicks, setInstaPopupClicks] = useState(0);
 
 //   const [activeTab, setActiveTab] = useState("all"); 
 //   const [selectedJobType, setSelectedJobType] = useState(""); 
@@ -89,27 +87,40 @@
 //     category: "Git & GitHub"
 //   });
 
-//   // Check first-time visitor status for Instagram follow prompt
 //   useEffect(() => {
-//     const hasFollowed = localStorage.getItem("insta_followed");
-//     if (!hasFollowed) {
-//       const timer = setTimeout(() => {
-//         setShowInstaModal(true);
-//       }, 1000);
-//       return () => clearTimeout(timer);
-//     }
+//     const statsDocRef = doc(db, "analytics", "insta_popup");
+//     const unsubscribe = onSnapshot(statsDocRef, (docSnap) => {
+//       if (docSnap.exists()) {
+//         setInstaPopupClicks(docSnap.data().clicks || 0);
+//       } else {
+//         setDoc(statsDocRef, { clicks: 0 }, { merge: true });
+//       }
+//     });
+//     return () => unsubscribe();
 //   }, []);
 
-//   const handleFollowInstaClick = () => {
-//     localStorage.setItem("insta_followed", "true");
-//     window.open("https://www.instagram.com/codes_and_clouds/", "_blank");
+//   useEffect(() => {
+//     const timer = setTimeout(() => {
+//       setShowInstaModal(true);
+//     }, 1000);
+//     return () => clearTimeout(timer);
+//   }, []);
+
+//   const handleFollowInstaClick = (e) => {
+//     if (e) {
+//       e.preventDefault();
+//       e.stopPropagation();
+//     }
+    
+//     window.open("https://www.instagram.com/codes_and_clouds/", "_blank", "noopener,noreferrer");
+
+//     const statsDocRef = doc(db, "analytics", "insta_popup");
+//     setDoc(statsDocRef, { clicks: increment(1) }, { merge: true }).catch((err) => {
+//       console.error("Error updating click count:", err);
+//     });
+
 //     setShowInstaModal(false);
 //     triggerNotification("Thank you for following us on Instagram!");
-//   };
-
-//   const handleDismissInstaModal = () => {
-//     localStorage.setItem("insta_followed", "true");
-//     setShowInstaModal(false);
 //   };
 
 //   useEffect(() => {
@@ -491,17 +502,16 @@
 //       </Helmet>
 
 //       <div>
-//         {/* Instagram Follow First-Time Modal */}
 //         {showInstaModal && (
 //           <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-//             <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200">
-//               <button
-//                 onClick={handleDismissInstaModal}
-//                 className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100"
-//                 aria-label="Close"
-//               >
-//                 <X className="w-5 h-5" />
-//               </button>
+//             <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in duration-200 z-50">
+              
+//               {isAdmin && (
+//                 <div className="mb-4 inline-flex items-center space-x-1.5 bg-pink-50 text-pink-700 border border-pink-200 text-xs font-bold px-3.5 py-1 rounded-full shadow-sm">
+//                   <Users className="w-3.5 h-3.5 text-pink-600" />
+//                   <span>Admin: {instaPopupClicks} Total Clicks</span>
+//                 </div>
+//               )}
 
 //               <div className="w-16 h-16 bg-gradient-to-tr from-purple-600 via-pink-600 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-pink-500/20">
 //                 <InstagramIcon className="w-8 h-8" />
@@ -511,24 +521,18 @@
 //                 Join Our Tech Community
 //               </h2>
 //               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6">
-//                 Follow <strong className="text-slate-900">@codes_and_clouds</strong> on Instagram to stay updated with daily direct hiring updates and learning reels!
+//                 Follow <strong className="text-slate-900">@codes_and_clouds</strong> on Instagram to unlock access and stay updated with daily direct hiring updates and learning reels!
 //               </p>
 
 //               <div className="space-y-3">
 //                 <button
+//                   type="button"
 //                   onClick={handleFollowInstaClick}
-//                   className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-95 text-white font-bold text-sm py-3 px-5 rounded-xl transition-all shadow-md"
+//                   className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-95 text-white font-bold text-sm py-3 px-5 rounded-xl transition-all shadow-md cursor-pointer relative z-50"
 //                 >
 //                   <InstagramIcon className="w-4 h-4" />
 //                   <span>Follow on Instagram</span>
 //                   <ExternalLink className="w-3.5 h-3.5 ml-1" />
-//                 </button>
-
-//                 <button
-//                   onClick={handleDismissInstaModal}
-//                   className="text-slate-400 hover:text-slate-600 text-xs font-semibold block w-full py-1"
-//                 >
-//                   Skip for now
 //                 </button>
 //               </div>
 //             </div>
@@ -536,7 +540,7 @@
 //         )}
 
 //         {showLearningBanner && (
-//           <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-50 transition-all border-b border-white/20">
+//           <div className="bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 text-white px-4 py-3 shadow-md sticky top-0 z-40 transition-all border-b border-white/20">
 //             <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
 //               <div className="flex items-center space-x-2 text-xs sm:text-sm font-semibold">
 //                 <Sparkle className="w-5 h-5 text-yellow-300 animate-spin" />
@@ -1431,13 +1435,19 @@
 
 
 
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { 
   PlusCircle, Search, ExternalLink, Trash2, Calendar, LayoutGrid, Table, 
   CheckCircle, Briefcase, Globe, Info, Mail, Zap, CheckSquare, Pencil, X,
   TrendingUp, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Share2,
-  BookOpen, Video, Play, Sparkle, Eye, Users
+  BookOpen, Video, Play, Sparkle, Eye, Users, MessageSquare, Save, Settings
 } from "lucide-react";
 import logoImg from "./assets/logo.jpeg";
 
@@ -1445,7 +1455,7 @@ import { auth, googleProvider, db } from "./firebase";
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { 
   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, 
-  updateDoc, getDocs, setDoc, increment 
+  updateDoc, getDocs, setDoc, increment, writeBatch 
 } from "firebase/firestore";
 
 const LinkedinIcon = ({ className = "w-4 h-4" }) => (
@@ -1481,6 +1491,7 @@ export default function App() {
 
   const [jobs, setJobs] = useState([]);
   const [learningReels, setLearningReels] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -1491,6 +1502,10 @@ export default function App() {
   const [showLearningBanner, setShowLearningBanner] = useState(false);
   const [showInstaModal, setShowInstaModal] = useState(false);
   const [instaPopupClicks, setInstaPopupClicks] = useState(0);
+
+  // Admin View State Management
+  const [popupLink, setPopupLink] = useState("https://www.instagram.com/codes_and_clouds/");
+  const [bulkDeleteDate, setBulkDeleteDate] = useState("");
 
   const [activeTab, setActiveTab] = useState("all"); 
   const [selectedJobType, setSelectedJobType] = useState(""); 
@@ -1518,17 +1533,32 @@ export default function App() {
     category: "Git & GitHub"
   });
 
+  // Load Popup configuration & clicks count
   useEffect(() => {
     const statsDocRef = doc(db, "analytics", "insta_popup");
     const unsubscribe = onSnapshot(statsDocRef, (docSnap) => {
       if (docSnap.exists()) {
-        setInstaPopupClicks(docSnap.data().clicks || 0);
+        const data = docSnap.data();
+        setInstaPopupClicks(data.clicks || 0);
+        if (data.url) setPopupLink(data.url);
       } else {
-        setDoc(statsDocRef, { clicks: 0 }, { merge: true });
+        setDoc(statsDocRef, { clicks: 0, url: "https://www.instagram.com/codes_and_clouds/" }, { merge: true });
       }
     });
     return () => unsubscribe();
   }, []);
+
+  // Sync Feedbacks for Admin
+  useEffect(() => {
+    if (isAdmin) {
+      const q = query(collection(db, "feedbacks"), orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setFeedbacks(list);
+      });
+      return () => unsubscribe();
+    }
+  }, [isAdmin]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1543,7 +1573,7 @@ export default function App() {
       e.stopPropagation();
     }
     
-    window.open("https://www.instagram.com/codes_and_clouds/", "_blank", "noopener,noreferrer");
+    window.open(popupLink, "_blank", "noopener,noreferrer");
 
     const statsDocRef = doc(db, "analytics", "insta_popup");
     setDoc(statsDocRef, { clicks: increment(1) }, { merge: true }).catch((err) => {
@@ -1551,7 +1581,7 @@ export default function App() {
     });
 
     setShowInstaModal(false);
-    triggerNotification("Thank you for following us on Instagram!");
+    triggerNotification("Thank you for following us!");
   };
 
   useEffect(() => {
@@ -1686,6 +1716,7 @@ export default function App() {
   };
 
   const startEditingJob = (job) => {
+    setActiveTab("admin");
     setEditingJobId(job.id);
     setFormData({
       title: job.title || "",
@@ -1767,6 +1798,69 @@ export default function App() {
       triggerNotification("Learning Reel successfully added to database!");
     } catch (error) {
       triggerNotification("Failed to add learning reel.");
+    }
+  };
+
+  const handleUpdatePopupLink = async (e) => {
+  e.preventDefault();
+  
+  if (!currentUser) {
+    triggerNotification("Please sign in to make updates.");
+    return;
+  }
+
+  if (!isAdmin) {
+    triggerNotification("Access denied: Admin privileges required.");
+    return;
+  }
+
+  if (!popupLink || !popupLink.trim()) {
+    triggerNotification("Please enter a valid URL.");
+    return;
+  }
+
+  try {
+    const statsDocRef = doc(db, "analytics", "insta_popup");
+    
+    // Using setDoc with merge: true guarantees the doc/field is created or updated
+    await setDoc(statsDocRef, { 
+      url: popupLink.trim(),
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    triggerNotification("Popup Redirect Link updated successfully!");
+  } catch (error) {
+    console.error("Error updating popup link in Firestore:", error);
+    triggerNotification(`Failed to save link: ${error.message}`);
+  }
+};
+
+  const handleBulkDelete = async (e) => {
+    e.preventDefault();
+    if (!isAdmin || !bulkDeleteDate) return;
+
+    if (!window.confirm(`Are you sure you want to delete all job postings added on or before ${bulkDeleteDate}?`)) {
+      return;
+    }
+
+    try {
+      const jobsToDelete = jobs.filter((job) => job.date && job.date <= bulkDeleteDate);
+      if (jobsToDelete.length === 0) {
+        triggerNotification("No jobs found matching the date criteria.");
+        return;
+      }
+
+      const batch = writeBatch(db);
+      jobsToDelete.forEach((job) => {
+        batch.delete(doc(db, "jobs", job.id));
+      });
+
+      await batch.commit();
+      triggerNotification(`Successfully deleted ${jobsToDelete.length} jobs.`);
+      setBulkDeleteDate("");
+    } catch (error) {
+      console.error(error);
+      triggerNotification("Error executing bulk delete.");
     }
   };
 
@@ -1863,6 +1957,8 @@ export default function App() {
     ? "Remote Software & Tech Jobs | Direct Application Links | GetJobLink"
     : activeTab === "post-job"
     ? "Post a Job | Reach Active Engineering Candidates | GetJobLink"
+    : activeTab === "admin"
+    ? "Admin Control Dashboard | GetJobLink"
     : "GetJobLink — Direct Hiring Links for Top Engineering & Tech Roles";
 
   const pageDescription = "Discover top software engineering, design, and product management jobs with official direct application links. Skip recruiter black holes.";
@@ -2213,11 +2309,17 @@ export default function App() {
               <PlusCircle className="w-4 h-4" />
               <span>Post Your Jobs Here</span>
             </button>
+            {isAdmin && (
+              <button onClick={() => setActiveTab("admin")} className={`flex items-center space-x-2 pb-3 px-4 text-sm font-semibold border-b-2 transition-all ${activeTab === "admin" ? "border-blue-600 text-blue-600" : "border-transparent text-amber-600 hover:text-amber-800"}`}>
+                <Settings className="w-4 h-4" />
+                <span>Admin View</span>
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {activeTab !== "learning" && activeTab !== "post-job" && (
+            {activeTab !== "learning" && activeTab !== "post-job" && activeTab !== "admin" && (
               <aside className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 flex items-start space-x-2.5">
                   <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
@@ -2303,8 +2405,333 @@ export default function App() {
               </aside>
             )}
 
-            <section className={`${activeTab === "learning" || activeTab === "post-job" ? "lg:col-span-12" : isAdmin ? "lg:col-span-5" : "lg:col-span-9"} space-y-6`}>
-              {activeTab === "learning" ? (
+            <section className={`${activeTab === "learning" || activeTab === "post-job" || activeTab === "admin" ? "lg:col-span-12" : "lg:col-span-9"} space-y-6`}>
+              {activeTab === "admin" && isAdmin ? (
+                <div className="space-y-8">
+                  <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-md">
+                    <h2 className="text-lg font-bold flex items-center space-x-2 text-blue-400 mb-2">
+                      <Settings className="w-5 h-5" />
+                      <span>Admin Control Panel</span>
+                    </h2>
+                    <p className="text-xs text-slate-400">Manage all administrative features in one place.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Job Posting Control */}
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                          <PlusCircle className="w-5 h-5 text-blue-600" />
+                          <span>{editingJobId ? "Edit Job Listing" : "Add Job Listing"}</span>
+                        </h3>
+                        {editingJobId && (
+                          <button aria-label="Cancel editing" onClick={cancelEditing} className="text-slate-400 hover:text-slate-600">
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
+                        <div>
+                          <label htmlFor="form-title" className="block font-bold text-slate-700 mb-1">Job Title *</label>
+                          <input
+                            id="form-title"
+                            type="text"
+                            required
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder="e.g. Frontend Engineer"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="form-company" className="block font-bold text-slate-700 mb-1">Company Name *</label>
+                          <input
+                            id="form-company"
+                            type="text"
+                            required
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder="e.g. Google"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="form-url" className="block font-bold text-slate-700 mb-1">Application URL *</label>
+                          <input
+                            id="form-url"
+                            type="url"
+                            required
+                            value={formData.url}
+                            onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder="https://company.com/careers/job"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label htmlFor="form-jobType" className="block font-bold text-slate-700 mb-1">Job Type</label>
+                            <select
+                              id="form-jobType"
+                              value={formData.jobType}
+                              onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                              <option value="Full Time">Full Time</option>
+                              <option value="Internship">Internship</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="form-domain" className="block font-bold text-slate-700 mb-1">Domain</label>
+                            <select
+                              id="form-domain"
+                              value={formData.domain}
+                              onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                              <option value="Engineering">Engineering</option>
+                              <option value="Design">Design</option>
+                              <option value="Marketing">Marketing</option>
+                              <option value="Management">Management</option>
+                              <option value="Data Entry">Data Entry</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label htmlFor="form-experience" className="block font-bold text-slate-700 mb-1">Experience</label>
+                            <select
+                              id="form-experience"
+                              value={formData.experience}
+                              onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            >
+                              <option value="More than 0 year">More than 0 year</option>
+                              <option value="More than 1 year">More than 1 year</option>
+                              <option value="More than 2 years">More than 2 years</option>
+                              <option value="More than 3 years">More than 3 years</option>
+                              <option value="More than 4 years">More than 4 years</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="form-salary" className="block font-bold text-slate-700 mb-1">Salary</label>
+                            <input
+                              id="form-salary"
+                              type="text"
+                              value={formData.salary}
+                              onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              placeholder="e.g. 10-20 LPA, Competitive, $40/hr"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="form-jd" className="block font-bold text-slate-700 mb-1">Description</label>
+                          <textarea
+                            id="form-jd"
+                            rows="3"
+                            value={formData.jd}
+                            onChange={(e) => setFormData({ ...formData, jd: e.target.value })}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder="Role summary or qualifications..."
+                          />
+                        </div>
+
+                        <div className="flex items-center space-x-2 pt-1">
+                          <input
+                            type="checkbox"
+                            id="isRemote"
+                            checked={formData.isRemote}
+                            onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                          />
+                          <label htmlFor="isRemote" className="font-semibold text-slate-700">Remote Position</label>
+                        </div>
+
+                        <div className="pt-2 flex space-x-2">
+                          <button
+                            type="submit"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm text-xs"
+                          >
+                            {editingJobId ? "Update Job" : "Publish Job"}
+                          </button>
+                          {editingJobId && (
+                            <button
+                              type="button"
+                              onClick={cancelEditing}
+                              className="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition-all text-xs"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </form>
+                    </div>
+
+                    {/* Quick Admin Actions: Update Popup Link & Bulk Delete */}
+                    <div className="space-y-6">
+                      {/* Update Popup Link */}
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
+                          <Save className="w-5 h-5 text-purple-600" />
+                          <span>Update Popup Redirect Link</span>
+                        </h3>
+                        <form onSubmit={handleUpdatePopupLink} className="space-y-3 text-xs">
+                          <div>
+                            <label className="block font-bold text-slate-700 mb-1">Target Redirect URL</label>
+                            <input
+                              type="url"
+                              required
+                              value={popupLink}
+                              onChange={(e) => setPopupLink(e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                              placeholder="https://www.instagram.com/your_handle"
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm text-xs"
+                          >
+                            Save Popup Link
+                          </button>
+                        </form>
+                      </div>
+
+                      {/* Bulk Delete Jobs */}
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                          <span>Bulk Delete Old Listings</span>
+                        </h3>
+                        <form onSubmit={handleBulkDelete} className="space-y-3 text-xs">
+                          <div>
+                            <label className="block font-bold text-slate-700 mb-1">Delete Jobs Posted On or Before Date</label>
+                            <input
+                              type="date"
+                              required
+                              value={bulkDeleteDate}
+                              onChange={(e) => setBulkDeleteDate(e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-600"
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm text-xs"
+                          >
+                            Bulk Delete Jobs
+                          </button>
+                        </form>
+                      </div>
+
+                      {/* Add Learning Content */}
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
+                          <BookOpen className="w-5 h-5 text-pink-600" />
+                          <span>Add Learning Content / Reel</span>
+                        </h3>
+                        <form onSubmit={handleReelSubmit} className="space-y-3 text-xs">
+                          <div>
+                            <label className="block font-bold text-slate-700 mb-1">Title *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Day 2 of GitHub in 10 Days"
+                              value={reelFormData.title}
+                              onChange={(e) => setReelFormData({ ...reelFormData, title: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-bold text-slate-700 mb-1">Reel / Video URL *</label>
+                            <input
+                              type="url"
+                              required
+                              placeholder="https://www.instagram.com/reel/..."
+                              value={reelFormData.reelUrl}
+                              onChange={(e) => setReelFormData({ ...reelFormData, reelUrl: e.target.value })}
+                              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block font-bold text-slate-700 mb-1">Category</label>
+                              <input
+                                type="text"
+                                placeholder="Git & GitHub"
+                                value={reelFormData.category}
+                                onChange={(e) => setReelFormData({ ...reelFormData, category: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                              />
+                            </div>
+                            <div>
+                              <label className="block font-bold text-slate-700 mb-1">Description</label>
+                              <input
+                                type="text"
+                                placeholder="Brief overview..."
+                                value={reelFormData.description}
+                                onChange={(e) => setReelFormData({ ...reelFormData, description: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm text-xs"
+                          >
+                            Save Learning Content
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feedback Table View */}
+                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2 border-b border-slate-100 pb-3">
+                      <MessageSquare className="w-5 h-5 text-blue-600" />
+                      <span>Submitted Feedback ({feedbacks.length})</span>
+                    </h3>
+
+                    {feedbacks.length === 0 ? (
+                      <p className="text-xs text-slate-400 py-4 text-center">No submitted feedback found.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                            <tr>
+                              <th scope="col" className="px-4 py-3">User Email / ID</th>
+                              <th scope="col" className="px-4 py-3">Feedback Message</th>
+                              <th scope="col" className="px-4 py-3">Rating / Tag</th>
+                              <th scope="col" className="px-4 py-3">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-slate-700">
+                            {feedbacks.map((fb) => (
+                              <tr key={fb.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="px-4 py-3 font-semibold text-slate-900">{fb.email || "Anonymous"}</td>
+                                <td className="px-4 py-3 text-slate-600">{fb.message}</td>
+                                <td className="px-4 py-3">
+                                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-bold">
+                                    {fb.rating || "General"}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-slate-400">{fb.date || "N/A"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : activeTab === "learning" ? (
                 <div className="space-y-6">
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
@@ -2317,67 +2744,6 @@ export default function App() {
                       </p>
                     </div>
                   </div>
-
-                  {isAdmin && (
-                    <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-md">
-                      <h3 className="text-sm font-bold flex items-center space-x-2 mb-4">
-                        <PlusCircle className="w-4 h-4 text-pink-400" />
-                        <span>Admin: Add Learning Reel to Database</span>
-                      </h3>
-                      <form onSubmit={handleReelSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <label className="block text-slate-300 font-bold mb-1">Title *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="e.g. Day 2 of GitHub in 10 Days"
-                            value={reelFormData.title}
-                            onChange={(e) => setReelFormData({ ...reelFormData, title: e.target.value })}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-300 font-bold mb-1">Reel / Video URL *</label>
-                          <input
-                            type="url"
-                            required
-                            placeholder="https://www.instagram.com/reel/..."
-                            value={reelFormData.reelUrl}
-                            onChange={(e) => setReelFormData({ ...reelFormData, reelUrl: e.target.value })}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-300 font-bold mb-1">Category</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. Git & GitHub"
-                            value={reelFormData.category}
-                            onChange={(e) => setReelFormData({ ...reelFormData, category: e.target.value })}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-300 font-bold mb-1">Description</label>
-                          <input
-                            type="text"
-                            placeholder="Explaining Git vs GitHub in simple language..."
-                            value={reelFormData.description}
-                            onChange={(e) => setReelFormData({ ...reelFormData, description: e.target.value })}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-pink-500/30"
-                          />
-                        </div>
-                        <div className="sm:col-span-2 pt-2">
-                          <button
-                            type="submit"
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-sm text-xs"
-                          >
-                            Save Reel to Database
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {learningReels.map((reel) => (
@@ -2662,165 +3028,6 @@ export default function App() {
                 </>
               )}
             </section>
-
-            {isAdmin && activeTab !== "learning" && activeTab !== "post-job" && (
-              <aside className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-20">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-                    <PlusCircle className="w-5 h-5 text-blue-600" />
-                    <span>{editingJobId ? "Edit Job Listing" : "Add Job Listing"}</span>
-                  </h2>
-                  {editingJobId && (
-                    <button aria-label="Cancel editing" onClick={cancelEditing} className="text-slate-400 hover:text-slate-600">
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
-                  <div>
-                    <label htmlFor="form-title" className="block font-bold text-slate-700 mb-1">Job Title *</label>
-                    <input
-                      id="form-title"
-                      type="text"
-                      required
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      placeholder="e.g. Frontend Engineer"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="form-company" className="block font-bold text-slate-700 mb-1">Company Name *</label>
-                    <input
-                      id="form-company"
-                      type="text"
-                      required
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      placeholder="e.g. Google"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="form-url" className="block font-bold text-slate-700 mb-1">Application URL *</label>
-                    <input
-                      id="form-url"
-                      type="url"
-                      required
-                      value={formData.url}
-                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      placeholder="https://company.com/careers/job"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label htmlFor="form-jobType" className="block font-bold text-slate-700 mb-1">Job Type</label>
-                      <select
-                        id="form-jobType"
-                        value={formData.jobType}
-                        onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      >
-                        <option value="Full Time">Full Time</option>
-                        <option value="Internship">Internship</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label htmlFor="form-domain" className="block font-bold text-slate-700 mb-1">Domain</label>
-                      <select
-                        id="form-domain"
-                        value={formData.domain}
-                        onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      >
-                        <option value="Engineering">Engineering</option>
-                        <option value="Design">Design</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Management">Management</option>
-                        <option value="Data Entry">Data Entry</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label htmlFor="form-experience" className="block font-bold text-slate-700 mb-1">Experience</label>
-                      <select
-                        id="form-experience"
-                        value={formData.experience}
-                        onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      >
-                        <option value="More than 0 year">More than 0 year</option>
-                        <option value="More than 1 year">More than 1 year</option>
-                        <option value="More than 2 years">More than 2 years</option>
-                        <option value="More than 3 years">More than 3 years</option>
-                        <option value="More than 4 years">More than 4 years</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label htmlFor="form-salary" className="block font-bold text-slate-700 mb-1">Salary</label>
-                      <input
-                        id="form-salary"
-                        type="text"
-                        value={formData.salary}
-                        onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                        placeholder="e.g. 10-20 LPA, Competitive, $40/hr"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="form-jd" className="block font-bold text-slate-700 mb-1">Description</label>
-                    <textarea
-                      id="form-jd"
-                      rows="3"
-                      value={formData.jd}
-                      onChange={(e) => setFormData({ ...formData, jd: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      placeholder="Role summary or qualifications..."
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2 pt-1">
-                    <input
-                      type="checkbox"
-                      id="isRemote"
-                      checked={formData.isRemote}
-                      onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
-                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
-                    />
-                    <label htmlFor="isRemote" className="font-semibold text-slate-700">Remote Position</label>
-                  </div>
-
-                  <div className="pt-2 flex space-x-2">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition-all shadow-sm text-xs"
-                    >
-                      {editingJobId ? "Update Job" : "Publish Job"}
-                    </button>
-                    {editingJobId && (
-                      <button
-                        type="button"
-                        onClick={cancelEditing}
-                        className="px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition-all text-xs"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </aside>
-            )}
 
           </div>
         </main>
