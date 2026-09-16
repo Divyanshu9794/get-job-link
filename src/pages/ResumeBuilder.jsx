@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { FileText, Download, ChevronRight, BookOpen, Sparkle, ArrowRight } from "lucide-react";
+import { FileText, Download, ChevronRight, BookOpen, Sparkle, ArrowRight, Linkedin, Globe, GraduationCap, Award, Languages, MapPin } from "lucide-react";
 
 export default function ResumeBuilder() {
   const { currentUser, isAdmin } = useAuth();
@@ -10,7 +10,11 @@ export default function ResumeBuilder() {
     title: "",
     experience: "",
     education: "",
-    skills: ""
+    skills: "",
+    summary: "",
+    projects: "",
+    certifications: "",
+    languages: ""
   });
 
   if (!currentUser) {
@@ -39,21 +43,29 @@ export default function ResumeBuilder() {
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 20px; color: #1e293b; line-height: 1.6; }
   h1 { font-size: 28px; margin: 0; color: #0f172a; }
   h2 { font-size: 14px; color: #3b82f6; margin: 20px 0 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }
+  h3 { font-size: 13px; color: #64748b; margin: 15px 0 4px; }
   p { margin: 4px 0; color: #475569; }
   .meta { color: #64748b; font-size: 14px; margin-top: 4px; }
   ul { padding-left: 20px; }
   li { margin-bottom: 4px; }
+  .section-title { color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
   <h1>${sections.name}</h1>
   <p class="meta">${sections.title}</p>
-  <h2>Experience</h2>
-  <p>${sections.experience}</p>
-  <h2>Education</h2>
-  <p>${sections.education}</p>
-  <h2>Skills</h2>
-  <p>${sections.skills}</p>
+  ${sections.summary ? `<p class="mb-6" style="font-style: italic; color: #334155;">${sections.summary}</p>` : ""}
+  <div className="space-y-6">
+    <h2 className="section-title">Professional Experience</h2>
+    <p>${sections.experience}</p>
+    <h2 className="section-title">Education</h2>
+    <p>${sections.education}</p>
+    ${sections.projects ? `<h2 className="section-title">Projects</h2><p>${sections.projects}</p>` : ""}
+    ${sections.certifications ? `<h2 className="section-title">Certifications</h2><p>${sections.certifications}</p>` : ""}
+    ${sections.languages ? `<h2 className="section-title">Languages</h2><p>${sections.languages}</p>` : ""}
+    <h2 className="section-title">Skills</h2>
+    <p>${sections.skills}</p>
+  </div>
 </body>
 </html>`;
     const blob = new Blob([html], { type: "text/html" });
@@ -100,7 +112,7 @@ export default function ResumeBuilder() {
               value={value}
               onChange={(e) => handleChange(key, e.target.value)}
               placeholder={`Enter your ${key}...`}
-              rows={key === "experience" ? 4 : key === "skills" ? 3 : 2}
+              rows={key === "experience" ? 5 : key === "projects" ? 4 : key === "certifications" ? 3 : key === "languages" ? 2 : 3}
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
           </div>

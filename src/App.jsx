@@ -30,6 +30,8 @@ export default function App() {
   const [reelFormData, setReelFormData] = useState({ title: "", description: "", reelUrl: "", category: "Git & GitHub" });
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sourceConfigs, setSourceConfigs] = useState({});
+  const [companyPriorities, setCompanyPriorities] = useState([]);
 
   useEffect(() => {
     const statsDocRef = doc(db, "analytics", "insta_popup");
@@ -92,6 +94,28 @@ export default function App() {
         setLearningReels(snaps.docs.map((doc) => ({ id: doc.id, clicks: 0, ...doc.data() })));
       });
     })();
+    return () => unsubscribe();
+  }, []);
+
+  // Firestore listener for source configuration (source_config / defaults)
+  useEffect(() => {
+    const sourceConfigRef = doc(db, "source_config", "defaults");
+    const unsubscribe = onSnapshot(sourceConfigRef, (snap) => {
+      if (snap.exists()) {
+        setSourceConfigs(snap.data()?.sources || {});
+      } else {
+        setDoc(sourceConfigRef, { sources: {} }, { merge: true });
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Firestore listener for company priorities (company_priority collection)
+  useEffect(() => {
+    const q = query(collection(db, "company_priority"), orderBy("priority", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setCompanyPriorities(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
     return () => unsubscribe();
   }, []);
 
@@ -162,6 +186,60 @@ export default function App() {
 
   const handleCheckboxChange = (value, state, setState) => { if (state.includes(value)) setState(state.filter((item) => item !== value)); else setState([...state, value]); };
 
+  // Source configuration helpers
+  const toggleSourceConfig = async (sourceKey) => {
+    const sourceConfigRef = doc(db, "source_config", "defaults");
+    setSourceConfigs((prev) => {
+      const currentEnabled = prev?.[sourceKey]?.enabled ?? false;
+      const newEnabled = !currentEnabled;
+      updateDoc(sourceConfigRef, { [`sources.${sourceKey}.enabled`]: newEnabled }).catch((error) => {
+        console.error("Error toggling source config:", error);
+        triggerNotification(`Failed to toggle ${sourceKey}`);
+      });
+      return { ...prev, [sourceKey]: { ...prev?.[sourceKey], enabled: newEnabled } };
+    });
+    triggerNotification(`Source ${sourceKey} updated`);
+  };
+
+  // Company priority helpers
+  const addCompanyPriority = async (company, priority = companyPriorities.length + 1) => {
+    try {
+      const docRef = await addDoc(collection(db, "company_priority"), {
+        company,
+        priority,
+        enabled: true,
+        createdAt: Date.now()
+      });
+      setCompanyPriorities((prev) => [...prev, { id: docRef.id, company, priority, enabled: true }]);
+      triggerNotification(`Company priority "${company}" added.`);
+    } catch (error) {
+      console.error("Error adding company priority:", error);
+      triggerNotification("Failed to add company priority.");
+    }
+  };
+
+  const updateCompanyPriority = async (id, updates) => {
+    try {
+      await updateDoc(doc(db, "company_priority", id), updates);
+      setCompanyPriorities((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+      triggerNotification(`Company priority "${id}" updated.`);
+    } catch (error) {
+      console.error("Error updating company priority:", error);
+      triggerNotification("Failed to update company priority.");
+    }
+  };
+
+  const removeCompanyPriority = async (id) => {
+    try {
+      await deleteDoc(doc(db, "company_priority", id));
+      setCompanyPriorities((prev) => prev.filter((p) => p.id !== id));
+      triggerNotification("Company priority removed.");
+    } catch (error) {
+      console.error("Error removing company priority:", error);
+      triggerNotification("Failed to remove company priority.");
+    }
+  };
+
   const shareToLinkedin = (job) => window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent("Job Opening: " + job.title + " at " + job.company)}`, "_blank");
   const shareToTwitter = (job) => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent("Hiring: " + job.title + " at " + job.company)}`, "_blank");
   const shareToWhatsapp = (job) => window.open(`https://wa.me/?text=${encodeURIComponent("Job: " + job.title + " at " + job.company)}`, "_blank");
@@ -173,6 +251,9 @@ export default function App() {
     showInstaModal, setShowInstaModal, instaPopupClicks, setInstaPopupClicks,
     popupLink, setPopupLink, bulkDeleteDate, setBulkDeleteDate,
     formData, setFormData, reelFormData, setReelFormData, activeTab, setActiveTab,
+    searchQuery, setSearchQuery,
+    sourceConfigs, setSourceConfigs, companyPriorities, setCompanyPriorities,
+    toggleSourceConfig, addCompanyPriority, updateCompanyPriority, removeCompanyPriority,
     triggerNotification, handleGoogleLogin, handleGoogleLogout, handleFormSubmit,
     handleReelSubmit, handleUpdatePopupLink, handleBulkDelete, handleRemoveJob,
     handleRemoveReel, shareToLinkedin, shareToTwitter, shareToWhatsapp, shareToInstagram,

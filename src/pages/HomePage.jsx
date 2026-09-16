@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useJobs } from "../hooks/useJobs";
 import { Link } from "react-router-dom";
-import { Briefcase, Globe, Search, Settings, Sparkle } from "lucide-react";
+import { Briefcase, Globe, BookOpen, Search, Settings, Sparkle } from "lucide-react";
 import logoImg from "../assets/logo.jpeg";
 
 export default function HomePage() {
