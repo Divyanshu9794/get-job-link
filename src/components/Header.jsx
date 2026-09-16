@@ -1,46 +1,81 @@
+import React from "react";
 import logoImg from "../assets/logo.jpeg";
-import { LayoutGrid, Table } from "lucide-react";
+import {
+  LayoutGrid, Table
+} from "lucide-react";
 
-export default function Header({ currentUser, isAdmin, onLogin, onLogout }) {
+export default function Header({ currentUser, isAdmin, onLogin, onLogout, onSearch }) {
+  const location = window.location.pathname;
+
+  const isActive = (path) => location === path || (path !== "/" && location.startsWith(path));
+
+  const Nav = [
+    { to: "/", label: "Home", icon: LayoutGrid },
+    { to: "/jobs", label: "Jobs", icon: LayoutGrid },
+    { to: "/resume", label: "Resume", icon: Table },
+    { to: "/ats", label: "ATS", icon: Table },
+  ];
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (onSearch) onSearch(document.getElementById("search-input").value);
+  };
+
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 backdrop-blur-md bg-white/90">
+    <header className="bg-white/90 border-b border-slate-200 sticky top-0 z-40 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
         <div className="flex items-center space-x-2.5 select-none shrink-0">
-          <img src={logoImg} alt="Get Job Link Logo - Direct Hiring Platform" className="w-8 h-8 object-contain rounded-lg" />
-          <span className="text-xl font-extrabold tracking-tight text-slate-900 hidden sm:inline">
-            GetJob<span className="text-blue-600">Link</span>
-          </span>
+          <Link to="/" className="flex items-center space-x-2.5">
+            <img src={logoImg} alt="Get Job Link Logo" className="w-8 h-8 object-contain rounded-lg" />
+            <span className="text-xl font-extrabold tracking-tight text-slate-900 hidden sm:inline">
+              GetJob<span className="text-blue-600">Link</span>
+            </span>
+          </Link>
         </div>
 
-        <div className="flex-1 max-w-2xl mx-2">
+        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl mx-2">
           <label htmlFor="search-input" className="sr-only">Search jobs and companies</label>
           <div className="relative">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            {/* Search icon rendered via CSS background or inline SVG */}
             <input
               id="search-input"
-              type="text"
+              type="search"
               placeholder="Search jobs by title, company, or tech stack..."
               className="w-full pl-10 pr-4 py-2 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all"
             />
           </div>
-        </div>
+        </form>
 
         <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-          {currentUser ? (
-            <div className="flex items-center space-x-2">
-              {currentUser.photoURL && <img src={currentUser.photoURL} alt="User avatar" className="w-7 h-7 rounded-full border border-slate-200" />}
-              <button onClick={onLogout} className="inline-flex items-center space-x-1 text-xs font-bold tracking-wide uppercase px-3 py-2 rounded-xl border bg-white border-slate-200 text-slate-600 hover:bg-slate-50 transition-all">
-                <span>Sign Out</span>
+          <nav className="hidden md:flex items-center space-x-1">
+            {Nav.map((item) => {
+              const active = isActive(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"}`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="flex items-center space-x-2">
+            {currentUser ? (
+              <div className="flex items-center space-x-2">
+                {currentUser.photoURL && <img src={currentUser.photoURL} alt="User avatar" className="w-7 h-7 rounded-full border border-slate-200" />}
+                <button onClick={onLogout} className="inline-flex items-center space-x-1 text-xs font-bold tracking-wide uppercase px-3 py-2 rounded-xl border bg-white border-slate-200 text-slate-600 hover:bg-slate-50 transition-all">
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <button onClick={onLogin} className="inline-flex items-center space-x-1 text-xs font-bold tracking-wide uppercase px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm">
+                <span>Admin Login</span>
               </button>
-            </div>
-          ) : (
-            <button onClick={onLogin} className="inline-flex items-center space-x-1 text-xs font-bold tracking-wide uppercase px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm">
-              <span>Admin Login</span>
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </header>

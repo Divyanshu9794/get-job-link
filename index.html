@@ -7,12 +7,22 @@
     <link rel="icon" type="image/png" href="/logo.jpeg" />
 
     <!-- 1. Secured Adcash Main Library -->
-    <script type="text/javascript" src="https://acscript.com"></script>
+    <script type="text/javascript" src="https://acscript.com" async></script>
 
-    <!-- 2. Adcash Autotag Script Execution -->
+    <!-- 2. Safe Adcash Autotag Script Execution -->
     <script type="text/javascript">
-      aclib.runAutoTag({
-        zoneId: 'mgttqf1elu'
+      window.addEventListener('DOMContentLoaded', () => {
+        const initAclib = () => {
+          if (typeof aclib !== 'undefined' && typeof aclib.runAutoTag === 'function') {
+            aclib.runAutoTag({
+              zoneId: 'mgttqf1elu'
+            });
+          } else {
+            // Retry shortly if the external script is still pulling in over the network or blocked
+            setTimeout(initAclib, 100);
+          }
+        };
+        initAclib();
       });
     </script>
 

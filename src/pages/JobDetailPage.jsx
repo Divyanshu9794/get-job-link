@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
 import {
   ExternalLink, MapPin, Briefcase, Clock3, Currency, Building2,
-  Star, Shield, ArrowRight
+  Star, Shield, ArrowRight, Calendar, DollarSign, Sparkle
 } from "lucide-react";
 
 export default function JobDetailPage() {
@@ -24,7 +24,7 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
       <nav className="flex items-center gap-2 text-sm text-slate-400 mb-6">
         <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
         <span>/</span>
@@ -33,7 +33,7 @@ export default function JobDetailPage() {
         <span className="text-slate-700">{job.title}</span>
       </nav>
 
-      <article className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <article className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden">
         <div className="p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start gap-4">
             <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
@@ -67,8 +67,12 @@ export default function JobDetailPage() {
               <span>Posted {job.date || "recently"}</span>
             </div>
             <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-slate-400" />
+              <span>Deadline: {job.deadline || "Not specified"}</span>
+            </div>
+            <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-slate-400" />
-              <span>Source: Company Careers</span>
+              <span>Source: {job.source || "Company Careers"}</span>
             </div>
           </div>
 
@@ -87,6 +91,26 @@ export default function JobDetailPage() {
             <div>
               <h3 className="text-sm font-bold text-slate-900 mb-2">Description</h3>
               <p className="text-sm text-slate-600 leading-relaxed">{job.jd || "No description provided."}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Responsibilities</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{job.responsibilities || "Responsibilities will be shared by the employer."}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Requirements</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{job.requirements || "Requirements will be shared by the employer."}</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Nice-to-have</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{job.niceToHave || "No nice-to-have skills listed."}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Benefits</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{job.benefits || "Benefits will be shared by the employer."}</p>
+              </div>
             </div>
           </div>
 

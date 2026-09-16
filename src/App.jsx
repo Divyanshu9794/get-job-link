@@ -7,8 +7,6 @@ import {
   updateDoc, getDocs, setDoc, writeBatch
 } from "firebase/firestore";
 import Router from "./router/Router";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import { CheckCircle2, Users, X } from "lucide-react";
 
 export const AppContext = createContext();
@@ -31,6 +29,7 @@ export default function App() {
   const [formData, setFormData] = useState({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
   const [reelFormData, setReelFormData] = useState({ title: "", description: "", reelUrl: "", category: "Git & GitHub" });
   const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const statsDocRef = doc(db, "analytics", "insta_popup");
@@ -183,11 +182,7 @@ export default function App() {
   return (
     <AppContext.Provider value={value}>
       <HelmetProvider>
-        <div className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col justify-between">
-          <Header />
-          <Router />
-          <Footer />
-        </div>
+        <Router />
       </HelmetProvider>
 
       {/* Global Modals */}
@@ -237,5 +232,3 @@ function InstaModal() {
     </div>
   );
 }
-
-
