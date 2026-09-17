@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { FileText, Download, ChevronRight, BookOpen, Sparkle, ArrowRight, Linkedin, Globe, GraduationCap, Award, Languages, MapPin } from "lucide-react";
+import { FileText, Download, ChevronRight, Sparkle } from "lucide-react";
 
 export default function ResumeBuilder() {
   const { currentUser, isAdmin } = useAuth();

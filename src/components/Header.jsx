@@ -15,6 +15,7 @@ export default function Header({ currentUser, isAdmin, onLogin, onLogout, onSear
     { to: "/jobs", label: "Jobs", icon: LayoutGrid },
     { to: "/resume", label: "Resume", icon: Table },
     { to: "/ats", label: "ATS", icon: Table },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Table }] : []),
   ];
 
   const handleSearchSubmit = (e) => {

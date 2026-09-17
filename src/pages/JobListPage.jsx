@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
+import { useApp } from "../App";
 import JobCard from "../components/JobCard";
 import {
   Briefcase, Search, ChevronDown, SlidersHorizontal, X, Check,
@@ -16,6 +17,7 @@ const SKILLS = ["React", "Node.js", "AWS", "SQL", "Python", "Data Analytics", "P
 export default function JobListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { jobs, loading } = useJobs();
+  const { companyPriorities } = useApp();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const q = searchParams.get("q") || "";
@@ -25,6 +27,16 @@ export default function JobListPage() {
   const salary = searchParams.get("salary") || "";
   const domain = searchParams.get("domain") || "";
   const sort = searchParams.get("sort") || "recent";
+
+  // Build a map of company name -> priority (lower number = higher priority)
+  const priorityMap = new Map();
+  companyPriorities.forEach((p) => {
+    if (p.enabled !== false) {
+      priorityMap.set((p.company || "").toLowerCase(), Number(p.priority) || 0);
+    }
+  });
+
+  const getPriority = (company) => priorityMap.get((company || "").toLowerCase()) ?? 999;
 
   const toggleParam = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -50,6 +62,12 @@ export default function JobListPage() {
       return matchesSearch && matchesType && matchesExp && matchesLocation && matchesSalary && matchesDomain;
     })
     .sort((a, b) => {
+      if (sort === "priority") {
+        const pa = getPriority(a.company);
+        const pb = getPriority(b.company);
+        if (pa !== pb) return pa - pb;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      }
       if (sort === "salary") return Number(b.salary?.match(/\d+/)?.[0]) - Number(a.salary?.match(/\d+/)?.[0]);
       if (sort === "company") return (a.company || "").localeCompare(b.company || "");
       return (b.createdAt || 0) - (a.createdAt || 0);
@@ -89,6 +107,7 @@ export default function JobListPage() {
           >
             <option value="recent">Most Recent</option>
             <option value="relevance">Relevance</option>
+            <option value="priority">Company Priority</option>
             <option value="salary">Salary</option>
             <option value="company">Company</option>
           </select>

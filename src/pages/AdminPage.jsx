@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useApp } from "../App";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import {
   PlusCircle, Trash2, Calendar, Settings, BookOpen, MessageSquare, Save,
   Search, Briefcase, Sparkle, Zap, Play, ArrowRight, RefreshCw, ExternalLink,
@@ -8,7 +10,7 @@ import {
 import { ingestAllJobs, ingestJobs, SOURCES } from "../services/ingestion";
 
 export default function AdminPage() {
-  const { jobs, learningReels, currentUser, isAdmin, triggerNotification } = useApp();
+  const { jobs, learningReels, currentUser, isAdmin, triggerNotification, toggleSourceConfig, companyPriorities, addCompanyPriority, updateCompanyPriority, removeCompanyPriority, sourceConfigs } = useApp();
   const [activeSection, setActiveSection] = useState("post-job");
   const [popupLink, setPopupLink] = useState("https://www.instagram.com/codes_and_clouds/");
   const [bulkDeleteDate, setBulkDeleteDate] = useState("");
@@ -21,7 +23,8 @@ export default function AdminPage() {
     title: "", description: "", reelUrl: "", category: "Git & GitHub"
   });
   const [ingestionStatus, setIngestionStatus] = useState({});
-  const [companyPriority, setCompanyPriority] = useState([]);
+  const [newCompany, setNewCompany] = useState("");
+  const [newPriority, setNewPriority] = useState("");
 
   if (!currentUser || !isAdmin) {
     return (
@@ -35,14 +38,23 @@ export default function AdminPage() {
     );
   }
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.company || !formData.url) {
       triggerNotification("Please fill in all required fields.");
       return;
     }
-    triggerNotification("Job post updated successfully!");
-    setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+    try {
+      await addDoc(collection(db, "jobs"), {
+        ...formData,
+        date: new Date().toISOString().split("T")[0],
+        createdAt: Date.now()
+      });
+      triggerNotification("Job post added successfully!");
+      setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+    } catch (error) {
+      triggerNotification("Error publishing job post: " + error.message);
+    }
   };
 
   const handleReelSubmit = (e) => {
@@ -89,12 +101,7 @@ export default function AdminPage() {
   };
 
   const toggleSourceEnabled = async (sourceKey) => {
-    // In a real app, this would update a config in Firestore or environment
-    // For now we just toggle in memory and notify
-    const source = SOURCES[sourceKey];
-    if (!source) return;
-    // Would persist to Firestore config collection
-    triggerNotification(`Toggled ${source.name} (would need backend persisting)`);
+    await toggleSourceConfig(sourceKey);
   };
 
   return (
@@ -119,7 +126,7 @@ export default function AdminPage() {
           <button
             key={tab.key}
             onClick={() => setActiveSection(tab.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSection === tab.key ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-700"}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSection === tab.key ? "bg-blue-600 text-white shadow-md" : "bg-white text-slate-600 hover:bg-slate-100"}`}
           >
             {tab.label}
           </button>
@@ -290,34 +297,37 @@ export default function AdminPage() {
           <div className="space-y-4">
             <h4 className="text-lg font-bold text-slate-900 mb-2">Sources Configuration</h4>
             <div className="space-y-2">
-              {Object.entries(SOURCES).map(([key, source]) => (
-                <div key={key} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
-                      {source.enabled ? <CheckCircle2 className="text-blue-600" /> : <Zap className="text-gray-500" />}
-                    </div>
-                    <div>
-                      <h5 className="font-medium text-slate-900">{source.name}</h5>
-                      <p className="text-sm text-slate-500">{source.name} job board adapter</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => toggleSourceEnabled(key)}
-                      className={`px-3 py-1 text-xs rounded ${source.enabled ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"} transition-colors`}
-                    >
-                      {source.enabled ? "Enabled" : "Disabled"}
-                    </button>
-                    <button
-                      onClick={() => handleRunSourceIngestion(key)}
-                      className="ml-2 px-3 py-1 text-xs rounded bg-green-600 hover:bg-green-700 text-white font-medium transition-colors disabled:${ingestionStatus.loading || (ingestionStatus[key]?.loading)}"
-                      disabled={ingestionStatus.loading || (ingestionStatus[key]?.loading)}
-                    >
-                      {ingestionStatus[key]?.loading ? "Running" : "Run Now"}
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {Object.entries(SOURCES).map(([key, source]) => {
+                    const enabled = sourceConfigs?.[key]?.enabled ?? source.enabled;
+                    return (
+                      <div key={key} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
+                            {enabled ? <CheckCircle2 className="text-blue-600" /> : <Zap className="text-gray-500" />}
+                          </div>
+                          <div>
+                            <h5 className="font-medium text-slate-900">{source.name}</h5>
+                            <p className="text-sm text-slate-500">{source.name} job board adapter</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => toggleSourceEnabled(key)}
+                            className={`px-3 py-1 text-xs rounded ${enabled ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"} transition-colors`}
+                          >
+                            {enabled ? "Enabled" : "Disabled"}
+                          </button>
+                          <button
+                            onClick={() => handleRunSourceIngestion(key)}
+                            className="ml-2 px-3 py-1 text-xs rounded bg-green-600 hover:bg-green-700 text-white font-medium transition-colors"
+                            disabled={!enabled || ingestionStatus.loading || ingestionStatus[key]?.loading}
+                          >
+                            {ingestionStatus[key]?.loading ? "Running" : "Run Now"}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
             </div>
           </div>
 
@@ -352,23 +362,94 @@ export default function AdminPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 mb-4">Company Priority Management</h3>
           <p className="text-sm text-slate-500 mb-4">Configure which companies appear at the top of job listings.</p>
-          {/* Simple placeholder - in a real app this would be a Firestore collection */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
-                  <CheckCircle2 className="text-blue-600" />
-                </div>
-                <div>
-                  <h5 className="font-medium text-slate-900">Google</h5>
-                  <p className="text-sm text-slate-500">Priority: 1 (Highest)</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button className="px-3 py-1 text-xs rounded bg-blue-50 text-blue-600 hover:bg-blue-600">Edit Priority</button>
-                <button className="ml-2 px-3 py-1 text-xs rounded bg-red-50 text-red-600 hover:red-600">Remove</button>
-              </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Company Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Google"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                onChange={(e) => setNewCompany(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newCompany.trim()) {
+                    addCompanyPriority(newCompany.trim());
+                    setNewCompany("");
+                  }
+                }}
+              />
             </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Priority</label>
+              <input
+                type="number"
+                min="1"
+                defaultValue={companyPriorities.length + 1}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                onChange={(e) => setNewPriority(e.target.value)}
+              />
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={() => {
+                  if (!newCompany.trim()) {
+                    triggerNotification("Please enter a company name.");
+                    return;
+                  }
+                  addCompanyPriority(newCompany.trim(), Number(newPriority) || companyPriorities.length + 1);
+                  setNewCompany("");
+                  setNewPriority("");
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+              >
+                <PlusCircle className="w-4 h-4" />
+                Add Company
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {companyPriorities.length === 0 ? (
+              <div className="border border-dashed border-slate-200 rounded-xl p-6 text-center text-sm text-slate-500">
+                No company priorities configured yet. Add your first company above.
+              </div>
+            ) : (
+              companyPriorities
+                .slice()
+                .sort((a, b) => Number(a.priority) - Number(b.priority))
+                .map((priority) => (
+                  <div key={priority.id} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
+                        <CheckCircle2 className="text-blue-600" />
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-slate-900">{priority.company}</h5>
+                        <p className="text-sm text-slate-500">Priority: {priority.priority}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => {
+                          const nextPriority = prompt("Enter new priority for " + priority.company, priority.priority);
+                          if (nextPriority && !Number.isNaN(Number(nextPriority))) {
+                            updateCompanyPriority(priority.id, { priority: Number(nextPriority) });
+                          }
+                        }}
+                        className="px-3 py-1 text-xs rounded bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                      >
+                        Edit Priority
+                      </button>
+                      <button
+                        onClick={() => removeCompanyPriority(priority.id)}
+                        className="ml-2 px-3 py-1 text-xs rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))
+            )}
           </div>
         </div>
       )}

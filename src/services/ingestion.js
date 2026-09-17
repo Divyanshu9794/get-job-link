@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
+import { collection, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { db } from "../firebase";
 
 // Safe environment variable getter for browser/Vite compatibility
@@ -51,7 +51,7 @@ export const SOURCES = {
             const desc = j.content || j.description || "";
             jobs.push({
               title: j.title || "",
-              company: j.absolute_url ? j.absolute_url.split("/")[3] : board,
+              company: board,
               description: desc,
               url: loc,
               jobType: "",

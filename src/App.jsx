@@ -6,6 +6,7 @@ import {
   collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc,
   updateDoc, getDocs, setDoc, writeBatch
 } from "firebase/firestore";
+import { SOURCES } from "./services/ingestion";
 import Router from "./router/Router";
 import { CheckCircle2, Users, X } from "lucide-react";
 
@@ -101,10 +102,15 @@ export default function App() {
   useEffect(() => {
     const sourceConfigRef = doc(db, "source_config", "defaults");
     const unsubscribe = onSnapshot(sourceConfigRef, (snap) => {
-      if (snap.exists()) {
-        setSourceConfigs(snap.data()?.sources || {});
-      } else {
-        setDoc(sourceConfigRef, { sources: {} }, { merge: true });
+      const sources = snap.data()?.sources || {};
+      setSourceConfigs(sources);
+      Object.entries(sources).forEach(([key, config]) => {
+        if (SOURCES[key]) {
+          SOURCES[key].enabled = Boolean(config.enabled);
+        }
+      });
+      if (!snap.exists()) {
+        setDoc(sourceConfigRef, { sources }, { merge: true });
       }
     });
     return () => unsubscribe();
@@ -196,6 +202,9 @@ export default function App() {
         console.error("Error toggling source config:", error);
         triggerNotification(`Failed to toggle ${sourceKey}`);
       });
+      if (SOURCES[sourceKey]) {
+        SOURCES[sourceKey].enabled = newEnabled;
+      }
       return { ...prev, [sourceKey]: { ...prev?.[sourceKey], enabled: newEnabled } };
     });
     triggerNotification(`Source ${sourceKey} updated`);
