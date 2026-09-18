@@ -1,4 +1,13 @@
-import { collection, query, where, getDocs, writeBatch } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+  writeBatch,
+  getDoc,
+  runTransaction,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 // Safe environment variable getter for browser/Vite compatibility
@@ -21,7 +30,7 @@ const fetchWithTimeout = (url, options = {}, timeout = 15000) => {
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
 };
 
-// CORS proxy for RSS feeds
+// CORS proxy for external APIs that don't support CORS
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 // Known job source adapters. Each returns an array of normalized job objects.
@@ -30,11 +39,11 @@ export const SOURCES = {
   greenhouse: {
     name: "Greenhouse",
     enabled: true,
-    board: getEnvVar("VITE_GREENHOUSE_BOARDS") || "google,netflix,airbnb",
+    board: getEnvVar("VITE_GREENHOUSE_BOARDS") || "airbnb,stripe,dropbox",
     company: "",
     feedUrl: "",
     apiKey: getEnvVar("VITE_GREENHOUSE_API_KEY"),
-    // https://www.greenhouse.io/developers
+    // Greenhouse API lacks CORS; use local server proxy via /api/greenhouse/:board/jobs
     adapter: async (config) => {
       const boards = (config.board || getEnvVar("VITE_GREENHOUSE_BOARDS") || "").split(",").map(b => b.trim()).filter(Boolean);
       if (boards.length === 0) return [];
@@ -42,7 +51,7 @@ export const SOURCES = {
       const jobs = [];
       for (const board of boards) {
         try {
-          const res = await fetchWithTimeout(`https://api.greenhouse.io/v1/boards/${board}/jobs`, {}, 15000);
+          const res = await fetchWithTimeout(`/api/greenhouse/${encodeURIComponent(board)}/jobs`, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
           const list = data.jobs || [];
@@ -51,7 +60,7 @@ export const SOURCES = {
             const desc = j.content || j.description || "";
             jobs.push({
               title: j.title || "",
-              company: board,
+              company: j.company_name || board,
               description: desc,
               url: loc,
               jobType: "",
@@ -88,7 +97,9 @@ export const SOURCES = {
       const company = config.company || "";
       if (!company) return [];
       try {
-        const res = await fetchWithTimeout(`https://api.lever.co/v0/postings/${company}`, {}, 15000);
+        // Lever API also lacks CORS, use proxy
+        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`https://api.lever.co/v0/postings?company=${company}`)}`;
+        const res = await fetchWithTimeout(proxyUrl, {}, 15000);
         if (!res.ok) return [];
         const data = await res.json();
         return (data || []).map(j => ({

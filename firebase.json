@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "function": "greenhouseJobs"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

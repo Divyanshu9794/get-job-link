@@ -80,5 +80,23 @@ app.get('/api/adcash-lib.js', (req, res) => {
   res.send(cachedAdcashJs);
 });
 
+// Greenhouse API proxy (bypass CORS)
+app.get('/api/greenhouse/:board/jobs', async (req, res) => {
+  try {
+    const { board } = req.params;
+    const url = `https://api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Greenhouse fetch failed' });
+    }
+    const data = await response.json();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json(data);
+  } catch (err) {
+    console.error('Greenhouse proxy error:', err);
+    res.status(500).json({ error: 'Proxy error' });
+  }
+});
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
