@@ -35,7 +35,8 @@ const corsHandler = cors({ origin: true });
 
 export const greenhouseJobs = onRequest({ cors: true }, async (req, res) => {
   corsHandler(req, res, async () => {
-    const pathMatch = req.path.match(/^\/greenhouse\/([^/]+)\/jobs$/);
+    // Handle both direct path (/greenhouse/:board/jobs) and rewrite path (/api/greenhouse/:board/jobs)
+    const pathMatch = req.path.match(/^\/(?:api\/)?greenhouse\/([^/]+)\/jobs$/);
     const board = pathMatch ? decodeURIComponent(pathMatch[1]) : req.query.board;
     if (!board) {
       return res.status(400).json({ error: "Board parameter required" });

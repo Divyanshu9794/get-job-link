@@ -307,25 +307,80 @@ export async function ingestJobs(sourceKey, config = {}) {
     throw new Error(`Source ${sourceKey} is not enabled`);
   }
 
-  const rawJobs = await source.adapter(config);
+  let rawCount = 0;
+  let validCount = 0;
+  let duplicateCount = 0;
+  let storedCount = 0;
+  const errors = [];
+
+  // SOURCE_STARTED
+  console.log(`[INGEST] SOURCE_STARTED: ${source.name} (${sourceKey})`);
+  console.log(`[INGEST] config: board=${config.board || 'default'}`);
+
+  // REQUEST_SENT
+  console.log(`[INGEST] REQUEST_SENT: calling ${source.name} adapter`);
+  let rawJobs;
+  try {
+    rawJobs = await source.adapter(config);
+    rawCount = rawJobs.length;
+  } catch (e) {
+    errors.push(e.message);
+    console.error(`[INGEST] SOURCE_FAILED: ${source.name} adapter error:`, e.message);
+    return { source: source.name, rawCount: 0, validCount: 0, duplicateCount: 0, storedCount: 0, failed: 0, errors };
+  }
+  console.log(`[INGEST] RESPONSE_RECEIVED: ${rawCount} raw jobs from ${source.name}`);
+
+  // Normalize
   const normalizedJobs = rawJobs.map(job => normalizeJob(job, source.name));
 
-  const batch = writeBatch(db);
-  let addedCount = 0;
+  // Validation — check for required fields
+  const validJobs = [];
   for (const job of normalizedJobs) {
+    if (!job.title || !job.company || !job.url) {
+      console.warn(`[INGEST] JOB_REJECTED: missing required fields (title=${!!job.title}, company=${!!job.company}, url=${!!job.url})`);
+      continue;
+    }
+    validJobs.push(job);
+  }
+  validCount = validJobs.length;
+  console.log(`[INGEST] JOBS_VALIDATED: ${validCount} valid out of ${rawCount} raw`);
+
+  // Deduplication
+  const uniqueJobs = [];
+  for (const job of validJobs) {
     const isDuplicate = await deduplicateJob(job);
-    if (!isDuplicate) {
-      const docRef = doc(collection(db, "jobs"));
-      batch.set(docRef, job);
-      addedCount++;
+    if (isDuplicate) {
+      duplicateCount++;
+      console.log(`[INGEST] DUPLICATE_SKIPPED: ${job.title} at ${job.url}`);
+    } else {
+      uniqueJobs.push(job);
     }
   }
+  console.log(`[INGEST] JOBS_DEDUPLICATED: ${uniqueJobs.length} unique, ${duplicateCount} duplicates skipped`);
 
-  if (addedCount > 0) {
+  // Store
+  if (uniqueJobs.length > 0) {
+    const batch = writeBatch(db);
+    for (const job of uniqueJobs) {
+      const docRef = doc(collection(db, "jobs"));
+      batch.set(docRef, job);
+      storedCount++;
+    }
     await batch.commit();
+    console.log(`[INGEST] JOBS_STORED: ${storedCount} jobs written to Firestore`);
+  } else {
+    console.log(`[INGEST] JOBS_STORED: 0 (no new jobs)`);
   }
 
-  return { source: source.name, rawCount: rawJobs.length, addedCount };
+  return {
+    source: source.name,
+    rawCount,
+    validCount,
+    duplicateCount,
+    storedCount,
+    failed: errors.length,
+    errors
+  };
 }
 
 // Ingest from all enabled sources

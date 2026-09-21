@@ -335,16 +335,22 @@ export default function AdminPage() {
             <div className="mt-6">
               <h4 className="text-lg font-bold text-slate-900 mb-2">Latest Ingestion Results</h4>
               <div className="space-y-2">
-                {ingestionStatus.results.map((result, index) => (
-                  <div key={index} className="p-3 border border-slate-200 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{result.source}</span>
-                      <span className="text-sm">
-                        {result.rawCount} fetched, {result.addedCount} added
-                      </span>
+                {ingestionStatus.results.map((result, index) => {
+                  const isError = result.errors && result.errors.length > 0;
+                  return (
+                    <div key={index} className={`p-3 border rounded-lg ${isError ? 'border-red-200 bg-red-50' : 'border-slate-200'}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{result.source}</span>
+                        <span className="text-sm">
+                          {isError
+                            ? `Failed: ${result.errors.join(', ')}`
+                            : `Fetched: ${result.rawCount}, Validated: ${result.validCount}, Duplicates: ${result.duplicateCount}, Added: ${result.storedCount}`
+                          }
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
