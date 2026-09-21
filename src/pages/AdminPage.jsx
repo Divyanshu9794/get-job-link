@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../App";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import {
   PlusCircle, Trash2, Calendar, Settings, BookOpen, MessageSquare, Save,
   Search, Briefcase, Sparkle, Zap, Play, ArrowRight, RefreshCw, ExternalLink,
-  Building2, Database, List, CheckCircle2
+  Building2, Database, List, CheckCircle2, Bell, BellOff, ArrowUpCircle
 } from "lucide-react";
 import { ingestAllJobs, ingestJobs, SOURCES } from "../services/ingestion";
 
@@ -25,6 +25,10 @@ export default function AdminPage() {
   const [ingestionStatus, setIngestionStatus] = useState({});
   const [newCompany, setNewCompany] = useState("");
   const [newPriority, setNewPriority] = useState("");
+  const [newJobsCount, setNewJobsCount] = useState(0);
+  const [newJobsList, setNewJobsList] = useState([]);
+  const [checkingNewJobs, setCheckingNewJobs] = useState(false);
+  const [lastVisitTime, setLastVisitTime] = useState(null);
 
   if (!currentUser || !isAdmin) {
     return (
@@ -104,6 +108,75 @@ export default function AdminPage() {
     await toggleSourceConfig(sourceKey);
   };
 
+  // Track last visit and count new jobs since that visit
+  const refreshLastVisit = async () => {
+    if (!currentUser) return;
+    const userRef = doc(db, "userActivity", currentUser.uid);
+    await setDoc(userRef, { lastVisit: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+    setLastVisitTime(Date.now());
+  };
+
+  const checkNewJobs = async () => {
+    if (!currentUser) return;
+    setCheckingNewJobs(true);
+    try {
+      const userRef = doc(db, "userActivity", currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      const lastVisit = userSnap.exists() ? (userSnap.data().lastVisit?.toMillis?.() || 0) : 0;
+      setLastVisitTime(lastVisit);
+
+      const jobsRef = collection(db, "jobs");
+      const q = query(jobsRef, where("createdAt", ">", lastVisit));
+      const snap = await getDocs(q);
+      const jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setNewJobsList(jobs);
+      setNewJobsCount(jobs.length);
+
+      if (jobs.length > 0) {
+        triggerNotification(`You have ${jobs.length} new job${jobs.length > 1 ? "s" : ""} since your last visit.`);
+      }
+    } catch (e) {
+      console.error("checkNewJobs error:", e);
+      triggerNotification("Failed to check new jobs: " + e.message);
+    } finally {
+      setCheckingNewJobs(false);
+    }
+  };
+
+  const dismissNewJobs = async () => {
+    await refreshLastVisit();
+    setNewJobsCount(0);
+    setNewJobsList([]);
+    triggerNotification("New jobs dismissed — last visit updated.");
+  };
+
+  useEffect(() => {
+    const loadLastVisit = async () => {
+      if (!currentUser) return;
+      try {
+        const userRef = doc(db, "userActivity", currentUser.uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          setLastVisitTime(data.lastVisit?.toMillis?.() || null);
+        }
+      } catch (e) {
+        console.error("loadLastVisit error:", e);
+      }
+    };
+    loadLastVisit();
+    checkNewJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
+
+  // Update last visit after ingestion completes so subsequent visits show only fresh jobs
+  useEffect(() => {
+    if (ingestionStatus.results && ingestionStatus.results.length > 0 && !ingestionStatus.loading) {
+      refreshLastVisit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ingestionStatus.results]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
       <div className="flex items-center justify-between mb-8">
@@ -121,7 +194,8 @@ export default function AdminPage() {
           { key: "reels", label: "Learning Reels" },
           { key: "bulk", label: "Bulk Delete" },
           { key: "ingestion", label: "Job Ingestion" },
-          { key: "companies", label: "Company Priority" }
+          { key: "companies", label: "Company Priority" },
+          { key: "new-jobs", label: "New Jobs" }
         ].map((tab) => (
           <button
             key={tab.key}
@@ -457,6 +531,83 @@ export default function AdminPage() {
                 ))
             )}
           </div>
+        </div>
+      )}
+
+      {activeSection === "new-jobs" && (
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Bell className="w-5 h-5 text-blue-600" />
+              New Job Notifications
+            </h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={checkNewJobs}
+                disabled={checkingNewJobs}
+                className="px-3 py-1.5 text-xs rounded bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors disabled:opacity-50"
+              >
+                {checkingNewJobs ? "Checking..." : "Refresh"}
+              </button>
+              {newJobsCount > 0 && (
+                <button
+                  onClick={dismissNewJobs}
+                  className="px-3 py-1.5 text-xs rounded bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors flex items-center gap-1"
+                >
+                  <BellOff className="w-3 h-3" />
+                  Dismiss
+                </button>
+              )}
+            </div>
+          </div>
+
+          <p className="text-sm text-slate-500 mb-4">
+            Shows jobs added to the database since your last visit. Clicking <strong>Dismiss</strong> updates your last-visit time.
+          </p>
+
+          {lastVisitTime && (
+            <p className="text-xs text-slate-400 mb-4">
+              Last visit: {new Date(lastVisitTime).toLocaleString()}
+            </p>
+          )}
+
+          {newJobsCount === 0 && !checkingNewJobs && (
+            <div className="border border-dashed border-slate-200 rounded-xl p-8 text-center">
+              <BellOff className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500">No new jobs since your last visit.</p>
+            </div>
+          )}
+
+          {newJobsList.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <ArrowUpCircle className="w-4 h-4 text-green-600" />
+                {newJobsCount} new job{newJobsCount > 1 ? "s" : ""} found
+              </div>
+              {newJobsList.map((job) => (
+                <div key={job.id} className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-slate-900 truncate">{job.title || "Untitled"}</h4>
+                      <p className="text-sm text-slate-500">{job.company || "Unknown Company"}</p>
+                      {job.domain && <p className="text-xs text-slate-400 mt-1">{job.domain} · {job.jobType || "Full Time"}</p>}
+                    </div>
+                    {job.url && (
+                      <a
+                        href={job.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 px-3 py-1.5 text-xs rounded bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        View
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
