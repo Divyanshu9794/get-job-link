@@ -1,3 +1,183 @@
+// import React, { useState, useEffect } from "react";
+// import { useApp } from "../App";
+// import { collection, addDoc, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+// import { db } from "../firebase";
+// import {
+//   PlusCircle, Trash2, Calendar, Settings, BookOpen, MessageSquare, Save,
+//   Search, Briefcase, Sparkle, Zap, Play, ArrowRight, RefreshCw, ExternalLink,
+//   Building2, Database, List, CheckCircle2, Bell, BellOff, ArrowUpCircle
+// } from "lucide-react";
+// import { ingestAllJobs, ingestJobs, SOURCES } from "../services/ingestion";
+
+// export default function AdminPage() {
+//   const { jobs, learningReels, currentUser, isAdmin, triggerNotification, toggleSourceConfig, companyPriorities, addCompanyPriority, updateCompanyPriority, removeCompanyPriority, sourceConfigs } = useApp();
+//   const [activeSection, setActiveSection] = useState("post-job");
+//   const [popupLink, setPopupLink] = useState("https://www.instagram.com/codes_and_clouds/");
+//   const [bulkDeleteDate, setBulkDeleteDate] = useState("");
+//   const [formData, setFormData] = useState({
+//     title: "", company: "", jd: "", url: "",
+//     jobType: "Full Time", experience: "More than 0 year",
+//     salary: "", domain: "Engineering", isRemote: false
+//   });
+//   const [reelFormData, setReelFormData] = useState({
+//     title: "", description: "", reelUrl: "", category: "Git & GitHub"
+//   });
+//   const [ingestionStatus, setIngestionStatus] = useState({});
+//   const [newCompany, setNewCompany] = useState("");
+//   const [newPriority, setNewPriority] = useState("");
+//   const [newJobsCount, setNewJobsCount] = useState(0);
+//   const [newJobsList, setNewJobsList] = useState([]);
+//   const [checkingNewJobs, setCheckingNewJobs] = useState(false);
+//   const [lastVisitTime, setLastVisitTime] = useState(null);
+
+//   if (!currentUser || !isAdmin) {
+//     return (
+//       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
+//         <div className="mx-auto w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-6">
+//           <Settings className="w-8 h-8 text-red-600" />
+//         </div>
+//         <h2 className="text-xl font-bold text-slate-900">Admin access required</h2>
+//         <p className="text-sm text-slate-500 mt-2">Please sign in as an admin to access the control panel.</p>
+//       </div>
+//     );
+//   }
+
+//   const handleFormSubmit = async (e) => {
+//     e.preventDefault();
+//     if (!formData.title || !formData.company || !formData.url) {
+//       triggerNotification("Please fill in all required fields.");
+//       return;
+//     }
+//     try {
+//       await addDoc(collection(db, "jobs"), {
+//         ...formData,
+//         date: new Date().toISOString().split("T")[0],
+//         createdAt: Date.now()
+//       });
+//       triggerNotification("Job post added successfully!");
+//       setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+//     } catch (error) {
+//       triggerNotification("Error publishing job post: " + error.message);
+//     }
+//   };
+
+//   const handleReelSubmit = (e) => {
+//     e.preventDefault();
+//     if (!reelFormData.title || !reelFormData.reelUrl) {
+//       triggerNotification("Please fill in all required fields.");
+//       return;
+//     }
+//     triggerNotification("Learning Reel successfully added to database!");
+//     setReelFormData({ title: "", description: "", reelUrl: "", category: "Git & GitHub" });
+//   };
+
+//   const handleRefreshIngestion = async () => {
+//     try {
+//       setIngestionStatus({ loading: true });
+//       const results = await ingestAllJobs();
+//       setIngestionStatus({ loading: false, results: results, timestamp: Date.now() });
+//       triggerNotification("Ingestion completed successfully!");
+//     } catch (error) {
+//       setIngestionStatus({ loading: false, error: error.message });
+//       triggerNotification("Error during ingestion: " + error.message);
+//     }
+//   };
+
+//   const handleRunSourceIngestion = async (sourceKey) => {
+//     try {
+//       setIngestionStatus(prev => ({ ...prev, loading: true, [sourceKey]: { loading: true } }));
+//       const result = await ingestJobs(sourceKey);
+//       setIngestionStatus(prev => ({
+//         ...prev,
+//         loading: false,
+//         [sourceKey]: { ...prev[sourceKey], loading: false, result: result },
+//         results: [...(prev.results || []), result]
+//       }));
+//       triggerNotification(`Ingestion from ${SOURCES[sourceKey]?.name || sourceKey} completed!`);
+//     } catch (error) {
+//       setIngestionStatus(prev => ({
+//         ...prev,
+//         loading: false,
+//         [sourceKey]: { ...prev[sourceKey], loading: false, error: error.message }
+//       }));
+//       triggerNotification(`Error ingesting from ${SOURCES[sourceKey]?.name}: ${error.message}`);
+//     }
+//   };
+
+//   const toggleSourceEnabled = async (sourceKey) => {
+//     await toggleSourceConfig(sourceKey);
+//   };
+
+//   // Track last visit and count new jobs since that visit
+//   const refreshLastVisit = async () => {
+//     if (!currentUser) return;
+//     const userRef = doc(db, "userActivity", currentUser.uid);
+//     await setDoc(userRef, { lastVisit: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+//     setLastVisitTime(Date.now());
+//   };
+
+//   const checkNewJobs = async () => {
+//     if (!currentUser) return;
+//     setCheckingNewJobs(true);
+//     try {
+//       const userRef = doc(db, "userActivity", currentUser.uid);
+//       const userSnap = await getDoc(userRef);
+//       const lastVisit = userSnap.exists() ? (userSnap.data().lastVisit?.toMillis?.() || 0) : 0;
+//       setLastVisitTime(lastVisit);
+
+//       const jobsRef = collection(db, "jobs");
+//       const q = query(jobsRef, where("createdAt", ">", lastVisit));
+//       const snap = await getDocs(q);
+//       const jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+//       setNewJobsList(jobs);
+//       setNewJobsCount(jobs.length);
+
+//       if (jobs.length > 0) {
+//         triggerNotification(`You have ${jobs.length} new job${jobs.length > 1 ? "s" : ""} since your last visit.`);
+//       }
+//     } catch (e) {
+//       console.error("checkNewJobs error:", e);
+//       triggerNotification("Failed to check new jobs: " + e.message);
+//     } finally {
+//       setCheckingNewJobs(false);
+//     }
+//   };
+
+//   const dismissNewJobs = async () => {
+//     await refreshLastVisit();
+//     setNewJobsCount(0);
+//     setNewJobsList([]);
+//     triggerNotification("New jobs dismissed — last visit updated.");
+//   };
+
+//   useEffect(() => {
+//     const loadLastVisit = async () => {
+//       if (!currentUser) return;
+//       try {
+//         const userRef = doc(db, "userActivity", currentUser.uid);
+//         const snap = await getDoc(userRef);
+//         if (snap.exists()) {
+//           const data = snap.data();
+//           setLastVisitTime(data.lastVisit?.toMillis?.() || null);
+//         }
+//       } catch (e) {
+//         console.error("loadLastVisit error:", e);
+//       }
+//     };
+//     loadLastVisit();
+//     checkNewJobs();
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [currentUser]);
+
+//   // Update last visit after ingestion completes so subsequent visits show only fresh jobs
+//   useEffect(() => {
+//     if (ingestionStatus.results && ingestionStatus.results.length > 0 && !ingestionStatus.loading) {
+//       refreshLastVisit();
+//     }
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [ingestionStatus.results]);
+
+
 import React, { useState, useEffect } from "react";
 import { useApp } from "../App";
 import { collection, addDoc, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -30,18 +210,7 @@ export default function AdminPage() {
   const [checkingNewJobs, setCheckingNewJobs] = useState(false);
   const [lastVisitTime, setLastVisitTime] = useState(null);
 
-  if (!currentUser || !isAdmin) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-6">
-          <Settings className="w-8 h-8 text-red-600" />
-        </div>
-        <h2 className="text-xl font-bold text-slate-900">Admin access required</h2>
-        <p className="text-sm text-slate-500 mt-2">Please sign in as an admin to access the control panel.</p>
-      </div>
-    );
-  }
-
+  // Define all functions first
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.company || !formData.url) {
@@ -108,7 +277,6 @@ export default function AdminPage() {
     await toggleSourceConfig(sourceKey);
   };
 
-  // Track last visit and count new jobs since that visit
   const refreshLastVisit = async () => {
     if (!currentUser) return;
     const userRef = doc(db, "userActivity", currentUser.uid);
@@ -150,6 +318,7 @@ export default function AdminPage() {
     triggerNotification("New jobs dismissed — last visit updated.");
   };
 
+  // Declare all useEffects BEFORE any early returns
   useEffect(() => {
     const loadLastVisit = async () => {
       if (!currentUser) return;
@@ -169,13 +338,27 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
-  // Update last visit after ingestion completes so subsequent visits show only fresh jobs
   useEffect(() => {
     if (ingestionStatus.results && ingestionStatus.results.length > 0 && !ingestionStatus.loading) {
       refreshLastVisit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ingestionStatus.results]);
+
+  // MOVED HERE: Early return AFTER all hooks have safely initialized
+  if (!currentUser || !isAdmin) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-6">
+          <Settings className="w-8 h-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">Admin access required</h2>
+        <p className="text-sm text-slate-500 mt-2">Please sign in as an admin to access the control panel.</p>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">

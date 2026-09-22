@@ -33,57 +33,176 @@ const fetchWithTimeout = (url, options = {}, timeout = 15000) => {
 // CORS proxy for external APIs that don't support CORS
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
-// Known job source adapters. Each returns an array of normalized job objects.
-// To add a new source, add an entry here and implement the adapter function.
 export const SOURCES = {
   greenhouse: {
     name: "Greenhouse",
     enabled: true,
-    board: getEnvVar("VITE_GREENHOUSE_BOARDS") || "airbnb,stripe,dropbox",
+    // PRODUCT-BASED (Global + Indian): Airbnb, Stripe, Dropbox, Discord, Swiggy, CRED, Meesho, BrowserStack...
+    // SERVICE-BASED: Thoughtworks, Globant, Fractal Analytics, Mu Sigma...
+    board: getEnvVar("VITE_GREENHOUSE_BOARDS") || "airbnb,stripe,dropbox,discord,twitch,figma,reddit,canva,lyft,pinterest,instacart,github,gitlab,doordash,coinbase,zapier,asana,okta,cloudflare,datadog,snowflake,mongodb,elastic,twilio,postman,netlify,vercel,gusto,rippling,roblox,duolingo,wayfair,affirm,patreon,grammarly,upwork,docusign,zoominfo,intercom,coursera,razorpay,phonepe,myntra,groww,swiggy,cred,meesho,urbancompany,browserstack,dream11,thoughtworks,globant,fractal",
     company: "",
     feedUrl: "",
     apiKey: getEnvVar("VITE_GREENHOUSE_API_KEY"),
-    // Greenhouse API lacks CORS; use local server proxy via /api/greenhouse/:board/jobs
     adapter: async (config) => {
-      const boards = (config.board || getEnvVar("VITE_GREENHOUSE_BOARDS") || "").split(",").map(b => b.trim()).filter(Boolean);
+      const boardString = config.board || SOURCES.greenhouse.board;
+      const boards = boardString.split(",").map(b => b.trim()).filter(Boolean);
       if (boards.length === 0) return [];
 
-      const jobs = [];
+      let allJobs = [];
       for (const board of boards) {
         try {
           const res = await fetchWithTimeout(`/api/greenhouse/${encodeURIComponent(board)}/jobs`, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
-          const list = data.jobs || [];
-          for (const j of list) {
-            const loc = j.absolute_url || "";
-            const desc = j.content || j.description || "";
-            jobs.push({
-              title: j.title || "",
-              company: j.company_name || board,
-              description: desc,
-              url: loc,
-              jobType: "",
-              experience: "",
-              salary: "",
-              domain: "",
-              isRemote: false,
-              skills: [],
-              fresherFriendly: false,
-              category: "",
-              subCategory: "",
-              experienceLevel: "",
-              remoteType: "",
-              sourceUrl: loc,
-              postedDate: null,
-              deadline: null
-            });
-          }
+          
+          const companyJobs = (data.jobs || []).map(j => ({
+            title: j.title || "",
+            company: j.company_name || board.charAt(0).toUpperCase() + board.slice(1),
+            description: j.content || j.description || "",
+            url: j.absolute_url || "",
+            jobType: "", experience: "", salary: "", domain: "", isRemote: false,
+            skills: [], fresherFriendly: false, category: "", subCategory: "",
+            experienceLevel: "", remoteType: "", sourceUrl: j.absolute_url || "",
+            postedDate: null, deadline: null
+          }));
+          
+          allJobs = [...allJobs, ...companyJobs];
         } catch (e) {
-          console.error(`Greenhouse board ${board} error:`, e);
+          console.warn(`Greenhouse board [${board}] skipped:`, e.message);
         }
       }
-      return jobs;
+      return allJobs;
+    }
+  },
+  lever: {
+    name: "Lever",
+    enabled: true, 
+    board: "",
+    // PRODUCT-BASED: Netflix, Spotify, Atlassian, Shopify, Yelp, Klarna, Zomato, ClearTax...
+    company: getEnvVar("VITE_LEVER_COMPANIES") || "netflix,spotify,yelp,atlassian,shopify,eventbrite,retool,hopper,clearbit,n26,qonto,monzo,deliveroo,auth0,framer,miro,typeform,wix,klarna,trustpilot,xero,opensea,medium,vanta,drata,remote,deel,gocardless,contentful,algolia,cypressio,outreach,zomato,cleartax",
+    feedUrl: "",
+    apiKey: null,
+    adapter: async (config) => {
+      const companyString = config.company || SOURCES.lever.company;
+      const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
+      if (companies.length === 0) return [];
+      
+      let allJobs = [];
+      for (const company of companies) {
+        try {
+          const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`https://api.lever.co/v0/postings?company=${company}`)}`;
+          const res = await fetchWithTimeout(proxyUrl, {}, 15000);
+          if (!res.ok) continue;
+          const data = await res.json();
+          
+          const companyJobs = (data || []).map(j => ({
+            title: j.text || "",
+            company: j.hostedUrl ? j.hostedUrl.split("/")[2] : company.charAt(0).toUpperCase() + company.slice(1),
+            description: j.description || "",
+            url: j.hostedUrl || "",
+            jobType: "", experience: "", salary: "", domain: "", isRemote: false,
+            skills: [], fresherFriendly: false, category: "", subCategory: "",
+            experienceLevel: "", remoteType: "", sourceUrl: j.hostedUrl || "",
+            postedDate: null, deadline: null
+          }));
+          
+          allJobs = [...allJobs, ...companyJobs];
+        } catch (e) {
+          console.warn(`Lever company [${company}] skipped:`, e.message);
+        }
+      }
+      return allJobs;
+    }
+  },
+  ashby: {
+    name: "Ashby",
+    enabled: true,
+    board: "",
+    // PRODUCT-BASED (AI Unicorns & Elite Startups): OpenAI, Anthropic, Ramp, Deel, Vercel...
+    company: getEnvVar("VITE_ASHBY_COMPANIES") || "openai,anthropic,ramp,deel,replit,cohere,clerk,posthog,render,neon,railway,supabase,freshpaint,loom",
+    feedUrl: "",
+    apiKey: null,
+    adapter: async (config) => {
+      const companyString = config.company || SOURCES.ashby.company;
+      const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
+      if (companies.length === 0) return [];
+
+      let allJobs = [];
+      for (const company of companies) {
+        try {
+          const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`https://api.ashbyhq.com/posting-api/job-board/${company}?includeCompensation=true`)}`;
+          const res = await fetchWithTimeout(proxyUrl, {}, 15000);
+          if (!res.ok) continue;
+          const data = await res.json();
+
+          const companyJobs = (data.jobs || []).map(j => ({
+            title: j.title || "",
+            company: company.charAt(0).toUpperCase() + company.slice(1),
+            description: j.descriptionPlain || "",
+            url: j.jobUrl || j.applyUrl || "",
+            jobType: j.employmentType || "",
+            experience: "", 
+            salary: j.compensation ? `${j.compensation.currency} ${j.compensation.min}-${j.compensation.max}` : "",
+            domain: j.department || "",
+            isRemote: Boolean(j.isRemote || (j.workplaceType && j.workplaceType.toLowerCase() === 'remote')),
+            skills: [], fresherFriendly: false, category: "", subCategory: "",
+            experienceLevel: "", remoteType: j.workplaceType || "", 
+            sourceUrl: j.jobUrl || "",
+            postedDate: j.publishedAt || null, deadline: null
+          }));
+
+          allJobs = [...allJobs, ...companyJobs];
+        } catch (e) {
+          console.warn(`Ashby company [${company}] skipped:`, e.message);
+        }
+      }
+      return allJobs;
+    }
+  },
+  smartrecruiters: {
+    name: "SmartRecruiters",
+    enabled: true,
+    board: "",
+    // SERVICE-BASED: Nagarro, Publicis Sapient, Capgemini, Sopra Steria, EPAM...
+    // PRODUCT-BASED: Visa, Bosch, IKEA, Ubisoft, McDonald's...
+    company: getEnvVar("VITE_SMARTRECRUITERS_COMPANIES") || "nagarro1,publicissapient,capgemini,soprasteria,epam,visa,ubisoft,bosch,ikea,mcdonalds,nielsen,smartrecruiters",
+    feedUrl: "",
+    apiKey: null,
+    adapter: async (config) => {
+      const companyString = config.company || SOURCES.smartrecruiters.company;
+      const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
+      if (companies.length === 0) return [];
+
+      let allJobs = [];
+      for (const company of companies) {
+        try {
+          const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`https://api.smartrecruiters.com/v1/companies/${company}/postings`)}`;
+          const res = await fetchWithTimeout(proxyUrl, {}, 15000);
+          if (!res.ok) continue;
+          const data = await res.json();
+
+          const companyJobs = (data.content || []).map(j => ({
+            title: j.name || "",
+            company: j.company?.name || company.charAt(0).toUpperCase() + company.slice(1),
+            description: "",
+            url: `https://jobs.smartrecruiters.com/${company}/${j.id}`,
+            jobType: j.typeOfEmployment?.label || "",
+            experience: j.experienceLevel?.label || "",
+            salary: "", domain: j.department?.label || "",
+            isRemote: j.location?.remote || false,
+            skills: [], fresherFriendly: false, category: "", subCategory: "",
+            experienceLevel: j.experienceLevel?.label || "", 
+            remoteType: j.location?.remote ? "Remote" : "On-site", 
+            sourceUrl: `https://jobs.smartrecruiters.com/${company}/${j.id}`,
+            postedDate: j.releasedDate || null, deadline: null
+          }));
+
+          allJobs = [...allJobs, ...companyJobs];
+        } catch (e) {
+          console.warn(`SmartRecruiters company [${company}] skipped:`, e.message);
+        }
+      }
+      return allJobs;
     }
   },
   lever: {
@@ -214,6 +333,9 @@ export const SOURCES = {
     }
   }
 };
+
+
+
 
 // Extract skills from job text
 export function extractSkills(text) {
