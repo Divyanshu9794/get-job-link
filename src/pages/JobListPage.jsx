@@ -189,13 +189,36 @@ export default function JobListPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filteredJobs.map((job) => (
+                // <JobCard
+                //   key={job.id}
+                //   job={job}
+                //   onApply={() => {
+                //     window.open(job.url, "_blank", "noopener,noreferrer");
+                //   }}
+                // />
+
                 <JobCard
-                  key={job.id}
-                  job={job}
-                  onApply={() => {
-                    window.open(job.url, "_blank", "noopener,noreferrer");
-                  }}
-                />
+  key={job.id}
+  job={job}
+  onApply={() => {
+    // 1. Check if the property is named differently in your database (e.g., applyUrl, link)
+    let targetUrl = job.url || job.applyUrl || job.link;
+
+    if (!targetUrl) {
+      console.error("No apply link found for this job:", job);
+      alert("Application link is unavailable for this job.");
+      return;
+    }
+
+    // 2. Add 'https://' if the URL doesn't already start with http:// or https://
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = `https://${targetUrl}`;
+    }
+
+    // 3. Open the formatted URL
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
+  }}
+/>
               ))}
             </div>
           )}

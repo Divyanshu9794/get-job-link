@@ -27,7 +27,8 @@ export default function App() {
   const [instaPopupClicks, setInstaPopupClicks] = useState(0);
   const [popupLink, setPopupLink] = useState("https://www.instagram.com/codes_and_clouds/");
   const [bulkDeleteDate, setBulkDeleteDate] = useState("");
-  const [formData, setFormData] = useState({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+  const [formData, setFormData] = useState({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false, skills: "", responsibilities: "", requirements: "", niceToHave: "", benefits: "" });
+  const [userResumeSkills, setUserResumeSkills] = useState("");
   const [reelFormData, setReelFormData] = useState({ title: "", description: "", reelUrl: "", category: "Git & GitHub" });
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,8 +62,13 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (user) { setCurrentUser(user); setIsAdmin(user.email === "sdivyanshu352@gmail.com"); }
-      else { setCurrentUser(null); setIsAdmin(false); }
+      if (user) {
+        setCurrentUser(user);
+        setIsAdmin(user.email === "sdivyanshu352@gmail.com");
+        const storedSkills = localStorage.getItem("user_resume_skills");
+        setUserResumeSkills(storedSkills || "");
+      }
+      else { setCurrentUser(null); setIsAdmin(false); setUserResumeSkills(""); }
     });
     return () => unsubscribeAuth();
   }, []);
@@ -259,7 +265,7 @@ export default function App() {
     editingJobId, setEditingJobId, weeklyUsers, showLearningBanner, setShowLearningBanner,
     showInstaModal, setShowInstaModal, instaPopupClicks, setInstaPopupClicks,
     popupLink, setPopupLink, bulkDeleteDate, setBulkDeleteDate,
-    formData, setFormData, reelFormData, setReelFormData, activeTab, setActiveTab,
+    formData, setFormData, userResumeSkills, setUserResumeSkills, reelFormData, setReelFormData, activeTab, setActiveTab,
     searchQuery, setSearchQuery,
     sourceConfigs, setSourceConfigs, companyPriorities, setCompanyPriorities,
     toggleSourceConfig, addCompanyPriority, updateCompanyPriority, removeCompanyPriority,
