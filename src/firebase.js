@@ -21,4 +21,5 @@ if (typeof window !== "undefined") {
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 export const db = getFirestore(app); // 2. Export Database instance

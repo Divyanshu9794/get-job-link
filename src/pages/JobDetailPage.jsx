@@ -152,6 +152,8 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
+import { normalizeSkills } from "../utils/skills";
+import { ShareRow } from "../components/ShareMenu";
 import {
   ExternalLink, MapPin, Briefcase, Clock3, Currency, Building2,
   Star, Shield, ArrowRight, Calendar, DollarSign, Sparkle
@@ -161,6 +163,7 @@ export default function JobDetailPage() {
   const { id } = useParams();
   const { jobs } = useJobs();
   const job = jobs.find((j) => j.id === id);
+  const skills = normalizeSkills(job?.skills);
 
   if (!job) {
     return (
@@ -234,16 +237,22 @@ export default function JobDetailPage() {
             </div>
           </div>
 
-          {(job.skills && job.skills.length > 0) && (
+          {skills.length > 0 && (
             <div className="mt-6 pt-6 border-t border-slate-100">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Skills</h3>
               <div className="flex flex-wrap gap-2">
-                {job.skills.map((skill) => (
+                {skills.map((skill) => (
                   <span key={skill} className="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-lg">{skill}</span>
                 ))}
               </div>
             </div>
           )}
+
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Share this job</h3>
+            <ShareRow job={job} />
+          </div>
+
 
           <div className="mt-6 pt-6 border-t border-slate-100 space-y-4">
             <div>

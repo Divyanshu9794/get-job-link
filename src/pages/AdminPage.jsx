@@ -825,6 +825,8 @@ import {
   Building2, Database, List, CheckCircle2, Bell, BellOff, ArrowUpCircle
 } from "lucide-react";
 import { ingestAllJobs, ingestJobs, SOURCES } from "../services/ingestion";
+import { normalizeSkills } from "../utils/skills";
+import ShareMenu from "../components/ShareMenu";
 
 export default function AdminPage() {
   const { jobs, learningReels, currentUser, isAdmin, triggerNotification, toggleSourceConfig, companyPriorities, addCompanyPriority, updateCompanyPriority, removeCompanyPriority, sourceConfigs } = useApp();
@@ -838,7 +840,7 @@ export default function AdminPage() {
   const [formData, setFormData] = useState({
     title: "", company: "", jd: "", url: "",
     jobType: "Full Time", experience: "More than 0 year",
-    salary: "", domain: "Engineering", isRemote: false
+    salary: "", domain: "Engineering", isRemote: false, skills: ""
   });
   const [reelFormData, setReelFormData] = useState({
     title: "", description: "", reelUrl: "", category: "Git & GitHub"
@@ -860,13 +862,15 @@ export default function AdminPage() {
       return;
     }
     try {
+      const skillsArray = formData.skills ? formData.skills.split(",").map(s => s.trim()).filter(Boolean) : [];
       await addDoc(collection(db, "jobs"), {
         ...formData,
         date: new Date().toISOString().split("T")[0],
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        skills: skillsArray
       });
       triggerNotification("Job post added successfully!");
-      setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+      setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false, skills: "" });
     } catch (error) {
       triggerNotification("Error publishing job post: " + error.message);
     }
@@ -1128,7 +1132,9 @@ export default function AdminPage() {
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Domain</label>
                     <select value={formData.domain} onChange={(e) => setFormData({ ...formData, domain: e.target.value })} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                      <option value="">Select domain</option>
                       <option value="Engineering">Engineering</option>
+                      <option value="Technical">Technical</option>
                       <option value="Design">Design</option>
                       <option value="Marketing">Marketing</option>
                       <option value="Management">Management</option>
@@ -1155,6 +1161,27 @@ export default function AdminPage() {
                 <div className="flex items-center space-x-2 pt-1">
                   <input type="checkbox" id="isRemote" checked={formData.isRemote} onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })} className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" />
                   <label htmlFor="isRemote" className="font-semibold text-slate-700">Remote Position</label>
+                </div>
+                <div className="space-y-2 pt-2">
+                  <label className="block font-bold text-slate-700 mb-1">Job Description (JD)</label>
+                  <textarea
+                    value={formData.jd}
+                    onChange={(e) => setFormData({ ...formData, jd: e.target.value })}
+                    placeholder="Paste the full job description here..."
+                    rows={5}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm resize-y"
+                  />
+                </div>
+                <div className="space-y-2 pt-2">
+                  <label className="block font-bold text-slate-700 mb-1">Required Skills (comma-separated)</label>
+                  <textarea
+                    value={formData.skills}
+                    onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                    placeholder="e.g. React, TypeScript, Node.js, AWS, PostgreSQL"
+                    rows={3}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm resize-y"
+                  />
+                  <p className="text-xs text-slate-500">Enter skills separated by commas. These will be shown on the job card and detail page.</p>
                 </div>
               </div>
               <div className="pt-2 flex space-x-2">
@@ -1490,6 +1517,15 @@ export default function AdminPage() {
                       <h4 className="font-medium text-slate-900 truncate">{job.title || "Untitled"}</h4>
                       <p className="text-sm text-slate-500">{job.company || "Unknown Company"}</p>
                       {job.domain && <p className="text-xs text-slate-400 mt-1">{job.domain} · {job.jobType || "Full Time"}</p>}
+                      {normalizeSkills(job.skills).length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {normalizeSkills(job.skills).map((skill, idx) => (
+                            <span key={idx} className="px-2 py-0.5 text-[11px] bg-slate-50 text-slate-500 rounded-md border border-slate-100">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     {job.url && (
                       <a
@@ -1502,6 +1538,7 @@ export default function AdminPage() {
                         View
                       </a>
                     )}
+                    <ShareMenu job={job} className="shrink-0" />
                   </div>
                 </div>
               ))}

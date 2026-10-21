@@ -7,7 +7,9 @@ import {
   updateDoc, getDocs, setDoc, writeBatch
 } from "firebase/firestore";
 import { SOURCES } from "./services/ingestion";
+import { normalizeSkills } from "./utils/skills";
 import Router from "./router/Router";
+import * as shareUtils from "./utils/share";
 import { CheckCircle2, Users, X } from "lucide-react";
 
 export const AppContext = createContext();
@@ -132,21 +134,29 @@ export default function App() {
   }, []);
 
   const triggerNotification = (message) => { setNotification(message); setTimeout(() => setNotification(""), 4000); };
-  const handleGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); } catch { triggerNotification("Authentication failed. Try again."); } };
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Google login error:", error);
+      triggerNotification("Authentication failed: " + (error?.message ?? "Try again."));
+    }
+  };
   const handleGoogleLogout = async () => { try { await signOut(auth); triggerNotification("Signed out completely."); } catch (error) { console.error(error); } };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.company || !formData.url) { triggerNotification("Please fill in all required fields."); return; }
     try {
+      const skillsArray = normalizeSkills(formData.skills);
       if (editingJobId) {
-        await updateDoc(doc(db, "jobs", editingJobId), { ...formData, updatedAt: Date.now() });
+        await updateDoc(doc(db, "jobs", editingJobId), { ...formData, skills: skillsArray, updatedAt: Date.now() });
         triggerNotification("Job post updated successfully!");
       } else {
-        await addDoc(collection(db, "jobs"), { ...formData, date: new Date().toISOString().split("T")[0], createdAt: Date.now() });
+        await addDoc(collection(db, "jobs"), { ...formData, skills: skillsArray, date: new Date().toISOString().split("T")[0], createdAt: Date.now() });
         triggerNotification("Job link published directly to production!");
       }
-      setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false });
+      setFormData({ title: "", company: "", jd: "", url: "", jobType: "Full Time", experience: "More than 0 year", salary: "", domain: "Engineering", isRemote: false, skills: "" });
       setEditingJobId(null);
     } catch (error) { triggerNotification("Error publishing post."); }
   };
@@ -255,10 +265,12 @@ export default function App() {
     }
   };
 
-  const shareToLinkedin = (job) => window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent("Job Opening: " + job.title + " at " + job.company)}`, "_blank");
-  const shareToTwitter = (job) => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent("Hiring: " + job.title + " at " + job.company)}`, "_blank");
-  const shareToWhatsapp = (job) => window.open(`https://wa.me/?text=${encodeURIComponent("Job: " + job.title + " at " + job.company)}`, "_blank");
-  const shareToInstagram = (job) => { navigator.clipboard.writeText("Job: " + job.title + " at " + job.company).then(() => triggerNotification("Copied!")); window.open("https://www.instagram.com/codes_and_clouds/", "_blank"); };
+  const shareToLinkedin = (job) => shareUtils.shareToLinkedin(job);
+  const shareToTwitter = (job) => shareUtils.shareToTwitter(job);
+  const shareToWhatsapp = (job) => shareUtils.shareToWhatsapp(job);
+  const shareToFacebook = (job) => shareUtils.shareToFacebook(job);
+  const copyJobText = (job) => shareUtils.copyJobText(job, (message) => triggerNotification(message));
+  const shareToInstagram = (job) => { shareUtils.copyJobText(job, (message) => triggerNotification(message)); window.open("https://www.instagram.com/codes_and_clouds/", "_blank"); };
 
   const value = {
     jobs, learningReels, currentUser, isAdmin, notification, setNotification,
@@ -269,9 +281,15 @@ export default function App() {
     searchQuery, setSearchQuery,
     sourceConfigs, setSourceConfigs, companyPriorities, setCompanyPriorities,
     toggleSourceConfig, addCompanyPriority, updateCompanyPriority, removeCompanyPriority,
-    triggerNotification, handleGoogleLogin, handleGoogleLogout, handleFormSubmit,
+    triggerNotification,
+    onLogin: handleGoogleLogin,
+    onLogout: handleGoogleLogout,
+    handleGoogleLogin,
+    handleGoogleLogout,
+    handleFormSubmit,
     handleReelSubmit, handleUpdatePopupLink, handleBulkDelete, handleRemoveJob,
     handleRemoveReel, shareToLinkedin, shareToTwitter, shareToWhatsapp, shareToInstagram,
+    shareToFacebook, copyJobText,
     handleCheckboxChange
   };
 

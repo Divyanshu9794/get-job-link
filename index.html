@@ -1,35 +1,107 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Get Job Link | Clean Daily Tech Jobs</title>
+
     <link rel="icon" type="image/png" href="/logo.jpeg" />
 
-    <!-- 1. Secured Adcash Main Library -->
-    <script type="text/javascript" src="https://acscript.com" async></script>
+    <meta
+      name="google-adsense-account"
+      content="ca-pub-6002861264084272"
+    />
 
-    <!-- 2. Safe Adcash Autotag Script Execution -->
+    <!-- Redirect old Firebase domain to the custom domain -->
+    <script>
+      (function () {
+        const hostname = window.location.hostname;
+
+        if (
+          hostname === "get-job-link.web.app" ||
+          hostname === "www.get-job-link.web.app"
+        ) {
+          const newUrl =
+            "https://getjoblink.in" +
+            window.location.pathname +
+            window.location.search +
+            window.location.hash;
+
+          window.location.replace(newUrl);
+        }
+      })();
+    </script>
+
+    <!-- Google AdSense -->
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6002861264084272"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Adcash Main Library -->
+    <script
+      type="text/javascript"
+      src="https://acscript.com"
+      async
+    ></script>
+
+    <!-- Adcash Autotag Initialization -->
     <script type="text/javascript">
-      window.addEventListener('DOMContentLoaded', () => {
+      window.addEventListener("DOMContentLoaded", () => {
         const initAclib = () => {
-          if (typeof aclib !== 'undefined' && typeof aclib.runAutoTag === 'function') {
+          if (
+            typeof aclib !== "undefined" &&
+            typeof aclib.runAutoTag === "function"
+          ) {
             aclib.runAutoTag({
-              zoneId: 'mgttqf1elu'
+              zoneId: "mgttqf1elu"
             });
           } else {
-            // Retry shortly if the external script is still pulling in over the network or blocked
+            // Retry if the Adcash library has not loaded yet.
             setTimeout(initAclib, 100);
           }
         };
+
         initAclib();
       });
     </script>
-
-    <!-- NOTE: Removed conflicting Google AdSense tag to protect account safety -->
   </head>
+
   <body class="bg-slate-50">
     <div id="root"></div>
+
+    <!-- React Application -->
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Google AdSense Ad Unit 1 -->
+    <ins
+      class="adsbygoogle"
+      style="display: block"
+      data-ad-client="ca-pub-6002861264084272"
+      data-ad-slot="1623901333"
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+
+    <!-- Google AdSense Ad Unit 2 -->
+    <ins
+      class="adsbygoogle"
+      style="display: block"
+      data-ad-client="ca-pub-6002861264084272"
+      data-ad-slot="7891680803"
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    ></ins>
+
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
   </body>
 </html>

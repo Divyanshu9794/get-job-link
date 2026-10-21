@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { normalizeSkills } from "../utils/skills";
+import ShareMenu from "./ShareMenu";
 
 export default function JobCard({ job, onShare, onApply }) {
+  const skills = normalizeSkills(job.skills);
+
   return (
     <article className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:border-slate-300 flex flex-col">
       <div className="p-5">
@@ -26,7 +30,7 @@ export default function JobCard({ job, onShare, onApply }) {
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
               </svg>
             </button>
-            {onShare && (
+            {onShare ? (
               <button
                 onClick={() => onShare(job)}
                 aria-label="Share job"
@@ -40,7 +44,7 @@ export default function JobCard({ job, onShare, onApply }) {
                   <line x1="15.41" y1="13.51" x2="8.59" y2="17.49"></line>
                 </svg>
               </button>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -60,7 +64,7 @@ export default function JobCard({ job, onShare, onApply }) {
             </span>
           )}
           <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-purple-50 text-purple-700">
-            {(job.domain || "Engineering").toLowerCase() === "technical" ? "Technical" : "Non-tech"}
+            {["technical", "engineering"].includes((job.domain || "Engineering").toLowerCase()) ? "Technical" : "Non-tech"}
           </span>
           {job.fresherFriendly && (
             <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-50 text-amber-700">
@@ -74,11 +78,15 @@ export default function JobCard({ job, onShare, onApply }) {
         </p>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {(job.skills || []).slice(0, 4).map((skill, idx) => (
+          {skills.slice(0, 4).map((skill, idx) => (
             <span key={idx} className="px-2 py-0.5 text-[11px] bg-slate-50 text-slate-500 rounded-md border border-slate-100">
               {skill}
             </span>
           ))}
+        </div>
+
+        <div className="mt-3 pt-3 border-t border-slate-100">
+          <ShareMenu job={job} />
         </div>
       </div>
 

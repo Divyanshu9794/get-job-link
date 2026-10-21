@@ -3,19 +3,23 @@ import { useJobs } from "../hooks/useJobs";
 import { Link } from "react-router-dom";
 import { Briefcase, Globe, BookOpen, Search, Settings, Sparkle } from "lucide-react";
 import logoImg from "../assets/logo.jpeg";
+import { normalizeSkills } from "../utils/skills";
+import ShareMenu from "../components/ShareMenu";
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { jobs, loading } = useJobs();
 
-  const filteredJobs = jobs.filter(job =>
-    !searchTerm ||
-    [job.title, job.company, job.jd]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  ).slice(0, 6);
+  const filteredJobs = jobs.filter(job => {
+    if (!searchTerm) return true;
+    return (
+      [job.title, job.company, job.jd, ...normalizeSkills(job.skills)]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+  }).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col justify-between">
@@ -92,17 +96,15 @@ export default function HomePage() {
                   <h2 className="mt-8 text-lg font-semibold text-slate-900">Featured Opportunities</h2>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredJobs.map((job) => (
-                      <Link
-                        key={job.id}
-                        to={`/job/${job.id}`}
-                        className="group bg-white rounded-xl border border-slate-200 p-5 hover:shadow-xl transition-shadow"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="font-medium text-slate-900 line-clamp-1">{job.title}</h3>
+                      <div key={job.id} className="group bg-white rounded-xl border border-slate-200 p-5 hover:shadow-xl transition-shadow relative">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="min-w-0">
+                            <Link to={`/job/${job.id}`}>
+                              <h3 className="font-medium text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">{job.title}</h3>
+                            </Link>
                             <p className="text-sm text-blue-600 line-clamp-1">{job.company}</p>
                           </div>
-                          <span className={`px-2 py-0.5 text-[10px] font-medium rounded ${
+                          <span className={`px-2 py-0.5 text-[10px] font-medium rounded shrink-0 ${
                             job.isRemote ? "bg-emerald-100 text-emerald-700" :
                             "bg-slate-100 text-slate-600"
                           }`}>
@@ -124,7 +126,28 @@ export default function HomePage() {
                               </span>
                             ))}
                         </div>
-                      </Link>
+                        {normalizeSkills(job.skills).length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {normalizeSkills(job.skills).slice(0, 4).map((skill, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 text-[10px] bg-slate-50 text-slate-500 rounded border border-slate-100"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                          <ShareMenu job={job} />
+                          <Link
+                            to={`/job/${job.id}`}
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                          >
+                            View Job →
+                          </Link>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </>

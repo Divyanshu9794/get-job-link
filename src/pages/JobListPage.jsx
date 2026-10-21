@@ -321,6 +321,7 @@ import { useSearchParams } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
 import { useApp } from "../App";
 import JobCard from "../components/JobCard";
+import { normalizeSkills } from "../utils/skills";
 import {
   Briefcase, Search, ChevronDown, SlidersHorizontal, X, Check,
   Building2, Clock3, MapPin, ExternalLink
@@ -369,7 +370,7 @@ export default function JobListPage() {
     .filter((job) => {
       const matchesSearch =
         !q ||
-        [job.title, job.company, job.jd, job.domain, ...(job.skills || [])]
+        [job.title, job.company, job.jd, job.domain, ...normalizeSkills(job.skills)]
           .filter(Boolean)
           .join(" ")
           .toLowerCase()
