@@ -322,6 +322,7 @@ import { useJobs } from "../hooks/useJobs";
 import { useApp } from "../App";
 import JobCard from "../components/JobCard";
 import { normalizeSkills } from "../utils/skills";
+import { withSource } from "../utils/applyLink";
 import {
   Briefcase, Search, ChevronDown, SlidersHorizontal, X, Check,
   Building2, Clock3, MapPin, ExternalLink
@@ -333,7 +334,7 @@ const SALARIES = ["Competitive", "2-4 LPA", "4-6 LPA", "6-10 LPA", "10-20 LPA", 
 const LOCATIONS = ["Remote", "Hybrid", "On-site", "Bengaluru", "Mumbai", "Delhi", "Chennai", "Pune"];
 const SKILLS = ["React", "Node.js", "AWS", "SQL", "Python", "Data Analytics", "Product Management", "Marketing", "Finance", "HR"];
 
-export default function JobListPage() {
+export default function JobListPage({ defaultLocation = "", pageTitle = "Job Discovery" } = {}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { jobs, loading } = useJobs();
   const { companyPriorities } = useApp();
@@ -342,7 +343,7 @@ export default function JobListPage() {
   const q = searchParams.get("q") || "";
   const type = searchParams.get("type") || "";
   const exp = searchParams.get("exp") || "";
-  const location = searchParams.get("location") || "";
+  const location = searchParams.get("location") || defaultLocation;
   const salary = searchParams.get("salary") || "";
   const domain = searchParams.get("domain") || "";
   const sort = searchParams.get("sort") || "recent";
@@ -399,7 +400,7 @@ export default function JobListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Job Discovery</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">{pageTitle}</h1>
         <p className="text-slate-500 mt-2 text-sm sm:text-base">Browse curated opportunities and apply directly on the company website[cite: 1].</p>
       </div>
 
@@ -532,7 +533,7 @@ export default function JobListPage() {
                         alert("Application link is unavailable for this job.");
                         return;
                       }
-                      window.open(targetUrl, "_blank", "noopener,noreferrer");
+                      window.open(withSource(targetUrl), "_blank", "noopener,noreferrer");
                     }}
                   />
                 );

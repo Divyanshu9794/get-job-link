@@ -1,18 +1,18 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logoImg from "../assets/logo.jpeg";
 import {
-  LayoutGrid, Table
+  LayoutGrid, Table, Globe
 } from "lucide-react";
 
 export default function Header({ currentUser, isAdmin, onLogin, onLogout, onSearch }) {
-  const location = window.location.pathname;
+  const location = useLocation().pathname;
 
   const isActive = (path) => location === path || (path !== "/" && location.startsWith(path));
 
   const Nav = [
     { to: "/", label: "Home", icon: LayoutGrid },
     { to: "/jobs", label: "Jobs", icon: LayoutGrid },
+    { to: "/remote", label: "Remote", icon: Globe },
     { to: "/resume", label: "Resume", icon: Table },
     { to: "/ats", label: "ATS", icon: Table },
     ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Table }] : []),

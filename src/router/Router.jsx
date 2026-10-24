@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useApp } from "../App";
 import HomePage from "../pages/HomePage";
 import JobListPage from "../pages/JobListPage";
+import RemoteJobsPage from "../pages/RemoteJobsPage";
 import JobDetailPage from "../pages/JobDetailPage";
 import ResumeBuilder from "../pages/ResumeBuilder";
 import ATSEvaluator from "../pages/ATSEvaluator";
@@ -19,6 +20,7 @@ export default function Router() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/jobs" element={<JobListPage />} />
+          <Route path="/remote" element={<RemoteJobsPage />} />
           <Route path="/job/:id" element={<JobDetailPage />} />
           <Route path="/resume" element={<ResumeBuilder />} />
           <Route path="/ats" element={<ATSEvaluator />} />

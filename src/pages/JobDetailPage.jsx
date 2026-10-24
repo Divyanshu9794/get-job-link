@@ -153,6 +153,7 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useJobs } from "../hooks/useJobs";
 import { normalizeSkills } from "../utils/skills";
+import { withSource } from "../utils/applyLink";
 import { ShareRow } from "../components/ShareMenu";
 import {
   ExternalLink, MapPin, Briefcase, Clock3, Currency, Building2,
@@ -284,7 +285,7 @@ export default function JobDetailPage() {
           <div className="mt-8 pt-6 border-t border-slate-100">
             {/* The href here is now updated to use the formatted applyUrl */}
             <a
-              href={applyUrl}
+              href={withSource(applyUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 px-4 text-sm font-semibold transition-colors"
