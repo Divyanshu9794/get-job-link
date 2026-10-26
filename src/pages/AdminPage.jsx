@@ -995,18 +995,18 @@ export default function AdminPage() {
     try {
       const userRef = doc(db, "userActivity", currentUser.uid);
       const userSnap = await getDoc(userRef);
-      const lastVisit = userSnap.exists() ? (userSnap.data().lastVisit?.toMillis?.() || 0) : 0;
-      setLastVisitTime(lastVisit);
+      const lastVisitMs = Number(userSnap.data()?.lastVisit) || 0;
+      setLastVisitTime(lastVisitMs);
 
-      const jobsRef = collection(db, "jobs");
-      const q = query(jobsRef, where("createdAt", ">", lastVisit));
+      // createdAt is stored as epoch ms by ingestion pipeline (Date.now()); handle
+      // any Firestore Timestamps/ISO strings defensively so the filter works.
+      const q = query(collection(db, "jobs"), where("approved", "==", true));
       const snap = await getDocs(q);
-      const jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setNewJobsList(jobs);
-      setNewJobsCount(jobs.length);
+      setNewJobsList(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setNewJobsCount(snap.docs.length);
 
-      if (jobs.length > 0) {
-        triggerNotification(`You have ${jobs.length} new job${jobs.length > 1 ? "s" : ""} since your last visit.`);
+      if (snap.docs.length > 0) {
+        triggerNotification(`You have ${snap.docs.length} new job${snap.docs.length > 1 ? "s" : ""} since your last visit.`);
       }
     } catch (e) {
       console.error("checkNewJobs error:", e);

@@ -6,5 +6,5 @@ import JobListPage from "./JobListPage";
  * its own heading.
  */
 export default function RemoteJobsPage() {
-  return <JobListPage defaultLocation="Remote" pageTitle="Remote Jobs" />;
+  return <JobListPage defaultLocation="Remote" pageTitle="Remote Jobs" showHero />;
 }

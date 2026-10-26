@@ -1,61 +1,56 @@
-import {
-  doc,
-  collection,
-  query,
-  where,
-  getDocs,
-  writeBatch,
-  getDoc,
-  runTransaction,
-} from "firebase/firestore";
+import { normalizeSkills } from "../utils/skills";
+
+// Firebase admin
+import { doc, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { db } from "../firebase";
 
-// Safe environment variable getter for browser/Vite compatibility
-const getEnvVar = (key) => {
-  // If running in Vite
-  if (typeof import.meta !== "undefined" && import.meta.env) {
-    return import.meta.env[key] || "";
-  }
-  // Safe fallback if process exists (Node environment)
-  if (typeof process !== "undefined" && process.env) {
-    return process.env[key] || "";
-  }
-  return "";
-};
-
-// Helper: fetch with AbortController timeout
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 const fetchWithTimeout = (url, options = {}, timeout = 15000) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
 };
 
-// CORS proxy for external APIs that don't support CORS
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+// Cap per daily run per source at PER_SOURCE_PER_RUN (spec target: 50 total / day across 10 sources).
+export const PER_SOURCE_PER_RUN = 5;
 
+// Source enums used by ingestJobs callers / AdminPage toggles.
+export const SOURCE_LABELS = {
+  greenhouse: "Greenhouse",
+  lever: "Lever",
+  ashby: "Ashby",
+  smartrecruiters: "SmartRecruiters",
+  workday: "Workday",
+  linkedin: "LinkedIn",
+  naukri: "Naukri",
+  instahyre: "Instahyre",
+  hirist: "Hirist",
+  foundit: "Foundit",
+};
+
+// ---------------------------------------------------------------------------
+// Sources
+// ---------------------------------------------------------------------------
 export const SOURCES = {
+  // --- GREENHOUSE (stable public API) ---------------------------------------
   greenhouse: {
     name: "Greenhouse",
     enabled: true,
-    // PRODUCT-BASED (Global + Indian): Airbnb, Stripe, Dropbox, Discord, Swiggy, CRED, Meesho, BrowserStack...
-    // SERVICE-BASED: Thoughtworks, Globant, Fractal Analytics, Mu Sigma...
     board: getEnvVar("VITE_GREENHOUSE_BOARDS") || "airbnb,stripe,dropbox,discord,twitch,figma,reddit,canva,lyft,pinterest,instacart,github,gitlab,doordash,coinbase,zapier,asana,okta,cloudflare,datadog,snowflake,mongodb,elastic,twilio,postman,netlify,vercel,gusto,rippling,roblox,duolingo,wayfair,affirm,patreon,grammarly,upwork,docusign,zoominfo,intercom,coursera,razorpay,phonepe,myntra,groww,swiggy,cred,meesho,urbancompany,browserstack,dream11,thoughtworks,globant,fractal",
     company: "",
     feedUrl: "",
-    apiKey: getEnvVar("VITE_GREENHOUSE_API_KEY"),
+    apiKey: null,
     adapter: async (config) => {
       const boardString = config.board || SOURCES.greenhouse.board;
       const boards = boardString.split(",").map(b => b.trim()).filter(Boolean);
       if (boards.length === 0) return [];
-
       let allJobs = [];
       for (const board of boards) {
         try {
           const res = await fetchWithTimeout(`/api/greenhouse/${encodeURIComponent(board)}/jobs`, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
-          
-          const companyJobs = (data.jobs || []).map(j => ({
+          const companyJobs = (data?.jobs || []).map(j => ({
             title: j.title || "",
             company: j.company_name || board.charAt(0).toUpperCase() + board.slice(1),
             description: j.content || j.description || "",
@@ -65,20 +60,18 @@ export const SOURCES = {
             experienceLevel: "", remoteType: "", sourceUrl: j.absolute_url || "",
             postedDate: null, deadline: null
           }));
-          
           allJobs = [...allJobs, ...companyJobs];
-        } catch (e) {
-          console.warn(`Greenhouse board [${board}] skipped:`, e.message);
-        }
+        } catch (e) { console.warn(`Greenhouse board [${board}] skipped:`, e.message); }
       }
-      return allJobs;
+      return allJobs.slice(0, PER_SOURCE_PER_RUN);
     }
   },
+
+  // --- LEVER (enterprise API; configured via env var) -----------------------
   lever: {
     name: "Lever",
-    enabled: true, 
+    enabled: true,
     board: "",
-    // PRODUCT-BASED: Netflix, Spotify, Atlassian, Shopify, Yelp, Klarna, Zomato, ClearTax...
     company: getEnvVar("VITE_LEVER_COMPANIES") || "netflix,spotify,yelp,atlassian,shopify,eventbrite,retool,hopper,clearbit,n26,qonto,monzo,deliveroo,auth0,framer,miro,typeform,wix,klarna,trustpilot,xero,opensea,medium,vanta,drata,remote,deel,gocardless,contentful,algolia,cypressio,outreach,zomato,cleartax",
     feedUrl: "",
     apiKey: null,
@@ -86,7 +79,6 @@ export const SOURCES = {
       const companyString = config.company || SOURCES.lever.company;
       const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
       if (companies.length === 0) return [];
-      
       let allJobs = [];
       for (const company of companies) {
         try {
@@ -94,7 +86,6 @@ export const SOURCES = {
           const res = await fetchWithTimeout(proxyUrl, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
-          
           const companyJobs = (data || []).map(j => ({
             title: j.text || "",
             company: j.hostedUrl ? j.hostedUrl.split("/")[2] : company.charAt(0).toUpperCase() + company.slice(1),
@@ -105,20 +96,18 @@ export const SOURCES = {
             experienceLevel: "", remoteType: "", sourceUrl: j.hostedUrl || "",
             postedDate: null, deadline: null
           }));
-          
           allJobs = [...allJobs, ...companyJobs];
-        } catch (e) {
-          console.warn(`Lever company [${company}] skipped:`, e.message);
-        }
+        } catch (e) { console.warn(`Lever company [${company}] skipped:`, e.message); }
       }
-      return allJobs;
+      return allJobs.slice(0, PER_SOURCE_PER_RUN);
     }
   },
+
+  // --- ASHBY (public posting API) -------------------------------------------
   ashby: {
     name: "Ashby",
     enabled: true,
     board: "",
-    // PRODUCT-BASED (AI Unicorns & Elite Startups): OpenAI, Anthropic, Ramp, Deel, Vercel...
     company: getEnvVar("VITE_ASHBY_COMPANIES") || "openai,anthropic,ramp,deel,replit,cohere,clerk,posthog,render,neon,railway,supabase,freshpaint,loom",
     feedUrl: "",
     apiKey: null,
@@ -126,7 +115,6 @@ export const SOURCES = {
       const companyString = config.company || SOURCES.ashby.company;
       const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
       if (companies.length === 0) return [];
-
       let allJobs = [];
       for (const company of companies) {
         try {
@@ -134,37 +122,32 @@ export const SOURCES = {
           const res = await fetchWithTimeout(proxyUrl, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
-
-          const companyJobs = (data.jobs || []).map(j => ({
+          const companyJobs = (data?.jobs || []).map(j => ({
             title: j.title || "",
             company: company.charAt(0).toUpperCase() + company.slice(1),
             description: j.descriptionPlain || "",
             url: j.jobUrl || j.applyUrl || "",
             jobType: j.employmentType || "",
-            experience: "", 
-            salary: j.compensation ? `${j.compensation.currency} ${j.compensation.min}-${j.compensation.max}` : "",
+            experience: "", salary: j.compensation ? `${j.compensation.currency} ${j.compensation.min}-${j.compensation.max}` : "",
             domain: j.department || "",
             isRemote: Boolean(j.isRemote || (j.workplaceType && j.workplaceType.toLowerCase() === 'remote')),
             skills: [], fresherFriendly: false, category: "", subCategory: "",
-            experienceLevel: "", remoteType: j.workplaceType || "", 
+            experienceLevel: "", remoteType: j.workplaceType || "",
             sourceUrl: j.jobUrl || "",
             postedDate: j.publishedAt || null, deadline: null
           }));
-
           allJobs = [...allJobs, ...companyJobs];
-        } catch (e) {
-          console.warn(`Ashby company [${company}] skipped:`, e.message);
-        }
+        } catch (e) { console.warn(`Ashby company [${company}] skipped:`, e.message); }
       }
-      return allJobs;
+      return allJobs.slice(0, PER_SOURCE_PER_RUN);
     }
   },
+
+  // --- SMARTRECRUITERS (public v1 endpoint) --------------------------------
   smartrecruiters: {
     name: "SmartRecruiters",
     enabled: true,
     board: "",
-    // SERVICE-BASED: Nagarro, Publicis Sapient, Capgemini, Sopra Steria, EPAM...
-    // PRODUCT-BASED: Visa, Bosch, IKEA, Ubisoft, McDonald's...
     company: getEnvVar("VITE_SMARTRECRUITERS_COMPANIES") || "nagarro1,publicissapient,capgemini,soprasteria,epam,visa,ubisoft,bosch,ikea,mcdonalds,nielsen,smartrecruiters",
     feedUrl: "",
     apiKey: null,
@@ -172,7 +155,6 @@ export const SOURCES = {
       const companyString = config.company || SOURCES.smartrecruiters.company;
       const companies = companyString.split(",").map(c => c.trim()).filter(Boolean);
       if (companies.length === 0) return [];
-
       let allJobs = [];
       for (const company of companies) {
         try {
@@ -180,7 +162,6 @@ export const SOURCES = {
           const res = await fetchWithTimeout(proxyUrl, {}, 15000);
           if (!res.ok) continue;
           const data = await res.json();
-
           const companyJobs = (data.content || []).map(j => ({
             title: j.name || "",
             company: j.company?.name || company.charAt(0).toUpperCase() + company.slice(1),
@@ -191,62 +172,19 @@ export const SOURCES = {
             salary: "", domain: j.department?.label || "",
             isRemote: j.location?.remote || false,
             skills: [], fresherFriendly: false, category: "", subCategory: "",
-            experienceLevel: j.experienceLevel?.label || "", 
-            remoteType: j.location?.remote ? "Remote" : "On-site", 
+            experienceLevel: j.experienceLevel?.label || "",
+            remoteType: j.location?.remote ? "Remote" : "On-site",
             sourceUrl: `https://jobs.smartrecruiters.com/${company}/${j.id}`,
             postedDate: j.releasedDate || null, deadline: null
           }));
-
           allJobs = [...allJobs, ...companyJobs];
-        } catch (e) {
-          console.warn(`SmartRecruiters company [${company}] skipped:`, e.message);
-        }
+        } catch (e) { console.warn(`SmartRecruiters company [${company}] skipped:`, e.message); }
       }
-      return allJobs;
+      return allJobs.slice(0, PER_SOURCE_PER_RUN);
     }
   },
-  lever: {
-    name: "Lever",
-    enabled: false,
-    board: "",
-    company: "",
-    feedUrl: "",
-    apiKey: null,
-    adapter: async (config) => {
-      const company = config.company || "";
-      if (!company) return [];
-      try {
-        // Lever API also lacks CORS, use proxy
-        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`https://api.lever.co/v0/postings?company=${company}`)}`;
-        const res = await fetchWithTimeout(proxyUrl, {}, 15000);
-        if (!res.ok) return [];
-        const data = await res.json();
-        return (data || []).map(j => ({
-          title: j.text || "",
-          company: j.hostedUrl ? j.hostedUrl.split("/")[2] : company,
-          description: j.description || "",
-          url: j.hostedUrl || "",
-          jobType: "",
-          experience: "",
-          salary: "",
-          domain: "",
-          isRemote: false,
-          skills: [],
-          fresherFriendly: false,
-          category: "",
-          subCategory: "",
-          experienceLevel: "",
-          remoteType: "",
-          sourceUrl: j.hostedUrl || "",
-          postedDate: null,
-          deadline: null
-        }));
-      } catch (e) {
-        console.error(`Lever company ${company} error:`, e);
-        return [];
-      }
-    }
-  },
+
+  // --- WORKDAY (requires enterprise configuration) -------------------------
   workday: {
     name: "Workday",
     enabled: false,
@@ -254,90 +192,90 @@ export const SOURCES = {
     company: "",
     feedUrl: "",
     apiKey: null,
-    adapter: async (config) => {
-      // Placeholder: fetch from Workday career site
-      return [];
+    adapter: async () => {
+      throw new Error("Workday integration requires configuration (VITE_WORKDAY_*). Until configured this source returns no jobs.");
     }
   },
-  ashby: {
-    name: "Ashby",
+
+  // --- LINKEDIN (partner API — mark requiring config) -----------------------
+  linkedin: {
+    name: "LinkedIn",
     enabled: false,
     board: "",
     company: "",
     feedUrl: "",
     apiKey: null,
-    adapter: async (config) => {
-      // Placeholder: fetch from Ashby API
-      return [];
+    adapter: async () => {
+      throw new Error("LinkedIn integration requires configuration: set VITE_LINKEDIN_API_TOKEN and complete Recruiter API partner onboarding.");
     }
   },
-  smartrecruiters: {
-    name: "SmartRecruiters",
+
+  // --- NAUKRI (scraped SaaS — placeholder) ---------------------------------
+  naukri: {
+    name: "Naukri",
     enabled: false,
     board: "",
     company: "",
     feedUrl: "",
     apiKey: null,
-    adapter: async (config) => {
-      // Placeholder: fetch from SmartRecruiters API
-      return [];
+    adapter: async () => {
+      throw new Error("Naukri integration requires configuration: supply a validated JSON feed endpoint (VITE_NAUKRI_FEED_URL) via fetchAndNormalize.");
     }
   },
-  rss: {
-    name: "RSS Feeds",
+
+  // --- INSTAHYRE (scraped SaaS — placeholder) -------------------------------
+  instahyre: {
+    name: "Instahyre",
     enabled: false,
     board: "",
     company: "",
     feedUrl: "",
     apiKey: null,
-    adapter: async (config) => {
-      const feedUrl = config.feedUrl || "";
-      if (!feedUrl) return [];
-      try {
-        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(feedUrl)}`;
-        const res = await fetchWithTimeout(proxyUrl, {}, 15000);
-        if (!res.ok) return [];
-        const text = await res.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, "text/xml");
-        const items = xml.querySelectorAll("item, entry");
-        return Array.from(items).map(item => {
-          const titleEl = item.querySelector("title");
-          const linkEl = item.querySelector("link");
-          const descEl = item.querySelector("description, summary");
-          return {
-            title: titleEl ? titleEl.textContent : "",
-            company: "",
-            description: descEl ? descEl.textContent : "",
-            url: linkEl ? (linkEl.getAttribute("href") || linkEl.textContent) : "",
-            jobType: "",
-            experience: "",
-            salary: "",
-            domain: "",
-            isRemote: false,
-            skills: [],
-            fresherFriendly: false,
-            category: "",
-            subCategory: "",
-            experienceLevel: "",
-            remoteType: "",
-            sourceUrl: linkEl ? (linkEl.getAttribute("href") || linkEl.textContent) : "",
-            postedDate: null,
-            deadline: null
-          };
-        });
-      } catch (e) {
-        console.error(`RSS feed ${feedUrl} error:`, e);
-        return [];
-      }
+    adapter: async () => {
+      throw new Error("Instahyre integration requires configuration: supply a validated JSON feed endpoint (VITE_INSTAHYRE_ENDPOINT) via fetchAndNormalize.");
     }
-  }
+  },
+
+  // --- HIRIST (scraped SaaS — placeholder) ----------------------------------
+  hirist: {
+    name: "Hirist",
+    enabled: false,
+    board: "",
+    company: "",
+    feedUrl: "",
+    apiKey: null,
+    adapter: async () => {
+      throw new Error("Hirist integration requires configuration: supply a validated JSON feed endpoint (VITE_HIRIST_FEED_URL) via fetchAndNormalize.");
+    }
+  },
+
+  // --- FOUNDIT (scraped SaaS — placeholder) ---------------------------------
+  foundit: {
+    name: "Foundit",
+    enabled: false,
+    board: "",
+    company: "",
+    feedUrl: "",
+    apiKey: null,
+    adapter: async () => {
+      throw new Error("Foundit integration requires configuration: supply a validated JSON feed endpoint (VITE_FOUNDIT_FEED_URL) via fetchAndNormalize.");
+    }
+  },
 };
 
+function getEnvVar(key) {
+  if (typeof import.meta !== "undefined" && import.meta.env) {
+    return import.meta.env[key] || "";
+  }
+  if (typeof process !== "undefined" && process.env) {
+    return process.env[key] || "";
+  }
+  return "";
+}
 
-
-
+// ---------------------------------------------------------------------------
 // Extract skills from job text
+// ---------------------------------------------------------------------------
 export function extractSkills(text) {
   if (!text) return [];
   const lower = text.toLowerCase();
@@ -385,7 +323,7 @@ const cleanHtml = (html) => {
 // This is where AI classification would happen (using @google/genai).
 export function normalizeJob(rawJob, source) {
   const description = cleanHtml(rawJob.description || "");
-  const skills = extractSkills(description);
+  const skills = normalizeSkills(rawJob.skills);
 
   return {
     title: rawJob.title || "Unknown Title",
@@ -397,7 +335,7 @@ export function normalizeJob(rawJob, source) {
     salary: rawJob.salary || "Competitive",
     domain: rawJob.domain || "Engineering",
     isRemote: Boolean(rawJob.isRemote),
-    skills: rawJob.skills || skills,
+    skills: skills,
     fresherFriendly: Boolean(rawJob.fresherFriendly),
     category: rawJob.category || "Technical",
     subCategory: rawJob.subCategory || "Software Engineering",
@@ -407,19 +345,27 @@ export function normalizeJob(rawJob, source) {
     sourceUrl: rawJob.sourceUrl || "",
     postedDate: rawJob.postedDate || null,
     deadline: rawJob.deadline || null,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    dedupeKey: String([source, rawJob.url || "", rawJob.title || "", rawJob.company || ""].join("::")).replace(/[^a-zA-Z0-9]+/g, "_")
   };
 }
 
-// Deduplicate jobs by title + company + url
+// Deduplicate jobs by dedupeKey (source+url+title+company) or title+company+url.
 export async function deduplicateJob(normalizedJob) {
+  if (normalizedJob.dedupeKey) {
+    const dq = query(collection(db, "jobs"), where("dedupeKey", "==", normalizedJob.dedupeKey));
+    const ds = await getDocs(dq);
+    if (!ds.empty) return true;
+  }
+  // Fallback: check by title+company+url exact match
   const q = query(
     collection(db, "jobs"),
     where("title", "==", normalizedJob.title),
-    where("company", "==", normalizedJob.company)
+    where("company", "==", normalizedJob.company),
+    where("url", "==", normalizedJob.url)
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.some(doc => doc.data().url === normalizedJob.url);
+  return !snapshot.empty;
 }
 
 // Ingest jobs from a specific source
@@ -435,11 +381,9 @@ export async function ingestJobs(sourceKey, config = {}) {
   let storedCount = 0;
   const errors = [];
 
-  // SOURCE_STARTED
   console.log(`[INGEST] SOURCE_STARTED: ${source.name} (${sourceKey})`);
   console.log(`[INGEST] config: board=${config.board || 'default'}`);
 
-  // REQUEST_SENT
   console.log(`[INGEST] REQUEST_SENT: calling ${source.name} adapter`);
   let rawJobs;
   try {
@@ -448,14 +392,12 @@ export async function ingestJobs(sourceKey, config = {}) {
   } catch (e) {
     errors.push(e.message);
     console.error(`[INGEST] SOURCE_FAILED: ${source.name} adapter error:`, e.message);
-    return { source: source.name, rawCount: 0, validCount: 0, duplicateCount: 0, storedCount: 0, failed: 0, errors };
+    return { source: source.name, rawCount: 0, validCount: 0, duplicateCount: 0, storedCount: 0, failed: 1, errors };
   }
   console.log(`[INGEST] RESPONSE_RECEIVED: ${rawCount} raw jobs from ${source.name}`);
 
-  // Normalize
   const normalizedJobs = rawJobs.map(job => normalizeJob(job, source.name));
 
-  // Validation — check for required fields
   const validJobs = [];
   for (const job of normalizedJobs) {
     if (!job.title || !job.company || !job.url) {
@@ -467,7 +409,6 @@ export async function ingestJobs(sourceKey, config = {}) {
   validCount = validJobs.length;
   console.log(`[INGEST] JOBS_VALIDATED: ${validCount} valid out of ${rawCount} raw`);
 
-  // Deduplication
   const uniqueJobs = [];
   for (const job of validJobs) {
     const isDuplicate = await deduplicateJob(job);
@@ -480,7 +421,6 @@ export async function ingestJobs(sourceKey, config = {}) {
   }
   console.log(`[INGEST] JOBS_DEDUPLICATED: ${uniqueJobs.length} unique, ${duplicateCount} duplicates skipped`);
 
-  // Store
   if (uniqueJobs.length > 0) {
     const batch = writeBatch(db);
     for (const job of uniqueJobs) {
@@ -524,9 +464,8 @@ export async function ingestAllJobs() {
 
 // AI classification using Google GenAI (when available)
 export async function classifyJobAI(rawText) {
-  // This is a placeholder for AI classification.
-  // When @google/genai is available, this would call the model
-  // to extract structured JSON from raw job text.
+  // Real classification lives in functions/utils/aiRank.js — this remains a
+  // fallback heuristic so browser ingestion keeps working offline.
   return {
     category: "Technical",
     subCategory: "Software Engineering",

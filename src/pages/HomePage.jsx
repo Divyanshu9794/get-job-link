@@ -21,6 +21,14 @@ export default function HomePage() {
     );
   }).slice(0, 6);
 
+  // Count how many jobs were added today (client-side date bucket filter).
+  const todayAdded = jobs.reduce((n, job) => {
+    const ms = Number(job?.createdAt);
+    if (!Number.isFinite(ms)) return n;
+    const dayKey = new Date(ms).toISOString().slice(0, 10);
+    return dayKey === new Date().toISOString().slice(0, 10) ? n + 1 : n;
+  }, 0);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased flex flex-col justify-between">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
@@ -162,6 +170,7 @@ export default function HomePage() {
                     <Briefcase className="w-6 h-6 text-blue-500" />
                   </div>
                   <p className="text-sm text-slate-500">{jobs.length}+ Active Opportunities</p>
+                  <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">{todayAdded} added today · Updated daily</p>
                 </div>
 
                 <div className="space-y-4">
