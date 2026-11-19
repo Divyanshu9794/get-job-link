@@ -23,7 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment files (keep local copies only)
+# Security: Never commit environment files or service account credentials
 .env
-.env.local
-.env.*.local
+.env.*
+*.secret
+*.pem
+*service-account*.json
+*-credentials*.json
+/functions/.env
+/functions/.env.*
+/functions/*credentials*.json
+/functions/*service-account*.json

@@ -1,4 +1,43 @@
+# GetJobLink - Official Robots.txt
+
+# Google AdSense Crawler
+User-agent: Mediapartners-Google
+Allow: /
+
+# Google Search Crawler
+User-agent: Googlebot
+Allow: /
+
 User-agent: *
 Allow: /
+Allow: /jobs/india
+Allow: /jobs/world
+Allow: /jobs/remote
+Allow: /job/
+Allow: /career-guides
+Allow: /career-guides/
+Allow: /resume
+Allow: /ats-checker
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /privacy-policy
+Allow: /terms
+Allow: /terms-and-conditions
+Allow: /disclaimer
+Allow: /editorial-policy
+
+# Disallow private user accounts and admin dashboard
+Disallow: /admin
+Disallow: /admin/
+Disallow: /profile
+Disallow: /profile/
+
+# Disallow deep internal query parameter combinations to prevent duplicate crawl loops
+Disallow: /*?*q=
+Disallow: /*?*exp=
+Disallow: /*?*mode=
+Disallow: /*?*country=
+Disallow: /*?*domain=
 
 Sitemap: https://getjoblink.in/sitemap.xml

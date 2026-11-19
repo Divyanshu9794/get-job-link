@@ -1,22 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Listing & Regional Portals -->
   <url>
     <loc>https://getjoblink.in/</loc>
+    <lastmod>2026-02-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://getjoblink.in/jobs</loc>
-    <changefreq>hourly</changefreq>
+    <loc>https://getjoblink.in/jobs/india</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://getjoblink.in/jobs/world</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/jobs/remote</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Editorial Career Guides Hub -->
+  <url>
+    <loc>https://getjoblink.in/career-guides</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- High-Value Editorial Articles -->
+  <url>
+    <loc>https://getjoblink.in/career-guides/fresher-software-engineer-hiring-guide-2026</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/react-node-fullstack-developer-career-path</loc>
+    <lastmod>2026-02-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/ats-resume-optimization-guide</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/cracking-tech-interviews-dsa-system-design</loc>
+    <lastmod>2026-02-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/remote-tech-jobs-global-application-strategy</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/java-spring-boot-backend-roadmap</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/off-campus-placement-internship-handbook</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/career-guides/cloud-devops-sre-career-roadmap</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Candidate Career Tools -->
+  <url>
     <loc>https://getjoblink.in/resume</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/ats-checker</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Transparency & Legal Pages -->
+  <url>
+    <loc>https://getjoblink.in/about</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/contact</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/editorial-policy</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/disclaimer</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://getjoblink.in/ats</loc>
+    <loc>https://getjoblink.in/privacy-policy</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://getjoblink.in/terms-and-conditions</loc>
+    <lastmod>2026-02-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

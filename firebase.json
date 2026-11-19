@@ -1,7 +1,4 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
   "hosting": {
     "public": "dist",
     "ignore": [
@@ -11,13 +8,18 @@
     ],
     "rewrites": [
       {
-        "source": "/api/**",
-        "function": "greenhouseJobs"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions"
   }
 }

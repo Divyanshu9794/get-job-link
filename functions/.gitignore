@@ -1,2 +1,8 @@
 node_modules/
-*.local
+.env
+.env.*
+*.secret
+*.pem
+*service-account*.json
+*-credentials*.json
+*.log

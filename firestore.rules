@@ -1,39 +1,76 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read/write their own user activity
-    match /userActivity/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "sdivyanshu352@gmail.com" ||
+        request.auth.token.email == "getjoblink647@gmail.com"
+      );
     }
 
-    // Jobs: allow authenticated users to read all, write for admins (email-based)
+    // 1. Public Jobs Collection
+    // Anyone can read and browse published listings; write operations restricted to admin
     match /jobs/{jobId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == "sdivyanshu352@gmail.com";
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // 2. User Profiles and Subcollections
+    match /users/{userId} {
+      // User profile document: private to account owner and admin
+      allow read, write: if isOwner(userId) || isAdmin();
+      
+      // Saved Jobs: users/{userId}/savedJobs/{jobId}
+      match /savedJobs/{jobId} {
+        // Only the authenticated account owner (or admin) can read their own saved jobs
+        allow read: if isOwner(userId) || isAdmin();
+        
+        // Owner can save under their own UID, ensuring document data.userId matches auth UID
+        allow create, update: if isOwner(userId)
+          && (request.resource.data.userId == request.auth.uid || request.resource.data.userId == userId);
+        
+        // Owner can delete / unsave their own saved jobs
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+      
+      // ATS Evaluation History
+      match /atsHistory/{evalId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+      
+      // Resume Metadata
+      match /resumes/{resumeId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
     }
 
-    // Source config: allow admin write, read for all authenticated
-    match /source_config/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == "sdivyanshu352@gmail.com";
+    // 3. Reports & Feedback (Public create, Admin read/manage)
+    match /reports/{reportId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Company priority: allow admin write, read for all authenticated
-    match /company_priority/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == "sdivyanshu352@gmail.com";
+    // 4. Contact Us Inquiries (Public create, Admin read/manage)
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Learning reels: allow admin write, read for all authenticated
-    match /learning_reels/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == "sdivyanshu352@gmail.com";
-    }
-
-    // Analytics: allow admin write, read for all authenticated
-    match /analytics/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.email == "sdivyanshu352@gmail.com";
+    // 5. User Platform Feedback (Authenticated users create only, Admin read/manage)
+    match /feedbacks/{feedbackId} {
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
     }
   }
 }

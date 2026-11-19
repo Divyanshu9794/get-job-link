@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "sdivyanshu352@gmail.com" ||
+        request.auth.token.email == "getjoblink647@gmail.com"
+      );
+    }
+
+    // User Private Resumes: secure, user-isolated, max 5MB, PDF/DOC/DOCX only
+    match /resumes/{userId}/{fileName} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if (isOwner(userId) || isAdmin())
+        && request.resource.size < 5 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('application/pdf') ||
+          request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
+          request.resource.contentType.matches('application/msword') ||
+          request.resource.contentType.matches('application/octet-stream')
+        );
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+  }
+}

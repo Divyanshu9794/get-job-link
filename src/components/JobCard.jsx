@@ -1,124 +1,177 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { normalizeSkills } from "../utils/skills";
-import ShareMenu from "./ShareMenu";
+import { useNavigate } from "react-router-dom";
+import {
+  MapPin,
+  Clock,
+  ExternalLink,
+  ChevronRight,
+  Sparkles,
+  Bookmark,
+} from "lucide-react";
+import {
+  isRemoteJob,
+  timeAgo,
+  getCompanyInitials,
+  getCompanyColor,
+  getApplyUrl,
+} from "../utils/jobClassification";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
-export default function JobCard({ job, onShare, onApply }) {
-  const skills = normalizeSkills(job.skills);
+export default function JobCard({ job }) {
+  const navigate = useNavigate();
+  const { isJobSaved, toggleSaveJob } = useAuth();
+  const { showToast } = useToast();
+
+  if (!job) return null;
+
+  const isRemote = isRemoteJob(job);
+  const colorScheme = getCompanyColor(job.company);
+  const initials = getCompanyInitials(job.company);
+  const applyUrl = getApplyUrl(job);
+  const saved = isJobSaved(job.id);
+
+  const handleCardClick = () => {
+    navigate(`/job/${job.id}`);
+  };
+
+  const handleDirectApply = (e) => {
+    e.stopPropagation();
+    window.open(applyUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleToggleBookmark = async (e) => {
+    e.stopPropagation();
+    try {
+      const isNowSaved = await toggleSaveJob(job);
+      showToast(isNowSaved ? "Job saved to your bookmarks!" : "Job removed from bookmarks.");
+    } catch (err) {
+      showToast(err.message || "Please log in to save jobs.", "info");
+    }
+  };
+
+  // Format experience string for compact display
+  const displayExperience = () => {
+    const exp = job.experience || "0+ yrs";
+    if (exp.toLowerCase().includes("fresher")) return "Fresher";
+    if (exp.toLowerCase().includes("more than 0")) return "0-1 yr";
+    if (exp.toLowerCase().includes("more than 1")) return "1+ yrs";
+    if (exp.toLowerCase().includes("more than 2")) return "2+ yrs";
+    if (exp.toLowerCase().includes("more than 3")) return "3+ yrs";
+    if (exp.toLowerCase().includes("more than 4")) return "4+ yrs";
+    return exp.length > 14 ? exp.slice(0, 12) + "…" : exp;
+  };
 
   return (
-    <article className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:border-slate-300 flex flex-col">
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-slate-500">
-                {(job.company || "?").slice(0, 2).toUpperCase()}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-bold text-slate-900 truncate">{job.title}</h3>
-              <p className="text-sm font-medium text-blue-600 truncate">{job.company}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              aria-label="Save job"
-              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+    <div
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
+      className="group relative bg-white border border-slate-200/90 hover:border-blue-400 hover:shadow-md rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex items-center justify-between cursor-pointer w-full min-h-[82px] select-none"
+    >
+      {/* Left: Company Avatar & Job Info */}
+      <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
+        {/* Company Avatar / Logo */}
+        <div
+          className={`w-11 h-11 rounded-xl ${colorScheme.bg} ${colorScheme.text} ${colorScheme.border} border flex items-center justify-center font-black text-xs shrink-0 shadow-xs tracking-tight`}
+        >
+          {initials}
+        </div>
+
+        {/* Text Details */}
+        <div className="min-w-0 flex-1">
+          {/* Row 1: Title + Remote Tag */}
+          <div className="flex items-center space-x-2">
+            <h3
+              title={job.title}
+              className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 truncate transition-colors leading-snug tracking-tight"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              </svg>
+              {job.title}
+            </h3>
+
+            {isRemote && (
+              <span className="shrink-0 bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+                Remote
+              </span>
+            )}
+          </div>
+
+          {/* Row 2: Company • Location */}
+          <div className="flex items-center space-x-1.5 text-xs text-slate-500 mt-0.5 truncate">
+            <span className="font-semibold text-slate-700 truncate max-w-[130px] sm:max-w-[160px]">
+              {job.company || "Company"}
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center space-x-1 text-slate-500 text-[11px] truncate max-w-[120px] sm:max-w-[180px]">
+              <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+              <span className="truncate">{job.location || "India"}</span>
+            </span>
+          </div>
+
+          {/* Row 3: Metadata Badges (Type, Experience, Salary, ATS) */}
+          <div className="flex items-center space-x-1.5 mt-1 text-[10px]">
+            <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
+              {job.jobType || "Full Time"}
+            </span>
+            <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
+              {displayExperience()}
+            </span>
+            {job.salary && job.salary !== "Not Disclosed" && job.salary !== "Competitive" && (
+              <span className="bg-emerald-50 text-emerald-700 font-semibold px-1.5 py-0.5 rounded hidden sm:inline-block truncate max-w-[90px]">
+                {job.salary}
+              </span>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/job/${job.id}#ats-section`);
+              }}
+              title="View role-specific ATS keywords & resume screening tips"
+              className="inline-flex items-center space-x-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/90 font-bold px-1.5 py-0.5 rounded transition-all hover:scale-105 active:scale-95"
+            >
+              <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+              <span>ATS Tips</span>
             </button>
-            {onShare ? (
-              <button
-                onClick={() => onShare(job)}
-                aria-label="Share job"
-                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="18" cy="5" r="3"></circle>
-                  <circle cx="6" cy="12" r="3"></circle>
-                  <circle cx="18" cy="19" r="3"></circle>
-                  <line x1="8.59" y1="6.51" x2="15.41" y2="10.49"></line>
-                  <line x1="15.41" y1="13.51" x2="8.59" y2="17.49"></line>
-                </svg>
-              </button>
-            ) : null}
           </div>
         </div>
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          <span className={`px-2 py-0.5 text-[11px] font-medium rounded-full ${job.isRemote ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
-            {job.isRemote ? "Remote" : "On-site"}
-          </span>
-          <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-600">
-            {job.jobType || "Full Time"}
-          </span>
-          <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-600">
-            {job.experience || "More than 0 year"}
-          </span>
-          {job.salary && (
-            <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-blue-50 text-blue-700">
-              {job.salary}
-            </span>
-          )}
-          <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-purple-50 text-purple-700">
-            {["technical", "engineering"].includes((job.domain || "Engineering").toLowerCase()) ? "Technical" : "Non-tech"}
-          </span>
-          {job.fresherFriendly && (
-            <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-50 text-amber-700">
-              Fresher Friendly
-            </span>
-          )}
-        </div>
-
-        <p className="text-slate-600 text-sm line-clamp-2 mt-3 leading-relaxed">
-          {job.jd || "No description provided."}
-        </p>
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {skills.slice(0, 4).map((skill, idx) => (
-            <span key={idx} className="px-2 py-0.5 text-[11px] bg-slate-50 text-slate-500 rounded-md border border-slate-100">
-              {skill}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-3 pt-3 border-t border-slate-100">
-          <ShareMenu job={job} />
-        </div>
       </div>
 
-      <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between mt-auto">
-        <div className="flex items-center text-xs text-slate-400">
-          <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span>{job.date || "Recently"}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to={`/job/${job.id}`}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-          >
-            View Job
-          </Link>
+      {/* Right: Posted Date & Direct Apply Action */}
+      <div className="flex flex-col items-end justify-between self-stretch shrink-0 pl-1">
+        <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium whitespace-nowrap flex items-center space-x-1">
+          <Clock className="w-3 h-3 text-slate-300 hidden sm:inline" />
+          <span>{timeAgo(job.createdAt || job.date)}</span>
+        </span>
+
+        <div className="flex items-center space-x-1 mt-auto">
           <button
-            onClick={onApply}
-            className="inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+            onClick={handleToggleBookmark}
+            title={saved ? "Remove from saved jobs" : "Save job"}
+            className={`p-1.5 rounded-lg transition-colors ${
+              saved
+                ? "text-blue-600 bg-blue-50"
+                : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+            }`}
+            aria-label={saved ? "Unsave Job" : "Save Job"}
           >
-            <span>Apply</span>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
+            <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-blue-600 text-blue-600" : ""}`} />
           </button>
+          <button
+            onClick={handleDirectApply}
+            title="Apply directly on employer site"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            aria-label="Direct Apply"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </button>
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
-    </article>
+    </div>
   );
 }

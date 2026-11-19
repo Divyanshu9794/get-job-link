@@ -1,107 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Get Job Link | Clean Daily Tech Jobs</title>
-
-    <link rel="icon" type="image/png" href="/logo.jpeg" />
-
-    <meta
-      name="google-adsense-account"
-      content="ca-pub-6002861264084272"
-    />
-
-    <!-- Redirect old Firebase domain to the custom domain -->
-    <script>
-      (function () {
-        const hostname = window.location.hostname;
-
-        if (
-          hostname === "get-job-link.web.app" ||
-          hostname === "www.get-job-link.web.app"
-        ) {
-          const newUrl =
-            "https://getjoblink.in" +
-            window.location.pathname +
-            window.location.search +
-            window.location.hash;
-
-          window.location.replace(newUrl);
-        }
-      })();
-    </script>
-
-    <!-- Google AdSense -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6002861264084272"
-      crossorigin="anonymous"
-    ></script>
-
-    <!-- Adcash Main Library -->
-    <script
-      type="text/javascript"
-      src="https://acscript.com"
-      async
-    ></script>
-
-    <!-- Adcash Autotag Initialization -->
-    <script type="text/javascript">
-      window.addEventListener("DOMContentLoaded", () => {
-        const initAclib = () => {
-          if (
-            typeof aclib !== "undefined" &&
-            typeof aclib.runAutoTag === "function"
-          ) {
-            aclib.runAutoTag({
-              zoneId: "mgttqf1elu"
-            });
-          } else {
-            // Retry if the Adcash library has not loaded yet.
-            setTimeout(initAclib, 100);
-          }
-        };
-
-        initAclib();
-      });
-    </script>
+    <title>GetJobLink | Clean Daily Tech Jobs & Verified Career Portals</title>
+    <meta name="description" content="Verified daily tech jobs across India and worldwide. 100% direct company application links with free ATS resume score evaluations and role-specific career guides." />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="canonical" href="https://getjoblink.in/" />
+    <!-- Google AdSense Official Script & Publisher Meta -->
+    <meta name="google-adsense-account" content="ca-pub-6002861264084272" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6002861264084272" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://firestore.googleapis.com" />
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
   </head>
-
   <body class="bg-slate-50">
     <div id="root"></div>
-
-    <!-- React Application -->
     <script type="module" src="/src/main.jsx"></script>
-
-    <!-- Google AdSense Ad Unit 1 -->
-    <ins
-      class="adsbygoogle"
-      style="display: block"
-      data-ad-client="ca-pub-6002861264084272"
-      data-ad-slot="1623901333"
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    ></ins>
-
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-
-    <!-- Google AdSense Ad Unit 2 -->
-    <ins
-      class="adsbygoogle"
-      style="display: block"
-      data-ad-client="ca-pub-6002861264084272"
-      data-ad-slot="7891680803"
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    ></ins>
-
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
   </body>
 </html>

@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"; // 1. Import Firestore
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAdJURK2WoFuP-gTPqdKD9RV516RZQ-ueo",
@@ -21,5 +22,5 @@ if (typeof window !== "undefined") {
 
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
-export const db = getFirestore(app); // 2. Export Database instance
+export const db = getFirestore(app);
+export const storage = getStorage(app);
