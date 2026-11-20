@@ -23,6 +23,8 @@ const CareerGuideDetailPage = lazy(() => import("./pages/CareerGuideDetailPage")
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const DisclaimerPage = lazy(() => import("./pages/DisclaimerPage"));
 const EditorialPolicyPage = lazy(() => import("./pages/EditorialPolicyPage"));
+const HiringRadarPage = lazy(() => import("./pages/HiringRadarPage"));
+const CompanyIntelligencePage = lazy(() => import("./pages/CompanyIntelligencePage"));
 
 function PageLoading() {
   return (
@@ -53,6 +55,10 @@ export default function App() {
 
                   {/* Dedicated Job Detail Route */}
                   <Route path="/job/:jobId" element={<JobDetailPage />} />
+
+                  {/* Public Hiring Radar & Company Intelligence */}
+                  <Route path="/hiring-radar" element={<HiringRadarPage />} />
+                  <Route path="/hiring-radar/company/:companySlug" element={<CompanyIntelligencePage />} />
 
                   {/* Editorial Career Guides */}
                   <Route path="/career-guides" element={<CareerGuidesPage />} />

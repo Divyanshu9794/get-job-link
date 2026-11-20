@@ -55,6 +55,7 @@ import {
   isRemoteJob,
 } from "../utils/jobClassification";
 import SEO from "../components/SEO";
+import AdminHiringAnalytics from "../components/AdminHiringAnalytics";
 
 const PAGE_SIZE = 50;
 
@@ -714,6 +715,18 @@ export default function AdminPage() {
           >
             <Briefcase className="w-4 h-4" />
             <span>Job Inventory &amp; Records ({stats.total.toLocaleString()})</span>
+          </button>
+
+          <button
+            onClick={() => setAdminSection("hiring_analytics")}
+            className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
+              adminSection === "hiring_analytics"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+            }`}
+          >
+            <TrendingUp className="w-4 h-4" />
+            <span>Hiring Analytics</span>
           </button>
 
           <button
@@ -1467,6 +1480,9 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+      ) : adminSection === "hiring_analytics" ? (
+        /* HIRING RADAR & COMPANY ANALYTICS HUB */
+        <AdminHiringAnalytics jobs={jobs} isAdmin={isAdmin} showToast={showToast} />
       ) : (
         /* DIRECT MESSAGES & INQUIRIES SECTION */
         <div className="space-y-6 animate-in fade-in">

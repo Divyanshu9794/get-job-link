@@ -15,6 +15,7 @@ import {
   BookOpen,
   ChevronDown,
   LogIn,
+  Radio,
 } from "lucide-react";
 import logoImg from "../assets/logo.jpeg";
 import { useAuth } from "../context/AuthContext";
@@ -52,6 +53,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Jobs", path: "/jobs/india", icon: Briefcase },
+    { name: "Hiring Radar", path: "/hiring-radar", icon: Radio },
     { name: "Career Guides", path: "/career-guides", icon: BookOpen },
     { name: "Resume Builder", path: "/resume", icon: FileText },
     { name: "ATS Checker", path: "/ats-checker", icon: Sparkles },

@@ -403,3 +403,371 @@ exports.getGA4Analytics = functions.https.onRequest(async (req, res) => {
     });
   }
 });
+
+/**
+ * 3. Hiring Radar & Hiring Analytics Aggregation Engine (Cloud Function)
+ * Analyzes the jobs collection in Firestore, builds idempotent company intelligence profiles,
+ * and caches public aggregates into `hiring_radar_metadata/overview`.
+ */
+function normalizeCompanyNameFn(rawName) {
+  if (!rawName || typeof rawName !== "string") return "Unknown Company";
+  let clean = rawName.trim();
+  if (!clean) return "Unknown Company";
+  const cleaned = clean
+    .replace(/\s+(?:Inc\.?|LLC\.?|Ltd\.?|Pvt\.?\s*Ltd\.?|Limited|Corporation|Corp\.?)$/i, "")
+    .trim();
+  return cleaned || clean;
+}
+
+function createCompanySlugFn(companyName) {
+  const norm = normalizeCompanyNameFn(companyName);
+  return norm
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || "unknown-company";
+}
+
+function getJobTimestampFn(job) {
+  if (!job) return 0;
+  const t = job.createdAt || job.date;
+  if (!t) return 0;
+  if (typeof t === "object" && t.seconds) return t.seconds * 1000;
+  if (typeof t === "number") return t;
+  const parsed = new Date(t).getTime();
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function extractSkillsFn(job) {
+  if (!job) return [];
+  if (Array.isArray(job.skills) && job.skills.length > 0) {
+    return job.skills.map((s) => String(s).trim()).filter(Boolean);
+  }
+  if (Array.isArray(job.requiredSkills) && job.requiredSkills.length > 0) {
+    return job.requiredSkills.map((s) => String(s).trim()).filter(Boolean);
+  }
+  if (typeof job.skills === "string" && job.skills.trim()) {
+    return job.skills.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+exports.rebuildHiringRadarAnalytics = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  // 1. Verify Admin Authentication via Firebase ID Token
+  const authHeader = req.headers.authorization || "";
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized: Missing Authorization header." });
+  }
+
+  const idToken = authHeader.split("Bearer ")[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userEmail = (decodedToken.email || "").toLowerCase();
+    const isAdmin = ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail);
+    if (!isAdmin) {
+      return res.status(403).json({ error: "Forbidden: Admin privileges required." });
+    }
+  } catch (authErr) {
+    return res.status(401).json({ error: "Invalid or expired authorization token." });
+  }
+
+  try {
+    const db = admin.firestore();
+    const snap = await db.collection("jobs").get();
+    const jobs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const now = Date.now();
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const t7DaysAgo = now - 7 * ONE_DAY_MS;
+    const t14DaysAgo = now - 14 * ONE_DAY_MS;
+    const t30DaysAgo = now - 30 * ONE_DAY_MS;
+    const t60DaysAgo = now - 60 * ONE_DAY_MS;
+    const t90DaysAgo = now - 90 * ONE_DAY_MS;
+
+    const companyMap = new Map();
+    const skillFreq7d = new Map();
+    const skillFreq30d = new Map();
+    const skillFreq90d = new Map();
+    const skillFreqAll = new Map();
+    const skillPairingsMap = new Map();
+    const locationMap = new Map();
+    const domainMap = new Map();
+    const dailyJobCounts = new Map();
+    const workModeCounts = { remote: 0, hybrid: 0, onsite: 0 };
+
+    const dataQuality = {
+      totalChecked: jobs.length,
+      missingCompany: 0,
+      missingLocation: 0,
+      missingSkills: 0,
+      missingDates: 0,
+      malformedSkills: 0,
+      potentialDuplicates: 0,
+    };
+    const seenSignatures = new Set();
+    let earliestObservationDate = now;
+
+    jobs.forEach((job) => {
+      const companyName = normalizeCompanyNameFn(job.company);
+      const slug = createCompanySlugFn(companyName);
+      const jobTime = getJobTimestampFn(job);
+      const locStr = String(job.location || "").trim();
+      const domainStr = String(job.domain || "Engineering").trim() || "Engineering";
+      const skills = extractSkillsFn(job);
+      const isRemote = Boolean(job.isRemote || String(job.jobType || "").toLowerCase().includes("remote") || locStr.toLowerCase().includes("remote"));
+
+      if (jobTime > 0 && jobTime < earliestObservationDate) {
+        earliestObservationDate = jobTime;
+      }
+
+      if (!job.company || String(job.company).trim() === "") dataQuality.missingCompany++;
+      if (!locStr) dataQuality.missingLocation++;
+      if (skills.length === 0) dataQuality.missingSkills++;
+      if (jobTime === 0) dataQuality.missingDates++;
+
+      const sig = `${companyName.toLowerCase()}|${String(job.title || "").toLowerCase().trim()}|${locStr.toLowerCase()}`;
+      if (seenSignatures.has(sig)) {
+        dataQuality.potentialDuplicates++;
+      } else {
+        seenSignatures.add(sig);
+      }
+
+      if (isRemote) workModeCounts.remote++;
+      else if (locStr.toLowerCase().includes("hybrid")) workModeCounts.hybrid++;
+      else workModeCounts.onsite++;
+
+      domainMap.set(domainStr, (domainMap.get(domainStr) || 0) + 1);
+
+      let cleanCity = locStr || "India";
+      let cleanCountry = "India";
+      if (cleanCity.includes(",")) {
+        const parts = cleanCity.split(",").map((p) => p.trim());
+        cleanCity = parts[0];
+        cleanCountry = parts[parts.length - 1];
+      }
+      if (!locationMap.has(cleanCity)) {
+        locationMap.set(cleanCity, { city: cleanCity, country: cleanCountry, count: 0, companies: new Set() });
+      }
+      const locEntry = locationMap.get(cleanCity);
+      locEntry.count++;
+      locEntry.companies.add(companyName);
+
+      if (jobTime > 0) {
+        const dayKey = new Date(jobTime).toISOString().split("T")[0];
+        dailyJobCounts.set(dayKey, (dailyJobCounts.get(dayKey) || 0) + 1);
+      }
+
+      skills.forEach((s) => {
+        skillFreqAll.set(s, (skillFreqAll.get(s) || 0) + 1);
+        if (jobTime >= t90DaysAgo) skillFreq90d.set(s, (skillFreq90d.get(s) || 0) + 1);
+        if (jobTime >= t30DaysAgo) skillFreq30d.set(s, (skillFreq30d.get(s) || 0) + 1);
+        if (jobTime >= t7DaysAgo) skillFreq7d.set(s, (skillFreq7d.get(s) || 0) + 1);
+      });
+
+      if (skills.length > 1) {
+        const sorted = [...new Set(skills)].sort();
+        for (let i = 0; i < sorted.length; i++) {
+          for (let j = i + 1; j < sorted.length; j++) {
+            const pair = `${sorted[i]} + ${sorted[j]}`;
+            skillPairingsMap.set(pair, (skillPairingsMap.get(pair) || 0) + 1);
+          }
+        }
+      }
+
+      if (!companyMap.has(companyName)) {
+        companyMap.set(companyName, {
+          companyName,
+          slug,
+          activeJobs: 0,
+          jobsLast7d: 0,
+          jobsPrev7d: 0,
+          jobsLast30d: 0,
+          jobsPrev30d: 0,
+          firstObservedAt: jobTime > 0 ? jobTime : now,
+          lastJobAddedAt: jobTime > 0 ? jobTime : now,
+          locations: new Set(),
+          skills: new Map(),
+          domains: new Set(),
+          titles: new Set(),
+          recentJobs: [],
+        });
+      }
+
+      const c = companyMap.get(companyName);
+      c.activeJobs++;
+      if (locStr) c.locations.add(locStr);
+      if (domainStr) c.domains.add(domainStr);
+      if (job.title) c.titles.add(job.title.trim());
+
+      if (jobTime > 0) {
+        if (jobTime < c.firstObservedAt) c.firstObservedAt = jobTime;
+        if (jobTime > c.lastJobAddedAt) c.lastJobAddedAt = jobTime;
+        if (jobTime >= t7DaysAgo) c.jobsLast7d++;
+        else if (jobTime >= t14DaysAgo && jobTime < t7DaysAgo) c.jobsPrev7d++;
+        if (jobTime >= t30DaysAgo) c.jobsLast30d++;
+        else if (jobTime >= t60DaysAgo && jobTime < t30DaysAgo) c.jobsPrev30d++;
+      }
+
+      skills.forEach((s) => c.skills.set(s, (c.skills.get(s) || 0) + 1));
+      if (c.recentJobs.length < 5) {
+        c.recentJobs.push({
+          id: job.id,
+          title: job.title,
+          location: job.location,
+          experience: job.experience,
+          salary: job.salary,
+          jobType: job.jobType,
+          isRemote,
+          createdAt: jobTime,
+        });
+      }
+    });
+
+    const companiesList = Array.from(companyMap.values()).map((c) => {
+      const topSkills = Array.from(c.skills.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([s]) => s);
+
+      let trend = "Steady";
+      if (c.firstObservedAt >= t7DaysAgo) trend = "New This Week";
+      else if (c.jobsLast7d >= 3 && c.jobsLast7d > c.jobsPrev7d * 1.5) trend = "Surging";
+      else if (c.jobsLast7d > c.jobsPrev7d && c.jobsLast7d >= 2) trend = "Increasing";
+      else if (c.jobsLast30d > c.jobsPrev30d && c.jobsLast30d >= 3) trend = "Active";
+
+      return {
+        companyName: c.companyName,
+        slug: c.slug,
+        activeJobs: c.activeJobs,
+        jobsLast7d: c.jobsLast7d,
+        jobsPrev7d: c.jobsPrev7d,
+        jobsLast30d: c.jobsLast30d,
+        jobsPrev30d: c.jobsPrev30d,
+        firstObservedAt: c.firstObservedAt,
+        lastJobAddedAt: c.lastJobAddedAt,
+        isNewThisWeek: c.firstObservedAt >= t7DaysAgo,
+        isMultiRole: c.titles.size >= 2 || c.domains.size >= 2,
+        distinctRolesCount: c.titles.size,
+        distinctDomainsCount: c.domains.size,
+        locations: Array.from(c.locations),
+        topLocations: Array.from(c.locations).slice(0, 3),
+        topSkills,
+        domains: Array.from(c.domains),
+        trend,
+        recentJobs: c.recentJobs.sort((a, b) => b.createdAt - a.createdAt),
+      };
+    });
+
+    const totalAnalyzed = jobs.length || 1;
+    function formatSkillsFn(freqMap) {
+      return Array.from(freqMap.entries())
+        .map(([name, count]) => ({
+          name,
+          count,
+          percentage: Math.round((count / totalAnalyzed) * 100) || 1,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 20);
+    }
+
+    const payload = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAtMs: now,
+      earliestObservationDate,
+      totalActiveJobs: jobs.length,
+      overview: {
+        totalCompanies: companiesList.length,
+        companiesHiring: companiesList.filter((c) => c.activeJobs > 0).length,
+        newCompaniesThisWeek: companiesList.filter((c) => c.firstObservedAt >= t7DaysAgo).length,
+        newCompaniesPrevWeek: companiesList.filter((c) => c.firstObservedAt >= t14DaysAgo && c.firstObservedAt < t7DaysAgo).length,
+        newJobsThisWeek: jobs.filter((j) => getJobTimestampFn(j) >= t7DaysAgo).length,
+        newJobsPrevWeek: jobs.filter((j) => getJobTimestampFn(j) >= t14DaysAgo && getJobTimestampFn(j) < t7DaysAgo).length,
+        multiRoleCompanies: companiesList.filter((c) => c.isMultiRole).length,
+      },
+      risingCompanies: [...companiesList].sort((a, b) => b.jobsLast7d - a.jobsLast7d || b.activeJobs - a.activeJobs).slice(0, 24),
+      newlyDiscoveredCompanies: [...companiesList].sort((a, b) => b.firstObservedAt - a.firstObservedAt).slice(0, 16),
+      skills: {
+        "7d": formatSkillsFn(skillFreq7d),
+        "30d": formatSkillsFn(skillFreq30d),
+        "90d": formatSkillsFn(skillFreq90d),
+        all: formatSkillsFn(skillFreqAll),
+        pairings: Array.from(skillPairingsMap.entries()).map(([pair, count]) => ({ pair, count })).sort((a, b) => b.count - a.count).slice(0, 10),
+      },
+      locations: Array.from(locationMap.values()).map((l) => ({ city: l.city, country: l.country, count: l.count, topCompanies: Array.from(l.companies).slice(0, 4) })).sort((a, b) => b.count - a.count).slice(0, 15),
+      domains: Array.from(domainMap.entries()).map(([domain, count]) => ({ domain, count, percentage: Math.round((count / totalAnalyzed) * 100) })).sort((a, b) => b.count - a.count),
+      workModes: workModeCounts,
+      dailyTrends: Array.from(dailyJobCounts.keys()).sort().slice(-30).map((d) => ({ date: d, count: dailyJobCounts.get(d) })),
+      dataQuality,
+    };
+
+    // 2. Persist to Firestore: hiring_radar_metadata/overview
+    await db.collection("hiring_radar_metadata").doc("overview").set(payload, { merge: true });
+
+    // 3. Batch commit top company profiles into company_analytics collection for fast O(1) detail lookups
+    const BATCH_LIMIT = 400;
+    const batches = [];
+    let currentBatch = db.batch();
+    let opCount = 0;
+
+    for (const comp of companiesList) {
+      const compRef = db.collection("company_analytics").doc(comp.slug);
+      currentBatch.set(compRef, {
+        ...comp,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      opCount++;
+
+      if (opCount >= BATCH_LIMIT) {
+        batches.push(currentBatch.commit());
+        currentBatch = db.batch();
+        opCount = 0;
+      }
+    }
+    if (opCount > 0) {
+      batches.push(currentBatch.commit());
+    }
+    await Promise.all(batches);
+
+    return res.status(200).json({
+      success: true,
+      message: `Hiring Radar analytics aggregated successfully for ${jobs.length} jobs across ${companiesList.length} companies.`,
+      stats: payload.overview,
+    });
+  } catch (err) {
+    console.error("Error in rebuildHiringRadarAnalytics:", err);
+    return res.status(500).json({ error: err.message || "Internal aggregation error" });
+  }
+});
+
+/**
+ * 4. Public Cached Hiring Radar Overview API
+ */
+exports.getHiringRadarOverview = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+  res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.set("Cache-Control", "public, max-age=300, s-maxage=600"); // 5m browser / 10m CDN cache
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  try {
+    const db = admin.firestore();
+    const docSnap = await db.collection("hiring_radar_metadata").doc("overview").get();
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: "Hiring Radar metadata not yet generated." });
+    }
+    return res.status(200).json(docSnap.data());
+  } catch (err) {
+    console.error("Error in getHiringRadarOverview:", err);
+    return res.status(500).json({ error: "Failed to load Hiring Radar overview" });
+  }
+});
