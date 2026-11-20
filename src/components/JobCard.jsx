@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   MapPin,
   Clock,
@@ -6,6 +7,8 @@ import {
   ChevronRight,
   Sparkles,
   Bookmark,
+  Link2,
+  Check,
 } from "lucide-react";
 import {
   isRemoteJob,
@@ -21,6 +24,7 @@ export default function JobCard({ job }) {
   const navigate = useNavigate();
   const { isJobSaved, toggleSaveJob } = useAuth();
   const { showToast } = useToast();
+  const [copied, setCopied] = useState(false);
 
   if (!job) return null;
 
@@ -46,6 +50,33 @@ export default function JobCard({ job }) {
       showToast(isNowSaved ? "Job saved to your bookmarks!" : "Job removed from bookmarks.");
     } catch (err) {
       showToast(err.message || "Please log in to save jobs.", "info");
+    }
+  };
+
+  const handleCopyLink = async (e) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/job/${job.id}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      setCopied(true);
+      showToast("Job link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      showToast("Failed to copy link", "error");
     }
   };
 
@@ -87,12 +118,14 @@ export default function JobCard({ job }) {
         <div className="min-w-0 flex-1">
           {/* Row 1: Title + Remote Tag */}
           <div className="flex items-center space-x-2">
-            <h3
+            <Link
+              to={`/job/${job.id}`}
+              onClick={(e) => e.stopPropagation()}
               title={job.title}
-              className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 truncate transition-colors leading-snug tracking-tight"
+              className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 truncate transition-colors leading-snug tracking-tight hover:underline"
             >
               {job.title}
-            </h3>
+            </Link>
 
             {isRemote && (
               <span className="shrink-0 bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
@@ -149,6 +182,22 @@ export default function JobCard({ job }) {
         </span>
 
         <div className="flex items-center space-x-1 mt-auto">
+          <button
+            onClick={handleCopyLink}
+            title={copied ? "Link copied!" : "Copy link to job details"}
+            className={`p-1.5 rounded-lg transition-colors ${
+              copied
+                ? "text-emerald-600 bg-emerald-50"
+                : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+            }`}
+            aria-label="Copy link to job details"
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
+            ) : (
+              <Link2 className="w-3.5 h-3.5" />
+            )}
+          </button>
           <button
             onClick={handleToggleBookmark}
             title={saved ? "Remove from saved jobs" : "Save job"}

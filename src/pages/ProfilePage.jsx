@@ -17,6 +17,8 @@ import {
   ThumbsUp,
   Star,
   Send,
+  Link2,
+  Check,
 } from "lucide-react";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, serverTimestamp } from "firebase/firestore";
@@ -59,6 +61,33 @@ export default function ProfilePage() {
   // Saved Jobs State
   const [savedJobsList, setSavedJobsList] = useState([]);
   const [loadingSavedJobs, setLoadingSavedJobs] = useState(false);
+  const [copiedJobId, setCopiedJobId] = useState(null);
+
+  const handleCopyJobLink = async (jobId) => {
+    const url = `${window.location.origin}/job/${jobId}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      setCopiedJobId(jobId);
+      showToast("Job link copied to clipboard!");
+      setTimeout(() => setCopiedJobId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      showToast("Failed to copy link", "error");
+    }
+  };
 
   // ATS History State
   const [atsHistoryList, setAtsHistoryList] = useState([]);
@@ -827,6 +856,22 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex items-center space-x-2 self-end sm:self-auto shrink-0">
+                    <button
+                      onClick={() => handleCopyJobLink(job.jobId || job.id)}
+                      className={`p-1.5 rounded-xl border border-slate-200 transition-colors ${
+                        copiedJobId === (job.jobId || job.id)
+                          ? "text-emerald-600 bg-emerald-50 border-emerald-200"
+                          : "text-slate-400 hover:text-blue-600 hover:bg-white"
+                      }`}
+                      title={copiedJobId === (job.jobId || job.id) ? "Link copied!" : "Copy link to job details"}
+                      aria-label="Copy link to job details"
+                    >
+                      {copiedJobId === (job.jobId || job.id) ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Link2 className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                     <Link
                       to={`/job/${job.jobId || job.id}`}
                       className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-white text-xs font-semibold transition-colors"
