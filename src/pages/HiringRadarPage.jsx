@@ -605,6 +605,55 @@ export default function HiringRadarPage() {
                 ))}
               </div>
             </section>
+
+            {/* ========================================================================= */}
+            {/* BEHIND THE RADAR — CREATOR & TRANSPARENCY CALLOUT                         */}
+            {/* ========================================================================= */}
+            <section className="pt-4 border-t border-slate-200">
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div className="flex items-start space-x-3.5">
+                  <img
+                    src="https://github.com/Divyanshu9794.png"
+                    alt="Divyanshu Singh"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                    className="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
+                        Behind the Radar
+                      </h3>
+                      <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.2 rounded-full border border-slate-200">
+                        Built by Divyanshu Singh
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                      Hiring Radar is part of GetJobLink, an independently built platform by Divyanshu Singh. It transforms job listing data into useful hiring activity insights to help candidates discover companies, roles and in-demand technologies.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 shrink-0 self-start sm:self-auto text-xs font-bold pt-1 sm:pt-0">
+                  <Link
+                    to="/about#meet-the-builder"
+                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    About GetJobLink
+                  </Link>
+                  <span className="text-slate-300">•</span>
+                  <a
+                    href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-slate-600 hover:text-slate-900 hover:underline"
+                  >
+                    GitHub
+                  </a>
+                </div>
+              </div>
+            </section>
           </>
         )}
       </main>
