@@ -56,12 +56,16 @@ export default function JobCard({ job }) {
   const handleCopyLink = async (e) => {
     e.stopPropagation();
     const url = `${window.location.origin}/job/${job.id}`;
+    const textToCopy = e.shiftKey
+      ? `🔥 Hiring: ${job.title} at ${job.company}\n📍 Location: ${job.location || "India"}\n💼 Experience: ${displayExperience()}\n🔗 Apply & View Details: ${url}`
+      : url;
+
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(textToCopy);
       } else {
         const textArea = document.createElement("textarea");
-        textArea.value = url;
+        textArea.value = textToCopy;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         textArea.style.top = "-999999px";
@@ -72,7 +76,7 @@ export default function JobCard({ job }) {
         textArea.remove();
       }
       setCopied(true);
-      showToast("Job link copied to clipboard!");
+      showToast(e.shiftKey ? "Full job details copied for sharing!" : "Job link copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy link:", err);
@@ -80,9 +84,19 @@ export default function JobCard({ job }) {
     }
   };
 
+  const isValidBadge = (val) => {
+    if (!val) return false;
+    const str = String(val).trim().toLowerCase();
+    return str !== "" && str !== "null" && str !== "undefined" && str !== "not disclosed" && str !== "competitive" && str !== "n/a";
+  };
+
   // Format experience string for compact display
   const displayExperience = () => {
-    const exp = job.experience || "0+ yrs";
+    const rawExp = job.experience;
+    if (!rawExp || String(rawExp).trim().toLowerCase() === "null" || String(rawExp).trim().toLowerCase() === "undefined") {
+      return "0+ yrs";
+    }
+    const exp = String(rawExp).trim();
     if (exp.toLowerCase().includes("fresher")) return "Fresher";
     if (exp.toLowerCase().includes("more than 0")) return "0-1 yr";
     if (exp.toLowerCase().includes("more than 1")) return "1+ yrs";
@@ -148,15 +162,17 @@ export default function JobCard({ job }) {
 
           {/* Row 3: Metadata Badges (Type, Experience, Salary, ATS) */}
           <div className="flex items-center space-x-1.5 mt-1 text-[10px]">
-            <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
-              {job.jobType || "Full Time"}
-            </span>
+            {isValidBadge(job.jobType) && (
+              <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
+                {String(job.jobType).trim()}
+              </span>
+            )}
             <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
               {displayExperience()}
             </span>
-            {job.salary && job.salary !== "Not Disclosed" && job.salary !== "Competitive" && (
+            {isValidBadge(job.salary) && (
               <span className="bg-emerald-50 text-emerald-700 font-semibold px-1.5 py-0.5 rounded hidden sm:inline-block truncate max-w-[90px]">
-                {job.salary}
+                {String(job.salary).trim()}
               </span>
             )}
             <button
@@ -184,7 +200,7 @@ export default function JobCard({ job }) {
         <div className="flex items-center space-x-1 mt-auto">
           <button
             onClick={handleCopyLink}
-            title={copied ? "Link copied!" : "Copy link to job details"}
+            title={copied ? "Copied!" : "Copy link (Shift+Click to copy full post text)"}
             className={`p-1.5 rounded-lg transition-colors ${
               copied
                 ? "text-emerald-600 bg-emerald-50"
