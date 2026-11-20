@@ -13,11 +13,15 @@ import {
   Heart,
   Radio,
   Award,
+  Briefcase,
+  GraduationCap,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import SEO from "../components/SEO";
 
 export default function AboutPage() {
-  const [avatarError, setAvatarError] = useState(false);
+  const [showFullResume, setShowFullResume] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 antialiased pb-20">
@@ -76,21 +80,12 @@ export default function AboutPage() {
           {/* Profile Card */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-              {/* Profile Image / Avatar */}
+              {/* Clean Avatar Badge Placeholder (No external photo) */}
               <div className="relative shrink-0">
-                {!avatarError ? (
-                  <img
-                    src="https://github.com/Divyanshu9794.png"
-                    alt="Divyanshu Singh — Founder & Independent Developer of GetJobLink"
-                    onError={() => setAvatarError(true)}
-                    className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
-                  />
-                ) : (
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-2xl flex items-center justify-center shadow-sm">
-                    DS
-                  </div>
-                )}
-                <span className="absolute -bottom-2 -right-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-2xl flex items-center justify-center shadow-md border-2 border-white ring-2 ring-blue-100">
+                  DS
+                </div>
+                <span className="absolute -bottom-1 -right-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
                   Active
                 </span>
               </div>
@@ -107,12 +102,12 @@ export default function AboutPage() {
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                    Software Engineer &amp; Full Stack Developer
+                    Software Engineer • React.js • Node.js • Azure • Power Platform
                   </p>
                 </div>
 
-                {/* Introduction Text */}
-                <div className="space-y-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed pt-1">
+                {/* Introduction Quote */}
+                <div className="space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed pt-1">
                   <p>
                     Hi, I&apos;m <strong>Divyanshu Singh</strong>, the independent developer behind <strong>GetJobLink</strong>.
                   </p>
@@ -127,7 +122,7 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                {/* Social & Public Profile Links */}
+                {/* Social & Contact Links */}
                 <div className="pt-2 flex flex-wrap items-center gap-2.5">
                   <a
                     href="https://linkedin.com/in/divyanshu-singh-3b433119b/"
@@ -138,11 +133,11 @@ export default function AboutPage() {
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                       <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
                     </svg>
-                    <span>Connect on LinkedIn</span>
+                    <span>LinkedIn</span>
                   </a>
 
                   <a
-                    href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                    href="https://github.com/Divyanshu9794/get-job-link"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition-colors"
@@ -150,15 +145,24 @@ export default function AboutPage() {
                     <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                       <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
                     </svg>
-                    <span>GitHub Repository</span>
+                    <span>GitHub Repo</span>
                   </a>
 
                   <a
-                    href="https://getjoblink.in"
-                    className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
+                    href="mailto:sdivyanshu352@gmail.com"
+                    className="inline-flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
                   >
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>getjoblink.in</span>
+                    <Mail className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Email</span>
+                  </a>
+
+                  <a
+                    href="https://leetcode.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 rounded-xl text-xs font-bold transition-colors"
+                  >
+                    <span>LeetCode</span>
                   </a>
                 </div>
               </div>
@@ -170,7 +174,178 @@ export default function AboutPage() {
                 <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
                 <span>GetJobLink is independently built and maintained by Divyanshu Singh.</span>
               </span>
-              <span className="text-[11px] text-slate-400">100% Bootstrapped &bull; Free For Job Seekers</span>
+              <span className="text-[11px] text-slate-400">100% Free For Job Seekers</span>
+            </div>
+          </div>
+
+          {/* Developer Background, Experience & Credentials Card */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight flex items-center space-x-2">
+                  <Briefcase className="w-5 h-5 text-blue-600" />
+                  <span>Engineering Experience &amp; Credentials</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Professional software engineering track record and technical background
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowFullResume(!showFullResume)}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center space-x-1"
+              >
+                <span>{showFullResume ? "Compact View" : "View Full Details"}</span>
+                {showFullResume ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+
+            {/* Work Experience */}
+            <div className="space-y-4">
+              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 sm:p-5 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <h4 className="text-sm font-extrabold text-slate-900">
+                      Analyst - Software Engineer
+                    </h4>
+                    <span className="text-xs font-bold text-blue-600">HCLTech</span>
+                    <span className="text-xs text-slate-400"> • Lucknow, Uttar Pradesh</span>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-lg self-start sm:self-auto">
+                    Nov 2024 – Present
+                  </span>
+                </div>
+
+                <ul className="space-y-1.5 text-xs text-slate-600 list-disc pl-4 leading-relaxed">
+                  <li>
+                    Engineered and delivered 2+ enterprise-grade web applications using React.js, Node.js, and Azure App Service, managing the complete software development lifecycle from implementation to deployment.
+                  </li>
+                  <li>
+                    Built responsive React.js user interfaces and developed RESTful APIs using Node.js and Express.js to support scalable business applications.
+                  </li>
+                  <li>
+                    Designed and integrated Logic Apps and Power Automate workflows for automated data collection, processing, and third-party API integrations.
+                  </li>
+                  <li>
+                    Deployed, monitored, and maintained applications on Microsoft Azure App Service, ensuring high availability, security, and performance.
+                  </li>
+                  <li>
+                    Integrated SharePoint, SQL Server, and external APIs with authentication, authorization, and role-based access control (RBAC).
+                  </li>
+                </ul>
+              </div>
+
+              {/* Education & Highlights Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Education */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2">
+                  <div className="flex items-center space-x-2 text-slate-900 font-bold text-xs">
+                    <GraduationCap className="w-4 h-4 text-indigo-600" />
+                    <span>Education</span>
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-extrabold text-slate-900">
+                      B.Tech in Computer Science with Honors
+                    </h5>
+                    <p className="text-[11px] text-slate-600">
+                      United College of Engineering and Research (UCER)
+                    </p>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                      <span>Prayagraj, UP (Jul 2024)</span>
+                      <strong className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        CGPA: 8.36 / 10
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Honors & Recognitions */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2">
+                  <div className="flex items-center space-x-2 text-slate-900 font-bold text-xs">
+                    <Award className="w-4 h-4 text-amber-500" />
+                    <span>Key Recognitions</span>
+                  </div>
+                  <ul className="space-y-1 text-[11px] text-slate-600 list-disc pl-4 leading-relaxed">
+                    <li>
+                      <strong>Rising Star Award - HCLTech</strong>: Awarded within 6 months of joining for outstanding performance.
+                    </li>
+                    <li>
+                      <strong>GATE 2024 Qualified</strong>: Graduate Aptitude Test in Engineering (CS).
+                    </li>
+                    <li>
+                      <strong>Amazon Summer ML School 2023</strong>: Selected for Amazon&apos;s machine learning program.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Technical Skills Pill Grid */}
+              <div className="pt-2 space-y-2">
+                <span className="text-xs font-bold text-slate-700 block">Core Technical Skills:</span>
+                <div className="flex flex-wrap gap-1.5 text-xs">
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-semibold border border-blue-100">
+                    React.js
+                  </span>
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-semibold border border-blue-100">
+                    Node.js &amp; Express
+                  </span>
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-semibold border border-blue-100">
+                    JavaScript / TypeScript
+                  </span>
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-semibold border border-blue-100">
+                    Microsoft Azure
+                  </span>
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-semibold border border-blue-100">
+                    Firebase &amp; Firestore
+                  </span>
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-medium">
+                    Power Automate &amp; Logic Apps
+                  </span>
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-medium">
+                    SQL Server &amp; MongoDB
+                  </span>
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-medium">
+                    Kotlin &amp; Android Studio
+                  </span>
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-medium">
+                    REST APIs &amp; RBAC
+                  </span>
+                </div>
+              </div>
+
+              {/* Collapsible Extended Projects & Certifications */}
+              {showFullResume && (
+                <div className="pt-4 border-t border-slate-200/80 space-y-4 animate-in fade-in duration-200">
+                  <div className="space-y-2">
+                    <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      Notable Built Projects
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                        <strong className="text-slate-900 block">UPAJ — Crop Suggestion System</strong>
+                        <p className="text-slate-500 text-[11px] leading-relaxed">
+                          Machine learning-based Android app with Firebase Authentication recommending crops from soil and weather analytics.
+                        </p>
+                      </div>
+                      <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                        <strong className="text-slate-900 block">Workflow Automation Platform</strong>
+                        <p className="text-slate-500 text-[11px] leading-relaxed">
+                          Enterprise automation utilizing Power Apps, SharePoint, and Azure for automated approval processes and real-time alerts.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    <h5 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
+                      Certifications
+                    </h5>
+                    <p className="text-slate-600 text-xs">
+                      Claude Code in Action (Anthropic) • Microsoft Certified: Azure Fundamentals (AZ-900) • Azure AI Fundamentals (AI-900) • Power Platform Fundamentals (PL-900)
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -381,10 +556,10 @@ export default function AboutPage() {
                 <span>Email Support</span>
               </span>
               <a
-                href="mailto:getjoblink647@gmail.com"
+                href="mailto:sdivyanshu352@gmail.com"
                 className="text-blue-600 hover:underline font-medium block"
               >
-                getjoblink647@gmail.com
+                sdivyanshu352@gmail.com
               </a>
               <span className="text-[11px] text-slate-400">Response within 24–48 hours</span>
             </div>
@@ -404,12 +579,12 @@ export default function AboutPage() {
                   LinkedIn (Divyanshu Singh)
                 </a>
                 <a
-                  href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                  href="https://github.com/Divyanshu9794/get-job-link"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline font-medium block"
                 >
-                  GitHub Project
+                  GitHub (get-job-link)
                 </a>
               </div>
             </div>

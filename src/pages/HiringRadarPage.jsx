@@ -612,14 +612,9 @@ export default function HiringRadarPage() {
             <section className="pt-4 border-t border-slate-200">
               <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                 <div className="flex items-start space-x-3.5">
-                  <img
-                    src="https://github.com/Divyanshu9794.png"
-                    alt="Divyanshu Singh"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                    className="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0"
-                  />
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    DS
+                  </div>
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
@@ -644,7 +639,7 @@ export default function HiringRadarPage() {
                   </Link>
                   <span className="text-slate-300">•</span>
                   <a
-                    href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                    href="https://github.com/Divyanshu9794/get-job-link"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-slate-600 hover:text-slate-900 hover:underline"

@@ -56,7 +56,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                href="https://github.com/Divyanshu9794/get-job-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-1.5 text-slate-400 hover:text-white transition-colors"
@@ -168,7 +168,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/Divyanshu9794/Get_job_Link_Android-App"
+                  href="https://github.com/Divyanshu9794/get-job-link"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors inline-flex items-center space-x-1.5"
