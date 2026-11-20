@@ -29,6 +29,7 @@ import Pagination from "../components/Pagination";
 import TrustBanner from "../components/TrustBanner";
 import SEO from "../components/SEO";
 import { CAREER_GUIDES } from "../data/careerGuidesData";
+import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import LinkedInBatchShareModal from "../components/LinkedInBatchShareModal";
 import {
@@ -86,69 +87,13 @@ export default function JobListingPage() {
   const [totalCount, setTotalCount] = useState(BASELINE_TOTALS[category]);
   const [hasMore, setHasMore] = useState(true);
 
-  // LinkedIn batch sharing state
+  // Admin-only LinkedIn batch sharing state & controls
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [quickCopied, setQuickCopied] = useState(false);
-
-  const handleQuickCopyTop10 = async () => {
-    if (!currentJobs || currentJobs.length === 0) return;
-    const baseUrl = window.location.origin;
-    const targetJobs = currentJobs.slice(0, 10);
-    const lines = [
-      `🚀 Latest Verified Daily Tech Jobs | GetJobLink.in`,
-      `🔥 100% direct company ATS links with zero recruiter spam or fees.\n`
-    ];
-
-    targetJobs.forEach((job, index) => {
-      const num = index + 1;
-      const title = job.title || "Software Engineering Role";
-      const company = job.company || "Leading Tech Firm";
-      const location = job.location && String(job.location).toLowerCase() !== "null" ? job.location : "India";
-      let exp = "0+ yrs";
-      if (job.experience && String(job.experience).toLowerCase() !== "null") {
-        exp = String(job.experience).trim();
-        if (exp.toLowerCase().includes("fresher")) exp = "Fresher (0-1 yr)";
-      }
-      const jobUrl = `${baseUrl}/job/${job.id}`;
-
-      lines.push(`${num}️⃣ ${title} — ${company}`);
-      lines.push(`   📍 Location: ${location}`);
-      lines.push(`   💼 Experience: ${exp}`);
-      if (job.salary && String(job.salary).toLowerCase() !== "null" && job.salary !== "Not Disclosed") {
-        lines.push(`   💰 Salary: ${job.salary}`);
-      }
-      lines.push(`   🔗 View Details & Apply: ${jobUrl}\n`);
-    });
-
-    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    lines.push(`👉 Explore 700+ verified daily tech jobs: ${baseUrl}\n`);
-    lines.push(`#Hiring #TechJobs #SoftwareEngineer #Developer #Freshers #JobSearch #GetJobLink`);
-
-    const fullText = lines.join("\n");
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(fullText);
-      } else {
-        const textArea = document.createElement("textarea");
-        textArea.value = fullText;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        textArea.style.top = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand("copy");
-        textArea.remove();
-      }
-      setQuickCopied(true);
-      showToast("Top 10 jobs copied for LinkedIn!");
-      setTimeout(() => setQuickCopied(false), 2500);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      showToast("Could not copy jobs", "error");
-    }
-  };
+  const [selectedJobIds, setSelectedJobIds] = useState(new Set());
+  const [customSelectCount, setCustomSelectCount] = useState("10");
 
   // Sync state to URL params without full page reload
   useEffect(() => {
@@ -396,7 +341,110 @@ export default function JobListingPage() {
     };
   }, [currentPage, matchJob, pageCache]);
 
-  const currentJobs = pageCache[currentPage] || [];
+  const currentJobs = useMemo(() => {
+    return pageCache[currentPage] || [];
+  }, [pageCache, currentPage]);
+
+  // Toggle individual job selection for admin LinkedIn batch sharing
+  const handleToggleSelectJob = useCallback((jobId) => {
+    setSelectedJobIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(jobId)) {
+        next.delete(jobId);
+      } else {
+        next.add(jobId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Quick preset batch selection
+  const handleSelectBatch = useCallback((count) => {
+    if (!currentJobs || currentJobs.length === 0) return;
+    if (count === "all") {
+      setSelectedJobIds(new Set(currentJobs.map((j) => j.id)));
+      setCustomSelectCount(String(currentJobs.length));
+    } else if (count === "clear") {
+      setSelectedJobIds(new Set());
+      setCustomSelectCount("0");
+    } else {
+      const num = Math.min(Number(count) || 1, currentJobs.length);
+      setSelectedJobIds(new Set(currentJobs.slice(0, num).map((j) => j.id)));
+      setCustomSelectCount(String(num));
+    }
+  }, [currentJobs]);
+
+  const handleApplyCustomSelect = (e) => {
+    e.preventDefault();
+    const num = parseInt(customSelectCount, 10);
+    if (!isNaN(num) && num > 0) {
+      handleSelectBatch(num);
+    }
+  };
+
+  const handleQuickCopySelected = async () => {
+    if (!currentJobs || currentJobs.length === 0) return;
+    const baseUrl = window.location.origin;
+
+    const targetJobs =
+      selectedJobIds.size > 0
+        ? currentJobs.filter((j) => selectedJobIds.has(j.id))
+        : currentJobs.slice(0, 10);
+
+    const lines = [
+      `🚀 Latest Verified Daily Tech Jobs | GetJobLink.in`,
+      `🔥 100% direct company ATS links with zero recruiter spam or fees.\n`
+    ];
+
+    targetJobs.forEach((job, index) => {
+      const num = index + 1;
+      const title = job.title || "Software Engineering Role";
+      const company = job.company || "Leading Tech Firm";
+      const location = job.location && String(job.location).toLowerCase() !== "null" ? job.location : "India";
+      let exp = "0+ yrs";
+      if (job.experience && String(job.experience).toLowerCase() !== "null") {
+        exp = String(job.experience).trim();
+        if (exp.toLowerCase().includes("fresher")) exp = "Fresher (0-1 yr)";
+      }
+      const jobUrl = `${baseUrl}/job/${job.id}`;
+
+      lines.push(`${num}️⃣ ${title} — ${company}`);
+      lines.push(`   📍 Location: ${location}`);
+      lines.push(`   💼 Experience: ${exp}`);
+      if (job.salary && String(job.salary).toLowerCase() !== "null" && job.salary !== "Not Disclosed") {
+        lines.push(`   💰 Salary: ${job.salary}`);
+      }
+      lines.push(`   🔗 View Details & Apply: ${jobUrl}\n`);
+    });
+
+    lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    lines.push(`👉 Explore 700+ verified daily tech jobs: ${baseUrl}\n`);
+    lines.push(`#Hiring #TechJobs #SoftwareEngineer #Developer #Freshers #JobSearch #GetJobLink`);
+
+    const fullText = lines.join("\n");
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(fullText);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = fullText;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      setQuickCopied(true);
+      showToast(`${targetJobs.length} jobs copied for LinkedIn!`);
+      setTimeout(() => setQuickCopied(false), 2500);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      showToast("Could not copy jobs", "error");
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -602,49 +650,118 @@ export default function JobListingPage() {
         ) : (
           /* Job Listing Cards */
           <div className="space-y-4">
-            {/* Batch LinkedIn Share Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-200/90 rounded-2xl p-3 sm:px-4 sm:py-2.5 shadow-2xs">
-              <div className="flex items-center space-x-2 text-xs text-slate-500">
-                <span className="font-bold text-slate-800">
-                  Showing {currentJobs.length} {category === "remote" ? "Remote" : category === "world" ? "Global" : "Indian"} Positions
-                </span>
-                <span className="text-slate-300 hidden sm:inline">•</span>
-                <span className="hidden sm:inline text-slate-400">Page {currentPage}</span>
-              </div>
+            {/* Batch LinkedIn Share Toolbar - ADMIN ONLY */}
+            {isAdmin && (
+              <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white border border-blue-900/60 rounded-2xl p-3 sm:px-4 sm:py-3 shadow-md space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">
+                      Admin Curation
+                    </span>
+                    <span className="text-xs font-semibold text-blue-100">
+                      {selectedJobIds.size} of {currentJobs.length} selected for LinkedIn
+                    </span>
+                  </div>
 
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleQuickCopyTop10}
-                  title="Quick copy top 10 jobs formatted for LinkedIn"
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:text-blue-600 hover:bg-slate-50 text-xs font-semibold transition-all"
-                >
-                  {quickCopied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700 font-bold">Top 10 Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Quick Copy Top 10</span>
-                    </>
-                  )}
-                </button>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] text-blue-200 mr-1 hidden sm:inline font-medium">Select:</span>
+                    {[5, 10, 15, 20, "all"].map((val) => {
+                      const isSelected =
+                        val === "all"
+                          ? selectedJobIds.size === currentJobs.length && currentJobs.length > 0
+                          : selectedJobIds.size === val;
+                      return (
+                        <button
+                          key={val}
+                          onClick={() => handleSelectBatch(val)}
+                          className={`px-2 py-0.5 rounded-lg text-xs font-bold transition-all ${
+                            isSelected
+                              ? "bg-amber-400 text-slate-900 shadow-2xs"
+                              : "bg-white/10 hover:bg-white/20 text-white"
+                          }`}
+                        >
+                          {val === "all" ? `All (${currentJobs.length})` : `Top ${val}`}
+                        </button>
+                      );
+                    })}
 
-                <button
-                  onClick={() => setShareModalOpen(true)}
-                  className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-2xs hover:shadow-xs transition-all"
-                  title="Copy all jobs formatted for LinkedIn sharing with direct links"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Copy All for LinkedIn</span>
-                </button>
+                    <form onSubmit={handleApplyCustomSelect} className="flex items-center space-x-1 pl-1">
+                      <input
+                        type="number"
+                        min="1"
+                        max={currentJobs.length}
+                        value={customSelectCount}
+                        onChange={(e) => setCustomSelectCount(e.target.value)}
+                        className="w-12 h-6 px-1 text-center bg-white/20 text-white border border-white/20 rounded-md text-xs font-bold focus:outline-none focus:bg-white focus:text-slate-900"
+                        placeholder="N"
+                        title="Enter custom number of jobs to select"
+                      />
+                      <button
+                        type="submit"
+                        className="px-2 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-xs font-bold transition-colors"
+                      >
+                        Pick
+                      </button>
+                    </form>
+
+                    {selectedJobIds.size > 0 && (
+                      <button
+                        onClick={() => handleSelectBatch("clear")}
+                        className="px-2 py-0.5 text-xs text-blue-300 hover:text-white underline ml-1"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-blue-900/60">
+                  <span className="text-[11px] text-blue-300">
+                    💡 Click checkboxes directly on job cards to cherry-pick specific positions.
+                  </span>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleQuickCopySelected}
+                      disabled={selectedJobIds.size === 0 && currentJobs.length === 0}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/15 transition-all disabled:opacity-50"
+                      title="Quick copy selected jobs directly to clipboard"
+                    >
+                      {quickCopied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-emerald-300 font-bold">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Quick Copy {selectedJobIds.size > 0 ? `(${selectedJobIds.size})` : "Top 10"}</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => setShareModalOpen(true)}
+                      className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold rounded-xl shadow-xs transition-all"
+                      title="Preview and customize LinkedIn post text"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>Preview &amp; Copy for LinkedIn ({selectedJobIds.size > 0 ? selectedJobIds.size : (currentJobs.length > 10 ? 10 : currentJobs.length)})</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               {currentJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  isAdmin={isAdmin}
+                  isSelected={selectedJobIds.has(job.id)}
+                  onToggleSelect={handleToggleSelectJob}
+                />
               ))}
             </div>
 
@@ -851,13 +968,16 @@ export default function JobListingPage() {
           </div>
         </section>
 
-        {/* LinkedIn Batch Sharing Modal */}
-        <LinkedInBatchShareModal
-          isOpen={shareModalOpen}
-          onClose={() => setShareModalOpen(false)}
-          jobs={currentJobs}
-          category={category}
-        />
+        {/* LinkedIn Batch Sharing Modal - ADMIN ONLY */}
+        {isAdmin && (
+          <LinkedInBatchShareModal
+            isOpen={shareModalOpen}
+            onClose={() => setShareModalOpen(false)}
+            jobs={currentJobs}
+            category={category}
+            initialSelectedIds={selectedJobIds}
+          />
+        )}
       </main>
     </div>
   );

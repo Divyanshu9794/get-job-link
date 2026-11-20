@@ -20,7 +20,12 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 
-export default function JobCard({ job }) {
+export default function JobCard({
+  job,
+  isAdmin = false,
+  isSelected = false,
+  onToggleSelect = null,
+}) {
   const navigate = useNavigate();
   const { isJobSaved, toggleSaveJob } = useAuth();
   const { showToast } = useToast();
@@ -117,10 +122,32 @@ export default function JobCard({ job }) {
           handleCardClick();
         }
       }}
-      className="group relative bg-white border border-slate-200/90 hover:border-blue-400 hover:shadow-md rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex items-center justify-between cursor-pointer w-full min-h-[82px] select-none"
+      className={`group relative bg-white border ${
+        isSelected
+          ? "border-blue-500 ring-2 ring-blue-500/30 bg-blue-50/10 shadow-xs"
+          : "border-slate-200/90 hover:border-blue-400 hover:shadow-md"
+      } rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex items-center justify-between cursor-pointer w-full min-h-[82px] select-none`}
     >
-      {/* Left: Company Avatar & Job Info */}
-      <div className="flex items-center space-x-3 min-w-0 flex-1 pr-2">
+      {/* Left: Checkbox (Admin Only) + Company Avatar & Job Info */}
+      <div className="flex items-center space-x-2.5 min-w-0 flex-1 pr-2">
+        {isAdmin && onToggleSelect && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSelect(job.id);
+            }}
+            className="p-1 -ml-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer shrink-0"
+            title={isSelected ? "Deselect job" : "Select job for LinkedIn share"}
+          >
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => {}}
+              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer pointer-events-none"
+            />
+          </div>
+        )}
+
         {/* Company Avatar / Logo */}
         <div
           className={`w-11 h-11 rounded-xl ${colorScheme.bg} ${colorScheme.text} ${colorScheme.border} border flex items-center justify-center font-black text-xs shrink-0 shadow-xs tracking-tight`}

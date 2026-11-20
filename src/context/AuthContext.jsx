@@ -11,7 +11,8 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-export const ADMIN_EMAIL = "sdivyanshu352@gmail.com";
+export const ADMIN_EMAILS = ["sdivyanshu352@gmail.com", "getjoblink647@gmail.com"];
+export const ADMIN_EMAIL = ADMIN_EMAILS[0];
 
 const AuthContext = createContext({
   currentUser: null,
@@ -44,7 +45,7 @@ export function AuthProvider({ children }) {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-        setIsAdmin(user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+        setIsAdmin(ADMIN_EMAILS.some((em) => em.toLowerCase() === user.email?.toLowerCase()));
 
         // Ensure user document exists in Firestore
         try {
