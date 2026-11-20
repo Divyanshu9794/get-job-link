@@ -21,7 +21,7 @@ import {
   Check,
 } from "lucide-react";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, serverTimestamp, where } from "firebase/firestore";
 import { storage, db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const location = useLocation();
   const {
     currentUser,
+    isAdmin,
     userProfile,
     updateUserProfile,
     saveUserResume,
@@ -173,7 +174,10 @@ export default function ProfilePage() {
       if (!currentUser || activeTab !== "feedback") return;
       setLoadingFeedbacks(true);
       try {
-        const snap = await getDocs(collection(db, "feedbacks"));
+        const feedbackQuery = isAdmin
+          ? collection(db, "feedbacks")
+          : query(collection(db, "feedbacks"), where("userId", "==", currentUser.uid));
+        const snap = await getDocs(feedbackQuery);
         const list = snap.docs
           .map((d) => ({ id: d.id, ...d.data() }))
           .filter((f) => f.userId === currentUser.uid);
@@ -190,7 +194,7 @@ export default function ProfilePage() {
       }
     }
     loadFeedbacks();
-  }, [currentUser, activeTab]);
+  }, [currentUser, activeTab, isAdmin]);
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();

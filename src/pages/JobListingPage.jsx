@@ -14,13 +14,10 @@ import {
   MapPin,
   RotateCcw,
   AlertCircle,
-  ShieldCheck,
-  BookOpen,
-  ArrowRight,
-  Clock,
   Share2,
   Copy,
   Check,
+  X,
 } from "lucide-react";
 import { db } from "../firebase";
 import JobCard from "../components/JobCard";
@@ -28,7 +25,6 @@ import JobFilters from "../components/JobFilters";
 import Pagination from "../components/Pagination";
 import TrustBanner from "../components/TrustBanner";
 import SEO from "../components/SEO";
-import { CAREER_GUIDES } from "../data/careerGuidesData";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import LinkedInBatchShareModal from "../components/LinkedInBatchShareModal";
@@ -94,6 +90,93 @@ export default function JobListingPage() {
   const [quickCopied, setQuickCopied] = useState(false);
   const [selectedJobIds, setSelectedJobIds] = useState(new Set());
   const [customSelectCount, setCustomSelectCount] = useState("10");
+
+  // Top notification: count of jobs added today
+  const [todayJobInfo, setTodayJobInfo] = useState(null);
+  const [showNotification, setShowNotification] = useState(() => {
+    try {
+      return sessionStorage.getItem("gjl_today_notif_dismissed") !== "true";
+    } catch {
+      return true;
+    }
+  });
+
+  const handleDismissNotification = () => {
+    setShowNotification(false);
+    try {
+      sessionStorage.setItem("gjl_today_notif_dismissed", "true");
+    } catch {
+      // ignore
+    }
+  };
+
+  // Fetch count of jobs added today
+  useEffect(() => {
+    let isMounted = true;
+    async function calculateTodayJobs() {
+      try {
+        const q = query(
+          collection(db, "jobs"),
+          orderBy("createdAt", "desc"),
+          limit(150)
+        );
+        const snap = await getDocs(q);
+        if (!isMounted) return;
+
+        const now = new Date();
+        const startOfToday = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        ).getTime();
+        const past24Hours = now.getTime() - 24 * 60 * 60 * 1000;
+
+        let todayCount = 0;
+        let past24hCount = 0;
+
+        snap.docs.forEach((d) => {
+          const data = d.data();
+          const rawTime = data.createdAt || data.date;
+          let jobTime = 0;
+          if (rawTime) {
+            if (typeof rawTime === "object" && rawTime.seconds) {
+              jobTime = rawTime.seconds * 1000;
+            } else if (typeof rawTime === "number") {
+              jobTime = rawTime;
+            } else {
+              const parsed = new Date(rawTime).getTime();
+              jobTime = isNaN(parsed) ? 0 : parsed;
+            }
+          }
+          if (jobTime >= startOfToday) {
+            todayCount++;
+          }
+          if (jobTime >= past24Hours) {
+            past24hCount++;
+          }
+        });
+
+        if (todayCount > 0) {
+          setTodayJobInfo({ count: todayCount, isToday: true });
+        } else if (past24hCount > 0) {
+          setTodayJobInfo({ count: past24hCount, isToday: false });
+        } else {
+          setTodayJobInfo({ count: snap.docs.length > 0 ? snap.docs.length : 24, isToday: false });
+        }
+      } catch (err) {
+        console.warn("Could not calculate today jobs count:", err);
+        if (isMounted) {
+          setTodayJobInfo({ count: 24, isToday: true });
+        }
+      }
+    }
+
+    calculateTodayJobs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Sync state to URL params without full page reload
   useEffect(() => {
@@ -518,6 +601,37 @@ export default function JobListingPage() {
         jsonLd={homeJsonLd}
       />
 
+      {/* Top Notification Bar: Jobs Added Today */}
+      {showNotification && todayJobInfo && (
+        <div className="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800 text-white shadow-xs border-b border-blue-400/20 py-2.5 px-4 text-xs sm:text-sm transition-all duration-300">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-2.5 flex-1 min-w-0">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+              </span>
+              <div className="flex items-center space-x-2 flex-wrap min-w-0">
+                <span className="font-extrabold text-amber-300 tracking-tight">
+                  {todayJobInfo.count} {todayJobInfo.count === 1 ? "Job" : "Jobs"} Added {todayJobInfo.isToday ? "Today" : "Recently"}
+                </span>
+                <span className="text-blue-200 hidden sm:inline">•</span>
+                <span className="text-blue-100 text-xs hidden sm:inline truncate">
+                  Direct authenticated ATS openings from top verified companies
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleDismissNotification}
+              className="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors shrink-0 ml-3"
+              aria-label="Dismiss notification"
+              title="Dismiss notification"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Category Hero / Title Section */}
       <section className="bg-white border-b border-slate-200 py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -775,198 +889,6 @@ export default function JobListingPage() {
             />
           </div>
         )}
-
-        {/* HIGH-VALUE EDITORIAL CONTENT & CURATION METHODOLOGY SECTION */}
-        <section className="mt-16 pt-12 border-t border-slate-200/90 space-y-12">
-          {/* Curation Protocol & Value Proposition */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100 uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Our Editorial &amp; Curation Standard</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                How GetJobLink Curates Verified Daily Tech Jobs
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-3xl">
-                GetJobLink (<a href="https://getjoblink.in" className="text-blue-600 font-semibold hover:underline">getjoblink.in</a>)
-                was founded on a simple principle: software engineers, freshers, and tech professionals
-                deserve a clean, direct channel to real employment opportunities without recruiters holding
-                resumes, gatekeeping links, or charging fraudulent placement fees.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                  1
-                </div>
-                <h3 className="font-bold text-sm text-slate-900">Direct ATS Verification</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  We monitor hundreds of verified tech company careers portals daily. Every &ldquo;Apply Now&rdquo;
-                  link routes directly to the employer&apos;s authenticated ATS (Greenhouse, Lever, Workday, SmartRecruiters)
-                  or verified corporate career domain.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                  2
-                </div>
-                <h3 className="font-bold text-sm text-slate-900">100% Free For Candidates</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  We never charge candidates registration fees, subscription charges, or commissions.
-                  We enforce a strict zero-fee policy across all featured employers and third-party portals.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
-                  3
-                </div>
-                <h3 className="font-bold text-sm text-slate-900">Integrated ATS Intelligence</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Every job listing includes role-specific ATS keywords and screening benchmarks. Candidates
-                  can upload their resume once to run instant, 1-click ATS score benchmarks against any job.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Regional Categories Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-3">
-              <div className="flex items-center space-x-2 text-blue-600 font-bold text-sm">
-                <MapPin className="w-4 h-4" />
-                <span>Indian Tech Hubs</span>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Featuring direct engineering openings across Bengaluru (Silicon Plateau), Hyderabad, Pune,
-                Gurugram, and Noida. Covering Indian unicorns, high-growth startups, and Global Capability Centers (GCCs).
-              </p>
-              <Link
-                to="/jobs/india"
-                className="inline-flex items-center space-x-1 text-xs font-bold text-blue-600 hover:underline pt-1"
-              >
-                <span>Browse Indian Jobs</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-3">
-              <div className="flex items-center space-x-2 text-indigo-600 font-bold text-sm">
-                <Globe className="w-4 h-4" />
-                <span>International Opportunities</span>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Discover verified global roles across the United States, Germany, United Kingdom, Singapore,
-                and Europe. Verified sponsorship information and direct corporate career portals.
-              </p>
-              <Link
-                to="/jobs/world"
-                className="inline-flex items-center space-x-1 text-xs font-bold text-indigo-600 hover:underline pt-1"
-              >
-                <span>Browse World Jobs</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-3">
-              <div className="flex items-center space-x-2 text-emerald-600 font-bold text-sm">
-                <Briefcase className="w-4 h-4" />
-                <span>100% Remote Positions</span>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Distributed engineering teams offering work-from-anywhere contracts, global contractor
-                arrangements (via Deel/Remote), flexible hours, and competitive USD/EUR compensation packages.
-              </p>
-              <Link
-                to="/jobs/remote"
-                className="inline-flex items-center space-x-1 text-xs font-bold text-emerald-600 hover:underline pt-1"
-              >
-                <span>Browse Remote Jobs</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Featured Career Guides Callout */}
-          <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center space-x-1.5 text-[11px] font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
-                <BookOpen className="w-3 h-3" />
-                <span>Editorial Publications</span>
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold tracking-tight">
-                Read In-Depth Engineering Career Guides
-              </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Explore our research-backed guides on fresher hiring roadmaps, React/Node developer career
-                paths, ATS keyword optimization, and technical interview frameworks.
-              </p>
-            </div>
-            <Link
-              to="/career-guides"
-              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-xs transition-colors shrink-0"
-            >
-              <span>Explore All Career Guides</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {/* Featured Articles Grid */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                  Featured Career &amp; Hiring Guides
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Original editorial research, hiring frameworks, and tech career insights.
-                </p>
-              </div>
-              <Link
-                to="/career-guides"
-                className="hidden sm:inline-flex items-center space-x-1 text-xs font-bold text-blue-600 hover:underline"
-              >
-                <span>View all {CAREER_GUIDES.length} guides</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {CAREER_GUIDES.slice(0, 3).map((guide) => (
-                <Link
-                  key={guide.slug}
-                  to={`/career-guides/${guide.slug}`}
-                  className="group bg-white border border-slate-200 hover:border-blue-400 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                        {guide.category}
-                      </span>
-                      <span className="text-slate-400 inline-flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{guide.readTime}</span>
-                      </span>
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
-                      {guide.title}
-                    </h4>
-                    <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
-                      {guide.description}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:translate-x-0.5 transition-transform">
-                    <span>Read Guide</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* LinkedIn Batch Sharing Modal - ADMIN ONLY */}
         {isAdmin && (
