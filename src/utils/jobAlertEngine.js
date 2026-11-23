@@ -4,6 +4,7 @@
  */
 
 import { areSkillsMatching, normalizeToken } from "./jobMatchEngine.js";
+import { getJobTimestamp, matchesExperienceFilter } from "./jobClassification.js";
 
 /**
  * Checks if a job matches a specific alert definition
@@ -141,3 +142,71 @@ export function createNotificationItem(alert, job, matchedCriteria) {
     isRead: false,
   };
 }
+
+/**
+ * Filters a list of jobs to only those added within the specified time window (in hours).
+ */
+export function filterJobsByTimeWindow(jobs, hours = 24) {
+  if (!Array.isArray(jobs)) return [];
+  const cutoffMs = Date.now() - hours * 60 * 60 * 1000;
+  return jobs.filter((job) => {
+    const timeMs = getJobTimestamp(job);
+    return timeMs !== null && timeMs >= cutoffMs;
+  });
+}
+
+/**
+ * Returns jobs from the past 24 hours that match a user alert.
+ * Enforces the strict rule: Daily alerts trigger only from the last 24h of postings.
+ */
+export function getDailyAlertMatches(alert, jobs) {
+  const last24hJobs = filterJobsByTimeWindow(jobs, 24);
+  const matches = [];
+
+  for (const job of last24hJobs) {
+    const res = checkAlertMatch(alert, job);
+    if (res.matches) {
+      matches.push({ job, ...res });
+    }
+  }
+
+  // Sort by highest match score, then newest
+  return matches.sort((a, b) => {
+    if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+    return (getJobTimestamp(b.job) || 0) - (getJobTimestamp(a.job) || 0);
+  });
+}
+
+/**
+ * Returns jobs from the past 7 days (last week only) tailored for the weekly digest.
+ * Enforces the strict rule: Weekly digest sends opportunities posted within the last 7 days only.
+ */
+export function getWeeklyDigestMatches(subscriber = {}, jobs = []) {
+  const last7DaysJobs = filterJobsByTimeWindow(jobs, 7 * 24);
+  const preferredRole = (subscriber.rolePreference || "").toLowerCase().trim();
+  const rawExp = (subscriber.experienceLevel || "").toLowerCase().trim();
+  const preferredExp =
+    rawExp.includes("fresher") || rawExp.includes("0")
+      ? "fresher"
+      : rawExp.includes("1-3") || rawExp.includes("1 - 3")
+      ? "1-3"
+      : rawExp.includes("3-5") || rawExp.includes("3 - 5")
+      ? "3-5"
+      : rawExp.includes("5") || rawExp.includes("senior")
+      ? "5+"
+      : rawExp;
+
+  return last7DaysJobs.filter((job) => {
+    if (preferredExp && !matchesExperienceFilter(job.experience, preferredExp)) {
+      return false;
+    }
+    if (preferredRole) {
+      const title = (job.title || "").toLowerCase();
+      const roleWords = preferredRole.split(" ").filter((w) => w.length > 2);
+      const matchesRole = roleWords.some((w) => title.includes(w));
+      if (!matchesRole) return false;
+    }
+    return true;
+  }).sort((a, b) => (getJobTimestamp(b) || 0) - (getJobTimestamp(a) || 0)).slice(0, 8);
+}
+

@@ -22,6 +22,9 @@ import {
 import {
   checkAlertMatch,
   createNotificationItem,
+  filterJobsByTimeWindow,
+  getDailyAlertMatches,
+  getWeeklyDigestMatches,
 } from "../jobAlertEngine.js";
 
 import {
@@ -241,6 +244,36 @@ describe("Smart Job Alert Engine", () => {
     assert.equal(notif.jobId, "j1");
     assert.equal(notif.company, "Zomato");
     assert.equal(notif.isRead, false);
+  });
+
+  it("filters jobs strictly within the 24-hour daily alert window", () => {
+    const now = Date.now();
+    const jobs = [
+      { id: "fresh", title: "React Dev", createdAt: now - 3 * 3600 * 1000 }, // 3h ago
+      { id: "yesterday", title: "React Dev", createdAt: now - 22 * 3600 * 1000 }, // 22h ago
+      { id: "old", title: "React Dev", createdAt: now - 30 * 3600 * 1000 }, // 30h ago (must be excluded)
+    ];
+
+    const alert = { role: "React", active: true };
+    const matches = getDailyAlertMatches(alert, jobs);
+    assert.equal(matches.length, 2);
+    assert.equal(matches[0].job.id, "fresh");
+    assert.equal(matches[1].job.id, "yesterday");
+  });
+
+  it("filters jobs strictly within the 7-day weekly digest window", () => {
+    const now = Date.now();
+    const jobs = [
+      { id: "this_week", title: "Software Engineer", experience: "Fresher (0 - 1 Years)", createdAt: now - 2 * 86400 * 1000 },
+      { id: "six_days_ago", title: "Software Engineer", experience: "Fresher (0 - 1 Years)", createdAt: now - 6 * 86400 * 1000 },
+      { id: "two_weeks_ago", title: "Software Engineer", experience: "Fresher (0 - 1 Years)", createdAt: now - 14 * 86400 * 1000 }, // excluded
+    ];
+
+    const subscriber = { rolePreference: "Software Engineer", experienceLevel: "Fresher (0 - 1 Years)" };
+    const matches = getWeeklyDigestMatches(subscriber, jobs);
+    assert.equal(matches.length, 2);
+    assert.equal(matches[0].id, "this_week");
+    assert.equal(matches[1].id, "six_days_ago");
   });
 });
 
