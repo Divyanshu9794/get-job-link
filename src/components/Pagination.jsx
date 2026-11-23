@@ -65,14 +65,14 @@ export default function Pagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-slate-200 mt-6 select-none">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-slate-200 dark:border-slate-800 mt-6 select-none transition-colors duration-150">
       {/* Count summary */}
-      <div className="text-xs sm:text-sm text-slate-500 font-medium">
+      <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
         Showing{" "}
-        <span className="font-bold text-slate-900">{startItem}</span>
+        <span className="font-bold text-slate-900 dark:text-white">{startItem}</span>
         {"–"}
-        <span className="font-bold text-slate-900">{endItem}</span> of{" "}
-        <span className="font-bold text-slate-900">{totalCount}</span> jobs
+        <span className="font-bold text-slate-900 dark:text-white">{endItem}</span> of{" "}
+        <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> jobs
       </div>
 
       {/* Navigation Buttons */}
@@ -83,8 +83,8 @@ export default function Pagination({
           disabled={currentPage === 1}
           className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
             currentPage === 1
-              ? "border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50"
-              : "border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white shadow-2xs"
+              ? "border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed bg-slate-50 dark:bg-slate-900"
+              : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 shadow-2xs"
           }`}
           aria-label="Previous Page"
         >
@@ -99,7 +99,7 @@ export default function Pagination({
               return (
                 <span
                   key={`ellipsis-${idx}`}
-                  className="px-2 py-1 text-slate-400 text-xs font-medium"
+                  className="px-2 py-1 text-slate-400 dark:text-slate-600 text-xs font-medium"
                 >
                   …
                 </span>
@@ -114,7 +114,7 @@ export default function Pagination({
                 className={`min-w-[32px] h-8 px-2 rounded-lg text-xs font-bold transition-all ${
                   isCurrent
                     ? "bg-blue-600 text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
                 aria-current={isCurrent ? "page" : undefined}
               >
@@ -130,8 +130,8 @@ export default function Pagination({
           disabled={currentPage >= totalPages && !hasMore}
           className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
             currentPage >= totalPages && !hasMore
-              ? "border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50"
-              : "border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 bg-white shadow-2xs"
+              ? "border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed bg-slate-50 dark:bg-slate-900"
+              : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 shadow-2xs"
           }`}
           aria-label="Next Page"
         >

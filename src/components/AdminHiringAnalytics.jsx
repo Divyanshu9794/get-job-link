@@ -178,16 +178,16 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
       {/* Top Controls Header */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1.5">
+          <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1.5">
             <Activity className="w-3.5 h-3.5" />
             <span>Telemetry &amp; Market Intelligence</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Hiring Analytics &amp; Company Velocity Hub
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Aggregated intelligence across {jobs.length.toLocaleString()} active jobs and {analytics.overview.totalCompanies} tech employers
           </p>
         </div>
@@ -195,7 +195,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={exportToCsv}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors shadow-2xs"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-colors shadow-2xs border border-transparent dark:border-slate-700"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -216,30 +216,30 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
       {/* 1. ADMIN OVERVIEW METRICS                                                 */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Total Companies</span>
-          <span className="text-2xl font-black text-slate-900 block">{analytics.overview.totalCompanies}</span>
-          <span className="text-[11px] text-slate-500 font-medium">All indexed employers</span>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Total Companies</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white block">{analytics.overview.totalCompanies}</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">All indexed employers</span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Active Employers</span>
-          <span className="text-2xl font-black text-emerald-700 block">{analytics.overview.companiesHiring}</span>
-          <span className="text-[11px] text-emerald-800 font-medium">With &ge;1 active job</span>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Active Employers</span>
+          <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 block">{analytics.overview.companiesHiring}</span>
+          <span className="text-[11px] text-emerald-800 dark:text-emerald-500 font-medium">With &ge;1 active job</span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">New Employers (7d)</span>
-          <span className="text-2xl font-black text-blue-700 block">+{analytics.overview.newCompaniesThisWeek}</span>
-          <span className="text-[11px] text-slate-500 font-medium">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">New Employers (7d)</span>
+          <span className="text-2xl font-black text-blue-700 dark:text-blue-400 block">+{analytics.overview.newCompaniesThisWeek}</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
             vs {analytics.overview.newCompaniesPrevWeek} prev 7d
           </span>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">New Listings (7d)</span>
-          <span className="text-2xl font-black text-indigo-700 block">+{analytics.overview.newJobsThisWeek}</span>
-          <span className="text-[11px] text-slate-500 font-medium">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider block">New Listings (7d)</span>
+          <span className="text-2xl font-black text-indigo-700 dark:text-indigo-400 block">+{analytics.overview.newJobsThisWeek}</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
             vs {analytics.overview.newJobsPrevWeek} prev 7d
           </span>
         </div>
@@ -250,22 +250,22 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Visual 1: Daily Job Ingestion Trend (Last 30 Days) */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
                 Daily Job Posting Activity (Recent 30 Days)
               </h3>
-              <p className="text-xs text-slate-400">Ingested postings timeline from Firestore date records</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Ingested postings timeline from Firestore date records</p>
             </div>
-            <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
+            <span className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900 px-2.5 py-1 rounded-md">
               {analytics.dailyTrends.length} Recorded Days
             </span>
           </div>
 
           {/* Sparkline / Bar Histogram */}
           <div className="pt-2">
-            <div className="h-44 flex items-end space-x-1.5 border-b border-slate-200 pb-2">
+            <div className="h-44 flex items-end space-x-1.5 border-b border-slate-200 dark:border-slate-800 pb-2">
               {analytics.dailyTrends.map((d) => {
                 const maxCount = Math.max(...analytics.dailyTrends.map((t) => t.count), 1);
                 const heightPct = Math.min(100, Math.max(12, (d.count / maxCount) * 100));
@@ -273,18 +273,18 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                 return (
                   <div key={d.date} className="flex-1 flex flex-col items-center group relative h-full justify-end">
                     {/* Tooltip on Hover */}
-                    <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] py-1 px-2 rounded font-mono pointer-events-none whitespace-nowrap z-10">
+                    <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 dark:bg-slate-800 border dark:border-slate-700 text-white text-[10px] py-1 px-2 rounded font-mono pointer-events-none whitespace-nowrap z-10 shadow-lg">
                       {d.date}: {d.count} jobs
                     </div>
                     <div
-                      className="w-full bg-blue-600 hover:bg-blue-500 rounded-t-sm transition-all"
+                      className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-500 dark:hover:bg-blue-400 rounded-t-sm transition-all"
                       style={{ height: `${heightPct}%` }}
                     />
                   </div>
                 );
               })}
             </div>
-            <div className="flex justify-between text-[10px] text-slate-400 pt-2 font-mono">
+            <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-2 font-mono">
               <span>{analytics.dailyTrends[0]?.date || "Earliest"}</span>
               <span>{analytics.dailyTrends[analytics.dailyTrends.length - 1]?.date || "Today"}</span>
             </div>
@@ -292,19 +292,19 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         </div>
 
         {/* Visual 2: Work Mode & Domain Distribution */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-5">
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">Work Mode Breakdown</h3>
-            <p className="text-xs text-slate-400">Remote vs Hybrid vs On-site distribution</p>
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">Work Mode Breakdown</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Remote vs Hybrid vs On-site distribution</p>
           </div>
 
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-700">Remote Positions</span>
-                <span className="font-bold text-emerald-700">{analytics.workModes.remote} jobs</span>
+                <span className="text-slate-700 dark:text-slate-300">Remote Positions</span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400">{analytics.workModes.remote} jobs</span>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-emerald-500 h-2 rounded-full"
                   style={{ width: `${(analytics.workModes.remote / (jobs.length || 1)) * 100}%` }}
@@ -314,10 +314,10 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
 
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-700">Hybrid Roles</span>
-                <span className="font-bold text-blue-700">{analytics.workModes.hybrid} jobs</span>
+                <span className="text-slate-700 dark:text-slate-300">Hybrid Roles</span>
+                <span className="font-bold text-blue-700 dark:text-blue-400">{analytics.workModes.hybrid} jobs</span>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-blue-500 h-2 rounded-full"
                   style={{ width: `${(analytics.workModes.hybrid / (jobs.length || 1)) * 100}%` }}
@@ -327,23 +327,23 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
 
             <div>
               <div className="flex justify-between text-xs font-semibold mb-1">
-                <span className="text-slate-700">On-Site Positions</span>
-                <span className="font-bold text-slate-700">{analytics.workModes.onsite} jobs</span>
+                <span className="text-slate-700 dark:text-slate-300">On-Site Positions</span>
+                <span className="font-bold text-slate-700 dark:text-slate-300">{analytics.workModes.onsite} jobs</span>
               </div>
-              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-slate-500 h-2 rounded-full"
+                  className="bg-slate-500 dark:bg-slate-600 h-2 rounded-full"
                   style={{ width: `${(analytics.workModes.onsite / (jobs.length || 1)) * 100}%` }}
                 />
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-100">
-            <h4 className="text-xs font-bold text-slate-800 mb-2">Top Engineering Domains</h4>
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">Top Engineering Domains</h4>
             <div className="flex flex-wrap gap-1.5">
               {analytics.domains.slice(0, 6).map((d) => (
-                <span key={d.domain} className="text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">
+                <span key={d.domain} className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-transparent dark:border-slate-700 px-2 py-0.5 rounded-md font-medium">
                   {d.domain} ({d.count})
                 </span>
               ))}
@@ -355,9 +355,9 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
       {/* ========================================================================= */}
       {/* 3. COMPANY HIRING ANALYTICS TABLE                                         */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-slate-200 rounded-3xl shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xs overflow-hidden">
         {/* Table Filter Toolbar */}
-        <div className="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -369,18 +369,18 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                   setCurrentPage(1);
                 }}
                 placeholder="Search company or skill..."
-                className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-52 sm:w-64"
+                className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-52 sm:w-64"
               />
             </div>
 
-            <div className="flex bg-slate-100 p-0.5 rounded-xl text-xs">
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl text-xs">
               <button
                 onClick={() => {
                   setTrendFilter("all");
                   setCurrentPage(1);
                 }}
                 className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  trendFilter === "all" ? "bg-white text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  trendFilter === "all" ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 All ({analytics.companies.length})
@@ -391,7 +391,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                   setCurrentPage(1);
                 }}
                 className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  trendFilter === "surging" ? "bg-white text-emerald-800 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  trendFilter === "surging" ? "bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-400 shadow-2xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 Surging
@@ -402,7 +402,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                   setCurrentPage(1);
                 }}
                 className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  trendFilter === "increasing" ? "bg-white text-blue-700 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  trendFilter === "increasing" ? "bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-2xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 Increasing
@@ -413,7 +413,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                   setCurrentPage(1);
                 }}
                 className={`px-3 py-1 rounded-lg font-bold transition-all ${
-                  trendFilter === "new" ? "bg-white text-amber-800 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  trendFilter === "new" ? "bg-white dark:bg-slate-900 text-amber-800 dark:text-amber-400 shadow-2xs" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 New (7d)
@@ -421,7 +421,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
             </div>
           </div>
 
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
             Showing {paginatedCompanies.length} of {filteredCompanies.length} companies
           </div>
         </div>
@@ -429,29 +429,29 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         {/* Data Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
               <tr>
                 <th
                   onClick={() => handleSortToggle("companyName")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-white"
                 >
                   Company Name {sortBy === "companyName" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
                   onClick={() => handleSortToggle("activeJobs")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 text-center"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-white text-center"
                 >
                   Active Jobs {sortBy === "activeJobs" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
                   onClick={() => handleSortToggle("jobsLast7d")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 text-center"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-white text-center"
                 >
                   7 Days {sortBy === "jobsLast7d" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
                   onClick={() => handleSortToggle("jobsLast30d")}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 text-center"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-white text-center"
                 >
                   30 Days {sortBy === "jobsLast30d" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
@@ -461,13 +461,13 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {paginatedCompanies.map((comp) => {
                 const color = getCompanyColor(comp.companyName);
                 const initials = getCompanyInitials(comp.companyName);
 
                 return (
-                  <tr key={comp.slug} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={comp.slug} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center space-x-2.5">
                         <div
@@ -475,21 +475,21 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                         >
                           {initials}
                         </div>
-                        <span className="font-extrabold text-slate-900">{comp.companyName}</span>
+                        <span className="font-extrabold text-slate-900 dark:text-white">{comp.companyName}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-center font-black text-slate-900">{comp.activeJobs}</td>
-                    <td className="py-3.5 px-4 text-center font-bold text-emerald-700">
+                    <td className="py-3.5 px-4 text-center font-black text-slate-900 dark:text-white">{comp.activeJobs}</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-700 dark:text-emerald-400">
                       {comp.jobsLast7d > 0 ? `+${comp.jobsLast7d}` : "0"}
                     </td>
-                    <td className="py-3.5 px-4 text-center font-bold text-blue-700">
+                    <td className="py-3.5 px-4 text-center font-bold text-blue-700 dark:text-blue-400">
                       {comp.jobsLast30d > 0 ? `+${comp.jobsLast30d}` : "0"}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600 truncate max-w-[140px]">
+                    <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 truncate max-w-[140px]">
                       {comp.topLocations?.[0] || "Disclosed in listing"}
                     </td>
                     <td className="py-3.5 px-4 truncate max-w-[160px]">
-                      <span className="text-slate-600 font-medium">
+                      <span className="text-slate-600 dark:text-slate-400 font-medium">
                         {comp.topSkills?.slice(0, 3).join(", ") || "Engineering"}
                       </span>
                     </td>
@@ -497,12 +497,12 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${
                           comp.trend === "Surging"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
                             : comp.trend === "Increasing"
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
                             : comp.trend === "New This Week"
-                            ? "bg-amber-50 text-amber-800 border-amber-200"
-                            : "bg-slate-100 text-slate-600 border-slate-200"
+                            ? "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
                         }`}
                       >
                         {comp.trend}
@@ -513,7 +513,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                         to={`/hiring-radar/company/${comp.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                        className="inline-flex items-center space-x-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold hover:underline"
                       >
                         <span>Intel</span>
                         <ExternalLink className="w-3 h-3" />
@@ -527,8 +527,8 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         </div>
 
         {/* Pagination Bar */}
-        <div className="p-4 border-t border-slate-200 flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-2 text-slate-500">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+          <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-400">
             <span>Rows per page:</span>
             <select
               value={pageSize}
@@ -536,7 +536,7 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
                 setPageSize(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs"
+              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-1 text-xs"
             >
               <option value="15">15</option>
               <option value="25">25</option>
@@ -545,20 +545,20 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-slate-500">
+            <span className="text-slate-500 dark:text-slate-400">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -571,25 +571,25 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Skill Combinations */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
               Top Co-Occurring Skill Pairs
             </h3>
-            <p className="text-xs text-slate-400">Technologies most frequently demanded together in job listings</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Technologies most frequently demanded together in job listings</p>
           </div>
 
           <div className="space-y-2.5">
             {analytics.skills.pairings.slice(0, 7).map((pair, idx) => (
               <div
                 key={pair.pair}
-                className="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100"
+                className="flex items-center justify-between text-xs p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800"
               >
                 <div className="flex items-center space-x-2">
-                  <span className="font-mono text-slate-400 text-[11px]">#{idx + 1}</span>
-                  <span className="font-bold text-slate-900">{pair.pair}</span>
+                  <span className="font-mono text-slate-400 dark:text-slate-500 text-[11px]">#{idx + 1}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{pair.pair}</span>
                 </div>
-                <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-[11px]">
+                <span className="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/40 px-2 py-0.5 rounded text-[11px]">
                   {pair.count} roles
                 </span>
               </div>
@@ -598,12 +598,12 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         </div>
 
         {/* Multi-Location & Multi-Domain Leaders */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
           <div>
-            <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
               Multi-Domain Engineering Teams
             </h3>
-            <p className="text-xs text-slate-400">Companies hiring across distinct engineering specializations</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Companies hiring across distinct engineering specializations</p>
           </div>
 
           <div className="space-y-2.5">
@@ -614,17 +614,17 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
               .map((c, idx) => (
                 <div
                   key={c.slug}
-                  className="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100"
+                  className="flex items-center justify-between text-xs p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800"
                 >
                   <div className="flex items-center space-x-2 min-w-0">
-                    <span className="font-mono text-slate-400 text-[11px]">#{idx + 1}</span>
-                    <span className="font-bold text-slate-900 truncate">{c.companyName}</span>
+                    <span className="font-mono text-slate-400 dark:text-slate-500 text-[11px]">#{idx + 1}</span>
+                    <span className="font-bold text-slate-900 dark:text-white truncate">{c.companyName}</span>
                   </div>
                   <div className="flex items-center space-x-2 shrink-0">
-                    <span className="text-[11px] font-semibold text-slate-500">
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                       {c.distinctRolesCount} specializations
                     </span>
-                    <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[11px]">
+                    <span className="font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/40 px-2 py-0.5 rounded text-[11px]">
                       {c.activeJobs} jobs
                     </span>
                   </div>

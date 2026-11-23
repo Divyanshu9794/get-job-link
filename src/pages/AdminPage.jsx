@@ -45,6 +45,7 @@ import {
   Inbox,
   Star,
   ThumbsUp,
+  Download,
 } from "lucide-react";
 import { db } from "../firebase";
 import { useAuth, ADMIN_EMAIL } from "../context/AuthContext";
@@ -56,6 +57,7 @@ import {
 } from "../utils/jobClassification";
 import SEO from "../components/SEO";
 import AdminHiringAnalytics from "../components/AdminHiringAnalytics";
+import AdminJobStagingHub from "../components/AdminJobStagingHub";
 
 const PAGE_SIZE = 50;
 
@@ -583,22 +585,22 @@ export default function AdminPage() {
   if (!currentUser) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
-        <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-lg max-w-md w-full text-center space-y-6">
-          <div className="w-14 h-14 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center mx-auto text-amber-600">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-lg max-w-md w-full text-center space-y-6">
+          <div className="w-14 h-14 bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400">
             <Shield className="w-7 h-7" />
           </div>
 
           <div className="space-y-1.5">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Admin Gateway</h1>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Admin Gateway</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Sign in with your verified administrator account to manage postings, update records,
               and review portal statistics.
             </p>
           </div>
 
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-[11px] text-slate-600 text-left space-y-1">
-            <div className="font-bold text-slate-700">Security Requirement:</div>
-            <div>Database writes are restricted to: <code className="bg-white px-1 rounded text-blue-700 font-mono">{ADMIN_EMAIL}</code></div>
+          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-xl p-3 text-[11px] text-slate-600 dark:text-slate-300 text-left space-y-1">
+            <div className="font-bold text-slate-700 dark:text-slate-200">Security Requirement:</div>
+            <div>Database writes are restricted to: <code className="bg-white dark:bg-slate-900 px-1 rounded text-blue-700 dark:text-blue-400 font-mono">{ADMIN_EMAIL}</code></div>
           </div>
 
           <button
@@ -610,7 +612,7 @@ export default function AdminPage() {
           </button>
 
           <div className="pt-2">
-            <Link to="/jobs/india" className="text-xs text-slate-500 hover:text-slate-800 transition-colors">
+            <Link to="/jobs/india" className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
               ← Return to public portal
             </Link>
           </div>
@@ -623,15 +625,15 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
-        <div className="bg-white border border-rose-200 rounded-3xl p-8 sm:p-10 shadow-lg max-w-md w-full text-center space-y-6">
-          <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto text-rose-600">
+        <div className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 rounded-3xl p-8 sm:p-10 shadow-lg max-w-md w-full text-center space-y-6">
+          <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-900/80 rounded-2xl flex items-center justify-center mx-auto text-rose-600 dark:text-rose-400">
             <AlertTriangle className="w-7 h-7" />
           </div>
 
           <div className="space-y-1.5">
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">Access Restricted</h1>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              You are signed in as <span className="font-bold text-slate-800">{currentUser.email}</span>,
+            <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Access Restricted</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              You are signed in as <span className="font-bold text-slate-800 dark:text-slate-200">{currentUser.email}</span>,
               which does not have administrator privileges on GetJobLink.
             </p>
           </div>
@@ -646,7 +648,7 @@ export default function AdminPage() {
             </button>
             <Link
               to="/jobs/india"
-              className="inline-flex items-center justify-center text-xs text-slate-600 hover:text-slate-900 py-2"
+              className="inline-flex items-center justify-center text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white py-2"
             >
               Back to Job Listings
             </Link>
@@ -658,21 +660,21 @@ export default function AdminPage() {
 
   // 4. Authenticated Admin Dashboard
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 pb-16 transition-colors duration-200">
       <SEO title="Admin Gateway" noIndex={true} />
       {/* Top Banner */}
-      <section className="bg-white border-b border-slate-200 py-6">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-6 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
               <Shield className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="text-xl font-black text-slate-900 tracking-tight">
+                <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                   Admin Workspace
                 </h1>
-                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
+                <span className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
                   Verified Admin
                 </span>
               </div>
@@ -704,13 +706,13 @@ export default function AdminPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
         {/* Navigation Section Tabs */}
-        <div className="flex items-center space-x-2 border-b border-slate-200 pb-3">
+        <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-slate-800 pb-3">
           <button
             onClick={() => setAdminSection("jobs")}
             className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
               adminSection === "jobs"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800"
             }`}
           >
             <Briefcase className="w-4 h-4" />
@@ -718,11 +720,23 @@ export default function AdminPage() {
           </button>
 
           <button
+            onClick={() => setAdminSection("staging")}
+            className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
+              adminSection === "staging"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            <Download className="w-4 h-4" />
+            <span>Auto-Fetch &amp; Staging Approval</span>
+          </button>
+
+          <button
             onClick={() => setAdminSection("hiring_analytics")}
             className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
               adminSection === "hiring_analytics"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800"
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -734,7 +748,7 @@ export default function AdminPage() {
             className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
               adminSection === "analytics"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800"
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -746,7 +760,7 @@ export default function AdminPage() {
             className={`inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl transition-all ${
               adminSection === "messages"
                 ? "bg-blue-600 text-white shadow-xs"
-                : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800"
             }`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -758,51 +772,51 @@ export default function AdminPage() {
           <>
             {/* Statistics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                     Total Database Jobs
                   </span>
-                  <span className="text-2xl font-black text-slate-900">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white">
                     {stats.total.toLocaleString()}
                   </span>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <Briefcase className="w-5 h-5" />
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                     Active Listings
                   </span>
-                  <span className="text-2xl font-black text-emerald-600">
+                  <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                     {stats.active.toLocaleString()}
                   </span>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                     Jobs Added Today
                   </span>
-                  <span className="text-2xl font-black text-indigo-600">
+                  <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                     {stats.todayCount}
                   </span>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5" />
                 </div>
               </div>
             </div>
 
         {/* Toolbar: Search, Filters, Bulk Delete Button */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3 w-full md:w-auto flex-1">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -814,7 +828,7 @@ export default function AdminPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search jobs by title, company, location, or ID..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -824,7 +838,7 @@ export default function AdminPage() {
                 setFilterType(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none"
             >
               <option value="">All Types</option>
               <option value="Full Time">Full Time</option>
@@ -835,7 +849,7 @@ export default function AdminPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none"
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -847,7 +861,7 @@ export default function AdminPage() {
           {/* Bulk Delete CTA (shown when items selected) */}
           {selectedIds.size > 0 && (
             <div className="flex items-center space-x-2 self-end md:self-auto shrink-0 animate-in fade-in">
-              <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
                 {selectedIds.size} selected
               </span>
               <button
@@ -862,19 +876,19 @@ export default function AdminPage() {
         </div>
 
         {/* Jobs Management Table */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-2xs overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <tr className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   <th className="py-3 px-4 w-10 text-center">
                     <button
                       onClick={handleSelectAll}
-                      className="text-slate-400 hover:text-slate-600"
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                       aria-label="Select All"
                     >
                       {selectedIds.size > 0 && selectedIds.size === paginatedJobs.length ? (
-                        <CheckSquare className="w-4 h-4 text-blue-600" />
+                        <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       ) : (
                         <Square className="w-4 h-4" />
                       )}
@@ -887,16 +901,16 @@ export default function AdminPage() {
                   <th className="py-3 px-4 pr-6 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                 {loadingJobs ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      <td className="py-4 px-4 text-center"><div className="w-4 h-4 bg-slate-200 rounded mx-auto" /></td>
-                      <td className="py-4 px-4"><div className="h-4 bg-slate-200 rounded w-48 mb-1" /><div className="h-3 bg-slate-100 rounded w-28" /></td>
-                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 rounded w-24" /></td>
-                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 rounded w-20" /></td>
-                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 rounded w-16" /></td>
-                      <td className="py-4 px-4 text-right"><div className="h-6 bg-slate-200 rounded w-16 ml-auto" /></td>
+                      <td className="py-4 px-4 text-center"><div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded mx-auto" /></td>
+                      <td className="py-4 px-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-1" /><div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-28" /></td>
+                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-24" /></td>
+                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-20" /></td>
+                      <td className="py-4 px-4"><div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-16" /></td>
+                      <td className="py-4 px-4 text-right"><div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-16 ml-auto" /></td>
                     </tr>
                   ))
                 ) : paginatedJobs.length === 0 ? (
@@ -912,17 +926,17 @@ export default function AdminPage() {
                     return (
                       <tr
                         key={job.id}
-                        className={`hover:bg-slate-50/70 transition-colors ${
-                          isSelected ? "bg-blue-50/30" : ""
+                        className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors ${
+                          isSelected ? "bg-blue-50/30 dark:bg-blue-950/30" : ""
                         }`}
                       >
                         <td className="py-3 px-4 text-center">
                           <button
                             onClick={() => handleToggleSelect(job.id)}
-                            className="text-slate-400 hover:text-slate-600"
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                           >
                             {isSelected ? (
-                              <CheckSquare className="w-4 h-4 text-blue-600" />
+                              <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                             ) : (
                               <Square className="w-4 h-4" />
                             )}
@@ -930,32 +944,32 @@ export default function AdminPage() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center space-x-2">
-                            <span className="font-bold text-slate-900 max-w-[220px] truncate block">
+                            <span className="font-bold text-slate-900 dark:text-white max-w-[220px] truncate block">
                               {job.title}
                             </span>
                             {isRemote && (
-                              <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold px-1.5 py-0.2 rounded border border-emerald-100">
+                              <span className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-[9px] font-bold px-1.5 py-0.2 rounded border border-emerald-100 dark:border-emerald-800">
                                 Remote
                               </span>
                             )}
                           </div>
-                          <span className="text-slate-500 font-medium text-[11px]">
+                          <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">
                             {job.company}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 font-medium truncate max-w-[150px]">
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium truncate max-w-[150px]">
                           <span className="flex items-center space-x-1">
                             <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                             <span>{job.location || "India"}</span>
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                           <div className="flex flex-col space-y-0.5">
-                            <span className="font-semibold text-slate-700">{job.jobType || "Full Time"}</span>
-                            <span className="text-slate-400 text-[10px]">{job.experience || "0+ yrs"}</span>
+                            <span className="font-semibold text-slate-700 dark:text-slate-200">{job.jobType || "Full Time"}</span>
+                            <span className="text-slate-400 dark:text-slate-500 text-[10px]">{job.experience || "0+ yrs"}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-slate-400 font-medium whitespace-nowrap">
+                        <td className="py-3 px-4 text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap">
                           {timeAgo(job.createdAt || job.date)}
                         </td>
                         <td className="py-3 px-4 pr-6 text-right whitespace-nowrap">
@@ -965,7 +979,7 @@ export default function AdminPage() {
                               to={`/job/${job.id}`}
                               target="_blank"
                               title="View Job Details"
-                              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg transition-colors"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Link>
@@ -974,7 +988,7 @@ export default function AdminPage() {
                             <button
                               onClick={() => openEditModal(job)}
                               title="Edit Job"
-                              className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg transition-colors"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
@@ -983,7 +997,7 @@ export default function AdminPage() {
                             <button
                               onClick={() => setDeletingJob(job)}
                               title="Delete Job"
-                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -998,14 +1012,14 @@ export default function AdminPage() {
           </div>
 
           {/* Admin Table Pagination */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 border-t border-slate-100 text-xs text-slate-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
             <div className="flex items-center space-x-2">
               <span className="font-medium">
                 Showing {processedJobs.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, processedJobs.length)} of{" "}
-                <span className="font-bold text-slate-800">{processedJobs.length.toLocaleString()}</span> jobs
+                <span className="font-bold text-slate-800 dark:text-slate-200">{processedJobs.length.toLocaleString()}</span> jobs
               </span>
               {jobs.length > 0 && (
-                <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-semibold">
+                <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md font-semibold">
                   All {jobs.length.toLocaleString()} in portal
                 </span>
               )}
@@ -1016,25 +1030,25 @@ export default function AdminPage() {
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(1)}
                 title="First Page"
-                className="px-2 py-1 rounded-lg border border-slate-200 text-[11px] font-semibold text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 First
               </button>
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="p-1.5 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Previous Page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span className="px-3 py-1 bg-slate-100 rounded-lg font-bold text-slate-800 text-xs">
+              <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg font-bold text-slate-800 dark:text-slate-200 text-xs">
                 Page {currentPage} of {totalPages || 1}
               </span>
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Next Page"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -1043,7 +1057,7 @@ export default function AdminPage() {
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage(totalPages)}
                 title="Last Page"
-                className="px-2 py-1 rounded-lg border border-slate-200 text-[11px] font-semibold text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 Last
               </button>
@@ -1055,27 +1069,27 @@ export default function AdminPage() {
         /* GOOGLE ANALYTICS 4 (GA4) DASHBOARD */
         <div className="space-y-6 animate-in fade-in">
           {/* Header Controls */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   Google Analytics 4 Overview
                 </h2>
-                <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
+                <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
                   Property: 543069695
                 </span>
-                <span className="bg-slate-100 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-semibold px-2 py-0.5 rounded-md">
                   G-7LPCET02EM
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Real-time audience tracking, job views, apply conversions, and feature usage.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               {/* Date Filter Buttons (Today, 7 Days, 30 Days, Year to Date) */}
-              <div className="inline-flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold">
+              <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
                 {[
                   { id: "today", label: "Today" },
                   { id: "7days", label: "7 Days" },
@@ -1087,8 +1101,8 @@ export default function AdminPage() {
                     onClick={() => setAnalyticsRange(tab.id)}
                     className={`px-3 py-1.5 rounded-lg transition-all ${
                       analyticsRange === tab.id
-                        ? "bg-white text-blue-600 shadow-xs"
-                        : "text-slate-600 hover:text-slate-900"
+                        ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
                     {tab.label}
@@ -1099,7 +1113,7 @@ export default function AdminPage() {
               <button
                 onClick={() => fetchAnalytics(analyticsRange)}
                 disabled={loadingAnalytics}
-                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 title="Refresh GA4 Data"
               >
                 <RotateCcw className={`w-4 h-4 ${loadingAnalytics ? "animate-spin text-blue-600" : ""}`} />
@@ -1109,7 +1123,7 @@ export default function AdminPage() {
                 href="https://analytics.google.com/analytics/web/#/a302626524p543069695/realtime/overview"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-xs"
+                className="inline-flex items-center space-x-1.5 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-all shadow-xs"
               >
                 <span>Live Realtime</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1118,58 +1132,58 @@ export default function AdminPage() {
           </div>
 
           {/* Real-time Platform Database Records (Always Live in Firestore) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
               <div>
-                <h3 className="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-emerald-600" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>GetJobLink Database Telemetry (Live Platform State)</span>
                 </h3>
                 <p className="text-xs text-slate-400">
                   Direct database records synchronized in real-time from Firestore.
                 </p>
               </div>
-              <span className="self-start sm:self-auto bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
+              <span className="self-start sm:self-auto bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
                 Active Firestore Sync
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-2xl p-4">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Registered Users
                 </span>
-                <span className="text-2xl font-black text-slate-900">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
                   {totalUsersCount.toLocaleString()}
                 </span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">Firebase Auth accounts</span>
               </div>
 
-              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-2xl p-4">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Total Indexed Jobs
                 </span>
-                <span className="text-2xl font-black text-blue-600">
+                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
                   {stats.total.toLocaleString()}
                 </span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">Active catalog listings</span>
               </div>
 
-              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-2xl p-4">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Active Openings
                 </span>
-                <span className="text-2xl font-black text-emerald-600">
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                   {stats.active.toLocaleString()}
                 </span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">Valid employer links</span>
               </div>
 
-              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+              <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-2xl p-4">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Added Today
                 </span>
-                <span className="text-2xl font-black text-indigo-600">
+                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                   {stats.todayCount}
                 </span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">Today&apos;s new jobs</span>
@@ -1180,12 +1194,12 @@ export default function AdminPage() {
           {/* Core GA4 Server-Side Metrics Grid (9 Required Metrics) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* 1. Total Users */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Total Users (GA4)
                 </span>
-                <span className="text-2xl font-black text-slate-900">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.totalUsers === "number"
@@ -1196,18 +1210,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Unique visitors" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <Users className="w-5 h-5" />
               </div>
             </div>
 
             {/* 2. New Users */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   New Users (GA4)
                 </span>
-                <span className="text-2xl font-black text-emerald-600">
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.newUsers === "number"
@@ -1218,18 +1232,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "First-time sessions" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5" />
               </div>
             </div>
 
             {/* 3. Active Users */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Active Users (GA4)
                 </span>
-                <span className="text-2xl font-black text-indigo-600">
+                <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.activeUsers === "number"
@@ -1240,18 +1254,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Engaged visitors" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                 <Activity className="w-5 h-5" />
               </div>
             </div>
 
             {/* 4. Total Page Views */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Total Page Views
                 </span>
-                <span className="text-2xl font-black text-slate-900">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.totalPageViews === "number"
@@ -1262,18 +1276,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "All screens rendered" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
                 <Eye className="w-5 h-5" />
               </div>
             </div>
 
             {/* 5. Job Detail Page Views */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Job Detail Page Views
                 </span>
-                <span className="text-2xl font-black text-amber-600">
+                <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.jobDetailPageViews === "number"
@@ -1284,18 +1298,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Deep job inspections" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Briefcase className="w-5 h-5" />
               </div>
             </div>
 
             {/* 6. Apply Button Clicks */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Apply Button Clicks
                 </span>
-                <span className="text-2xl font-black text-emerald-600">
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.applyButtonClicks === "number"
@@ -1306,18 +1320,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Direct candidate conversions" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                 <MousePointerClick className="w-5 h-5" />
               </div>
             </div>
 
             {/* 7. Resume Builder Usage */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Resume Builder Usage
                 </span>
-                <span className="text-2xl font-black text-blue-600">
+                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.resumeBuilderUsage === "number"
@@ -1328,18 +1342,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Resumes created/downloaded" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
             </div>
 
             {/* 8. ATS Checker Usage */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   ATS Checker Usage
                 </span>
-                <span className="text-2xl font-black text-amber-600">
+                <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.atsCheckerUsage === "number"
@@ -1350,18 +1364,18 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Resume score scans" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                 <Sparkles className="w-5 h-5" />
               </div>
             </div>
 
             {/* 9. Saved Job Engagement */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                   Saved Job Engagement
                 </span>
-                <span className="text-2xl font-black text-rose-600">
+                <span className="text-2xl font-black text-rose-600 dark:text-rose-400">
                   {loadingAnalytics
                     ? "..."
                     : analyticsData?.configured && typeof analyticsData?.metrics?.savedJobEngagement === "number"
@@ -1372,7 +1386,7 @@ export default function AdminPage() {
                   {analyticsData?.configured ? "Bookmarks created" : "Pending API credential"}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
                 <Bookmark className="w-5 h-5" />
               </div>
             </div>
@@ -1381,10 +1395,10 @@ export default function AdminPage() {
           {/* Trends and Top Pages Tables */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Daily / Monthly Trends */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 className="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-blue-600" />
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>Daily &amp; Monthly Trends</span>
                 </h3>
                 <span className="text-[11px] text-slate-400 uppercase font-semibold">Filter: {analyticsRange}</span>
@@ -1393,11 +1407,11 @@ export default function AdminPage() {
               {analyticsData?.trends && analyticsData.trends.length > 0 ? (
                 <div className="space-y-2 max-h-72 overflow-y-auto">
                   {analyticsData.trends.map((t, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs py-2 border-b border-slate-50 last:border-0">
-                      <span className="font-medium text-slate-700">{t.date}</span>
+                    <div key={idx} className="flex items-center justify-between text-xs py-2 border-b border-slate-50 dark:border-slate-800 last:border-0">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">{t.date}</span>
                       <div className="flex items-center space-x-4">
-                        <span className="text-slate-500">{t.activeUsers} users</span>
-                        <span className="font-bold text-slate-900">{t.pageViews} views</span>
+                        <span className="text-slate-500 dark:text-slate-400">{t.activeUsers} users</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{t.pageViews} views</span>
                       </div>
                     </div>
                   ))}
@@ -1410,10 +1424,10 @@ export default function AdminPage() {
             </div>
 
             {/* Top Visited Pages */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 className="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                  <Eye className="w-4 h-4 text-blue-600" />
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                  <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>Top Visited Pages &amp; Most Viewed Jobs</span>
                 </h3>
               </div>
@@ -1421,9 +1435,9 @@ export default function AdminPage() {
               {analyticsData?.topPages && analyticsData.topPages.length > 0 ? (
                 <div className="space-y-2 max-h-72 overflow-y-auto">
                   {analyticsData.topPages.map((p, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-slate-50 last:border-0">
-                      <span className="font-mono text-slate-700 truncate max-w-xs">{p.pagePath}</span>
-                      <span className="font-bold text-slate-900">{p.views} views</span>
+                    <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-slate-50 dark:border-slate-800 last:border-0">
+                      <span className="font-mono text-slate-700 dark:text-slate-300 truncate max-w-xs">{p.pagePath}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{p.views} views</span>
                     </div>
                   ))}
                 </div>
@@ -1480,6 +1494,9 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+      ) : adminSection === "staging" ? (
+        /* AUTO-FETCH & JOB STAGING APPROVAL HUB */
+        <AdminJobStagingHub existingJobs={jobs} onJobPublished={loadAdminJobs} />
       ) : adminSection === "hiring_analytics" ? (
         /* HIRING RADAR & COMPANY ANALYTICS HUB */
         <AdminHiringAnalytics jobs={jobs} isAdmin={isAdmin} showToast={showToast} />
@@ -1487,32 +1504,32 @@ export default function AdminPage() {
         /* DIRECT MESSAGES & INQUIRIES SECTION */
         <div className="space-y-6 animate-in fade-in">
           {/* Header Controls */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <MessageSquare className="w-5 h-5 text-blue-600" />
-                <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
                   Direct Messages &amp; User Feedback
                 </h2>
-                <span className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
                   {contactsList.length + feedbacksList.length} Total
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Review inquiries from the Contact page and authenticated member feedback.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* Type Filter Tabs */}
-              <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+              <div className="flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
                 <button
                   type="button"
                   onClick={() => setInquiryTypeFilter("all")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
                     inquiryTypeFilter === "all"
-                      ? "bg-white text-blue-600 shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   All ({contactsList.length + feedbacksList.length})
@@ -1522,8 +1539,8 @@ export default function AdminPage() {
                   onClick={() => setInquiryTypeFilter("inquiry")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
                     inquiryTypeFilter === "inquiry"
-                      ? "bg-white text-blue-600 shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   Contact Form ({contactsList.length})
@@ -1533,8 +1550,8 @@ export default function AdminPage() {
                   onClick={() => setInquiryTypeFilter("feedback")}
                   className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg transition-all ${
                     inquiryTypeFilter === "feedback"
-                      ? "bg-white text-blue-600 shadow-2xs"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   <ThumbsUp className="w-3 h-3" />
@@ -1549,13 +1566,13 @@ export default function AdminPage() {
                   placeholder="Search inquiries & feedback..."
                   value={contactsSearch}
                   onChange={(e) => setContactsSearch(e.target.value)}
-                  className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 w-44 sm:w-56"
+                  className="pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500 w-44 sm:w-56"
                 />
               </div>
               <button
                 onClick={loadContactsAndFeedbacks}
                 disabled={loadingContacts}
-                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 title="Refresh messages & feedback"
               >
                 <RotateCcw className={`w-4 h-4 ${loadingContacts ? "animate-spin text-blue-600" : ""}`} />
@@ -1565,12 +1582,12 @@ export default function AdminPage() {
 
           {/* Messages & Feedback List */}
           {filteredInquiriesAndFeedbacks.length === 0 ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-xs space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
                 <Inbox className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900">No Submissions Found</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">No Submissions Found</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 {contactsSearch
                   ? "No messages or feedback matched your search query."
                   : "Inquiries submitted via /contact and member feedback will appear here."}
@@ -1599,41 +1616,41 @@ export default function AdminPage() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xs space-y-4 hover:border-slate-300 transition-colors"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <span className="font-black text-slate-900 text-sm">{senderName}</span>
+                        <span className="font-black text-slate-900 dark:text-white text-sm">{senderName}</span>
 
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider border ${
                             isFeedback
-                              ? "bg-purple-50 text-purple-700 border-purple-200"
-                              : "bg-blue-50 text-blue-700 border-blue-200"
+                              ? "bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+                              : "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                           }`}
                         >
                           {isFeedback ? `Feedback: ${subjectBadge}` : subjectBadge}
                         </span>
 
                         {isFeedback && typeof item.rating === "number" && (
-                          <div className="flex items-center text-amber-400 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                          <div className="flex items-center text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-md">
                             {Array.from({ length: item.rating }).map((_, idx) => (
                               <Star key={idx} className="w-3 h-3 fill-amber-400" />
                             ))}
-                            <span className="text-[10px] font-bold text-amber-700 ml-1">
+                            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 ml-1">
                               {item.rating}/5
                             </span>
                           </div>
                         )}
 
-                        <span className="text-[11px] text-slate-400">• {dateStr}</span>
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500">• {dateStr}</span>
                       </div>
 
                       <div className="flex items-center space-x-2">
                         {senderEmail && (
                           <a
                             href={`mailto:${senderEmail}?subject=Re: ${encodeURIComponent(subjectBadge || "GetJobLink")}`}
-                            className="inline-flex items-center space-x-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-200 transition-colors"
+                            className="inline-flex items-center space-x-1.5 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors"
                           >
                             <Mail className="w-3.5 h-3.5" />
                             <span>Reply ({senderEmail})</span>
@@ -1642,7 +1659,7 @@ export default function AdminPage() {
 
                         <button
                           onClick={() => (isFeedback ? handleDeleteFeedback(item.id) : handleDeleteContact(item.id))}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1650,7 +1667,7 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-xs text-slate-700 whitespace-pre-wrap leading-relaxed font-sans">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed font-sans">
                       {item.message || item.feedback}
                     </div>
                   </div>
@@ -1664,16 +1681,16 @@ export default function AdminPage() {
 
       {/* ADD JOB MODAL */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center space-x-2">
-                <PlusCircle className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-black text-slate-900">Publish New Job Link</h3>
+                <PlusCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Publish New Job Link</h3>
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1682,61 +1699,61 @@ export default function AdminPage() {
             <form onSubmit={handleAddSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Job Title *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Title *</label>
                   <input
                     type="text"
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="e.g. Senior Frontend Engineer"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Company *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Company *</label>
                   <input
                     type="text"
                     required
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     placeholder="e.g. Google / Razorpay"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Location *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Location *</label>
                   <input
                     type="text"
                     required
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="e.g. Bengaluru, India or Remote"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Application URL *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Application URL *</label>
                   <input
                     type="url"
                     required
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                     placeholder="https://company.greenhouse.io/..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Job Type</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Type</label>
                   <select
                     value={formData.jobType}
                     onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>Full Time</option>
                     <option>Internship</option>
@@ -1745,11 +1762,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Experience</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Experience</label>
                   <select
                     value={formData.experience}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>More than 0 year</option>
                     <option>Fresher (0 - 1 Years)</option>
@@ -1760,11 +1777,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Salary</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Salary</label>
                   <select
                     value={formData.salary}
                     onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>Competitive</option>
                     <option>2-4 LPA</option>
@@ -1780,11 +1797,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Domain</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Domain</label>
                   <select
                     value={formData.domain}
                     onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option value="Engineering">Engineering</option>
                     <option value="Design">Design</option>
@@ -1795,7 +1812,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 cursor-pointer">
+              <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
                   id="add-remote"
@@ -1803,39 +1820,39 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
                   className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                 />
-                <label htmlFor="add-remote" className="font-semibold text-slate-700 cursor-pointer">
+                <label htmlFor="add-remote" className="font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                   Flag as Distributed Remote Role
                 </label>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Skills (comma-separated)</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Skills (comma-separated)</label>
                 <input
                   type="text"
                   value={formData.skills}
                   onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                   placeholder="e.g. React, Node.js, TypeScript, Docker"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Job Description & Requirements *</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Description & Requirements *</label>
                 <textarea
                   rows={5}
                   required
                   value={formData.jd}
                   onChange={(e) => setFormData({ ...formData, jd: e.target.value })}
                   placeholder="Paste complete requirements, qualifications, and context details..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl leading-relaxed"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-semibold"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold"
                 >
                   Cancel
                 </button>
@@ -1854,16 +1871,16 @@ export default function AdminPage() {
 
       {/* EDIT JOB MODAL */}
       {editingJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center space-x-2">
-                <Edit3 className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-lg font-black text-slate-900">Edit Job Listing</h3>
+                <Edit3 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Edit Job Listing</h3>
               </div>
               <button
                 onClick={() => setEditingJob(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1872,57 +1889,57 @@ export default function AdminPage() {
             <form onSubmit={handleEditSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Job Title *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Title *</label>
                   <input
                     type="text"
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Company *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Company *</label>
                   <input
                     type="text"
                     required
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Location *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Location *</label>
                   <input
                     type="text"
                     required
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Application URL *</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Application URL *</label>
                   <input
                     type="url"
                     required
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Job Type</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Type</label>
                   <select
                     value={formData.jobType}
                     onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>Full Time</option>
                     <option>Internship</option>
@@ -1931,11 +1948,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Experience</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Experience</label>
                   <select
                     value={formData.experience}
                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>More than 0 year</option>
                     <option>Fresher (0 - 1 Years)</option>
@@ -1946,11 +1963,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Salary</label>
+                  <label className="block font-bold text-slate-700 mb-1 dark:text-slate-300">Salary</label>
                   <select
                     value={formData.salary}
                     onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option>Competitive</option>
                     <option>2-4 LPA</option>
@@ -1966,11 +1983,11 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Domain</label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Domain</label>
                   <select
                     value={formData.domain}
                     onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                    className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl"
+                    className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 rounded-xl"
                   >
                     <option value="Engineering">Engineering</option>
                     <option value="Design">Design</option>
@@ -1981,7 +1998,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 cursor-pointer">
+              <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer">
                 <input
                   type="checkbox"
                   id="edit-remote"
@@ -1989,36 +2006,36 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
                   className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                 />
-                <label htmlFor="edit-remote" className="font-semibold text-slate-700 cursor-pointer">
+                <label htmlFor="edit-remote" className="font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                   Flag as Distributed Remote Role
                 </label>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Skills (comma-separated)</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Skills (comma-separated)</label>
                 <input
                   type="text"
                   value={formData.skills}
                   onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Job Description & Requirements</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Job Description & Requirements</label>
                 <textarea
                   rows={5}
                   value={formData.jd}
                   onChange={(e) => setFormData({ ...formData, jd: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl leading-relaxed"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setEditingJob(null)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-semibold"
+                  className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold"
                 >
                   Cancel
                 </button>
@@ -2037,26 +2054,26 @@ export default function AdminPage() {
 
       {/* INDIVIDUAL DELETE CONFIRMATION MODAL */}
       {deletingJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900">Confirm Deletion</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">Confirm Deletion</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Are you sure you want to permanently delete{" "}
-                <span className="font-bold text-slate-900">{deletingJob.title}</span> at{" "}
-                <span className="font-bold text-slate-900">{deletingJob.company}</span>?
+                <span className="font-bold text-slate-900 dark:text-white">{deletingJob.title}</span> at{" "}
+                <span className="font-bold text-slate-900 dark:text-white">{deletingJob.company}</span>?
                 This action cannot be undone.
               </p>
             </div>
 
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setDeletingJob(null)}
-                className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </button>
@@ -2074,27 +2091,27 @@ export default function AdminPage() {
 
       {/* BULK DELETE CONFIRMATION MODAL */}
       {isBulkDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
               <Trash2 className="w-6 h-6" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900">
+              <h3 className="text-lg font-black text-slate-900 dark:text-white">
                 Bulk Delete ({selectedIds.size} Jobs)
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Are you sure you want to delete all{" "}
-                <span className="font-bold text-slate-900">{selectedIds.size}</span> selected job
+                <span className="font-bold text-slate-900 dark:text-white">{selectedIds.size}</span> selected job
                 records from Firestore? This operation will remove them from production.
               </p>
             </div>
 
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setIsBulkDeleteModalOpen(false)}
-                className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold"
+                className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </button>

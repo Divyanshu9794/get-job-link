@@ -32,6 +32,8 @@ import {
   isIndiaJob,
   isWorldJob,
   isRemoteJob,
+  matchesExperienceFilter,
+  getJobTimestamp,
 } from "../utils/jobClassification";
 
 const PAGE_SIZE = 50;
@@ -259,30 +261,16 @@ export default function JobListingPage() {
 
     // 3. Experience filter
     if (filters.experience) {
-      const exp = (job.experience || "").toLowerCase();
-      if (filters.experience === "fresher") {
-        if (!exp.includes("fresher") && !exp.includes("0 year") && !exp.includes("0 - 1") && !exp.includes("0-1")) {
-          return false;
-        }
-      } else if (filters.experience === "1-3") {
-        if (!exp.includes("1 year") && !exp.includes("2 year") && !exp.includes("1 -") && !exp.includes("1-3")) {
-          return false;
-        }
-      } else if (filters.experience === "3-5") {
-        if (!exp.includes("3 year") && !exp.includes("4 year") && !exp.includes("3 -") && !exp.includes("3-5")) {
-          return false;
-        }
-      } else if (filters.experience === "5+") {
-        if (!exp.includes("5") && !exp.includes("6") && !exp.includes("7") && !exp.includes("8") && !exp.includes("more than 4")) {
-          return false;
-        }
+      if (!matchesExperienceFilter(job.experience, filters.experience)) {
+        return false;
       }
     }
 
     // 4. Job Type
     if (filters.employmentType) {
-      const type = (job.jobType || "").toLowerCase();
-      if (!type.includes(filters.employmentType.toLowerCase())) {
+      const type = (job.jobType || "").toLowerCase().replace("-", " ").trim();
+      const targetType = filters.employmentType.toLowerCase().replace("-", " ").trim();
+      if (!type.includes(targetType)) {
         return false;
       }
     }
@@ -293,14 +281,17 @@ export default function JobListingPage() {
       const loc = (job.location || "").toLowerCase();
       if (filters.workMode === "remote" && !isRem) return false;
       if (filters.workMode === "onsite" && isRem) return false;
-      if (filters.workMode === "hybrid" && !loc.includes("hybrid")) return false;
+      if (filters.workMode === "hybrid" && !loc.includes("hybrid") && !String(job.title).toLowerCase().includes("hybrid")) return false;
     }
 
     // 6. Country
     if (filters.country) {
       const loc = (job.location || "").toLowerCase();
-      if (!loc.includes(filters.country.toLowerCase())) {
-        return false;
+      const c = filters.country.toLowerCase();
+      if (c === "india") {
+        if (!isIndiaJob(job)) return false;
+      } else {
+        if (!loc.includes(c)) return false;
       }
     }
 
@@ -314,9 +305,9 @@ export default function JobListingPage() {
 
     // 8. Posted Date
     if (filters.postedDate) {
-      const time = job.createdAt || (job.date ? new Date(job.date).getTime() : null);
-      if (time) {
-        const diffMs = Date.now() - new Date(time).getTime();
+      const timeMs = getJobTimestamp(job);
+      if (timeMs) {
+        const diffMs = Date.now() - timeMs;
         const diffHours = diffMs / (1000 * 60 * 60);
         if (filters.postedDate === "24h" && diffHours > 24) return false;
         if (filters.postedDate === "7d" && diffHours > 24 * 7) return false;
@@ -592,7 +583,7 @@ export default function JobListingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 antialiased pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased pb-16 transition-colors duration-150">
       {/* Dynamic SEO Meta Tags & Schema */}
       <SEO
         title={categoryHeader.seoTitle}
@@ -633,30 +624,30 @@ export default function JobListingPage() {
       )}
 
       {/* Category Hero / Title Section */}
-      <section className="bg-white border-b border-slate-200 py-8 sm:py-10">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 sm:py-10 transition-colors duration-150">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
-              <div className="inline-flex items-center space-x-1.5 bg-blue-50 border border-blue-200/80 text-blue-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+              <div className="inline-flex items-center space-x-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
                 <span>{categoryHeader.badge}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {categoryHeader.title}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed">
                 {categoryHeader.description}
               </p>
             </div>
 
             {/* Category Quick Pill Selector */}
-            <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200/80 shrink-0 self-start md:self-auto">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 shrink-0 self-start md:self-auto">
               <Link
                 to="/jobs/india"
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
                   category === "india"
-                    ? "bg-white text-blue-600 shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <MapPin className="w-3.5 h-3.5" />
@@ -666,8 +657,8 @@ export default function JobListingPage() {
                 to="/jobs/world"
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
                   category === "world"
-                    ? "bg-white text-blue-600 shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <Globe className="w-3.5 h-3.5" />
@@ -677,8 +668,8 @@ export default function JobListingPage() {
                 to="/jobs/remote"
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
                   category === "remote"
-                    ? "bg-white text-blue-600 shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
                 <Globe className="w-3.5 h-3.5" />
@@ -704,9 +695,9 @@ export default function JobListingPage() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 mb-6 text-rose-800 flex items-center justify-between">
+          <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-5 mb-6 text-rose-800 dark:text-rose-200 flex items-center justify-between">
             <div className="flex items-center space-x-2.5 text-xs sm:text-sm">
-              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
               <span>{error}</span>
             </div>
             <button
@@ -714,7 +705,7 @@ export default function JobListingPage() {
                 setPageCache({});
                 setCurrentPage(1);
               }}
-              className="px-3 py-1 bg-white border border-rose-200 text-rose-700 font-semibold rounded-lg text-xs hover:bg-rose-100 transition-colors"
+              className="px-3 py-1 bg-white dark:bg-slate-800 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-semibold rounded-lg text-xs hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
             >
               Retry
             </button>
@@ -727,29 +718,29 @@ export default function JobListingPage() {
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white border border-slate-200/80 rounded-xl p-3.5 min-h-[82px] animate-pulse flex items-center justify-between"
+                className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3.5 min-h-[82px] animate-pulse flex items-center justify-between"
               >
                 <div className="flex items-center space-x-3 flex-1">
-                  <div className="w-11 h-11 bg-slate-200 rounded-xl shrink-0" />
+                  <div className="w-11 h-11 bg-slate-200 dark:bg-slate-800 rounded-xl shrink-0" />
                   <div className="space-y-2 flex-1 pr-4">
-                    <div className="h-4 bg-slate-200 rounded w-3/4" />
-                    <div className="h-3 bg-slate-100 rounded w-1/2" />
+                    <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
+                    <div className="h-3 bg-slate-100 dark:bg-slate-850 rounded w-1/2" />
                   </div>
                 </div>
-                <div className="w-12 h-3 bg-slate-100 rounded" />
+                <div className="w-12 h-3 bg-slate-100 dark:bg-slate-800 rounded" />
               </div>
             ))}
           </div>
         ) : currentJobs.length === 0 ? (
           /* Empty State */
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4 shadow-xs my-6">
-            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mx-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-4 shadow-xs my-6">
+            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 mx-auto">
               <Briefcase className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
               No job openings found matching your criteria
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
               We couldn't find any positions matching your selected category and filters. Try
               adjusting keywords or clearing filters.
             </p>

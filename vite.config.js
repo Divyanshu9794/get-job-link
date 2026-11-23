@@ -203,6 +203,52 @@ function ga4DevPlugin() {
   };
 }
 
+function fantasticJobsDevPlugin() {
+  return {
+    name: 'fantastic-jobs-dev-plugin',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (!req.url || !req.url.startsWith('/api/fantastic-jobs')) {
+          return next();
+        }
+
+        try {
+          const urlObj = new URL(req.url, 'http://localhost');
+          const targetUrl =
+            urlObj.searchParams.get('url') ||
+            'https://data.fantastic.jobs/v1/active-ats?time_frame=24h&limit=20&description_format=text&title=%22Developer%22';
+
+          const envFilePath = path.resolve(__dirname, '.env');
+          let apiKey = process.env.VITE_FANTASTIC_JOBS_API_KEY || '';
+          if (!apiKey && fs.existsSync(envFilePath)) {
+            const envContent = fs.readFileSync(envFilePath, 'utf-8');
+            const match = envContent.match(/VITE_FANTASTIC_JOBS_API_KEY=(.*)/);
+            if (match) apiKey = match[1].trim();
+          }
+
+          const response = await fetch(targetUrl, {
+            headers: {
+              ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            },
+          });
+
+          const data = await response.json();
+          const creditsUsed = response.headers.get('x-api-jobs-this-request') || '1';
+
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('x-api-jobs-this-request', creditsUsed);
+          res.end(JSON.stringify(data));
+        } catch (err) {
+          console.error('Fantastic Jobs dev proxy error:', err);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: err.message }));
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), ga4DevPlugin()],
+  plugins: [react(), tailwindcss(), ga4DevPlugin(), fantasticJobsDevPlugin()],
 });

@@ -223,7 +223,7 @@ export default function AtsChecker() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xs border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
         {/* Banner */}
         <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 p-6 sm:p-8 text-white">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -252,20 +252,20 @@ export default function AtsChecker() {
         <div className="grid lg:grid-cols-2 gap-6 p-6 sm:p-8" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-blue-600" />
+              <h2 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>Your Resume Text</span>
               </h2>
               {usingDefaultResume && (
-                <span className="text-[11px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded border border-emerald-200">
+                <span className="text-[11px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">
                   Default Resume Loaded
                 </span>
               )}
             </div>
             {usingDefaultResume && userProfile?.defaultResume && (
-              <div className="bg-blue-50/80 border border-blue-200/80 rounded-xl px-3 py-2 flex items-center justify-between text-xs text-blue-900">
+              <div className="bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-800/60 rounded-xl px-3 py-2 flex items-center justify-between text-xs text-blue-900 dark:text-blue-200">
                 <div className="flex items-center space-x-1.5 truncate">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span className="truncate">Active: <strong>{userProfile.defaultResume.fileName}</strong></span>
                 </div>
                 <button
@@ -273,7 +273,7 @@ export default function AtsChecker() {
                     setResumeText("");
                     setUsingDefaultResume(false);
                   }}
-                  className="text-[11px] text-blue-700 hover:text-blue-900 font-semibold underline shrink-0 ml-2"
+                  className="text-[11px] text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 font-semibold underline shrink-0 ml-2"
                 >
                   Clear / Custom
                 </button>
@@ -284,13 +284,13 @@ export default function AtsChecker() {
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
               placeholder="Paste your plain resume text here, or drop a PDF file..."
-              className="w-full rounded-2xl border border-slate-200 p-4 text-xs font-mono text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none bg-slate-50"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 p-4 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none bg-slate-50 dark:bg-slate-800/80"
             />
           </div>
 
           <div className="space-y-2">
-            <h2 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-blue-600" />
+            <h2 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>Target Job Description</span>
             </h2>
             <textarea
@@ -298,15 +298,15 @@ export default function AtsChecker() {
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the employer's full job description, qualifications, and requirements here..."
-              className="w-full rounded-2xl border border-slate-200 p-4 text-xs font-mono text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none bg-slate-50"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 p-4 text-xs font-mono text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none bg-slate-50 dark:bg-slate-800/80"
             />
           </div>
         </div>
 
         {/* 4 Role-Specific ATS Tips ("What this JD is actually filtering for") */}
         {roleSpecificTips.length > 0 && (
-          <div className="mx-6 sm:mx-8 mb-6 bg-slate-900 text-white rounded-2xl p-5 sm:p-6 border border-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+          <div className="mx-6 sm:mx-8 mb-6 bg-slate-900 dark:bg-slate-800/90 text-white rounded-2xl p-5 sm:p-6 border border-slate-800 dark:border-slate-700 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 dark:border-slate-700">
               <div className="space-y-0.5">
                 <div className="inline-flex items-center space-x-1.5 text-[11px] font-bold text-amber-400 uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
@@ -377,18 +377,18 @@ export default function AtsChecker() {
 
         {/* Report Output */}
         {report && (
-          <div className="border-t border-slate-200 bg-slate-50/70 p-6 sm:p-8 space-y-6 animate-in fade-in">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
-              <Sparkles className="w-5 h-5 text-blue-600" />
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Evaluation Report</h2>
+          <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 p-6 sm:p-8 space-y-6 animate-in fade-in">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+              <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Evaluation Report</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center shadow-2xs flex flex-col items-center justify-center">
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-6 text-center shadow-2xs flex flex-col items-center justify-center">
                 <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3">Overall Match</h3>
                 <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
                   <svg className="w-28 h-28 rotate-[-90deg]" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" stroke="#e2e8f0" strokeWidth="8" fill="none" />
+                    <circle cx="50" cy="50" r="42" stroke="currentColor" className="text-slate-200 dark:text-slate-700" strokeWidth="8" fill="none" />
                     <circle
                       cx="50"
                       cy="50"
@@ -410,7 +410,7 @@ export default function AtsChecker() {
                 </div>
               </div>
 
-              <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-2xs space-y-3">
+              <div className="lg:col-span-2 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-6 shadow-2xs space-y-3">
                 {[
                   ["Keyword Alignment", report.keywordScore ?? 80],
                   ["Experience Relevance", report.experienceScore ?? 85],
@@ -420,10 +420,10 @@ export default function AtsChecker() {
                 ].map(([label, value]) => (
                   <div key={label}>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-slate-700">{label}</span>
-                      <span className="font-bold text-slate-900">{value}%</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{label}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{value}%</span>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
                       <div className={`h-2 rounded-full ${progressColor(value)} transition-all`} style={{ width: `${value}%` }} />
                     </div>
                   </div>
@@ -433,12 +433,12 @@ export default function AtsChecker() {
 
             {/* Strengths */}
             {report.strengths?.length > 0 && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-700 flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 space-y-2">
+                <h3 className="font-bold text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>Resume Strengths</span>
                 </h3>
-                <ul className="space-y-1.5 text-xs text-slate-700 pl-5 list-disc">
+                <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300 pl-5 list-disc">
                   {report.strengths.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
@@ -448,14 +448,14 @@ export default function AtsChecker() {
 
             {/* Missing Keywords */}
             {report.missingKeywords?.length > 0 && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-rose-700 flex items-center space-x-1.5">
-                  <AlertCircle className="w-4 h-4 text-rose-600" />
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 space-y-2">
+                <h3 className="font-bold text-xs uppercase tracking-wider text-rose-700 dark:text-rose-400 flex items-center space-x-1.5">
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                   <span>Missing Keywords from Job Description</span>
                 </h3>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {report.missingKeywords.map((k, i) => (
-                    <span key={i} className="bg-rose-50 border border-rose-200 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                    <span key={i} className="bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 px-2.5 py-1 rounded-lg text-xs font-semibold">
                       {k}
                     </span>
                   ))}
@@ -465,11 +465,11 @@ export default function AtsChecker() {
 
             {/* Improvements */}
             {report.improvements?.length > 0 && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 space-y-2">
+                <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-200">
                   Recommended Improvements
                 </h3>
-                <ul className="space-y-1.5 text-xs text-slate-700 pl-5 list-disc">
+                <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300 pl-5 list-disc">
                   {report.improvements.map((t, i) => (
                     <li key={i}>{t}</li>
                   ))}
@@ -479,13 +479,13 @@ export default function AtsChecker() {
 
             {/* AI Rewritten Bullets */}
             {report.improvedBullets?.length > 0 && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-blue-700">
+              <div className="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 space-y-2">
+                <h3 className="font-bold text-xs uppercase tracking-wider text-blue-700 dark:text-blue-400">
                   High-Impact Bullet Point Examples
                 </h3>
                 <ul className="space-y-2">
                   {report.improvedBullets.map((b, i) => (
-                    <li key={i} className="text-xs text-slate-700 pl-3 border-l-2 border-blue-500 italic">
+                    <li key={i} className="text-xs text-slate-700 dark:text-slate-300 pl-3 border-l-2 border-blue-500 italic">
                       “{b}”
                     </li>
                   ))}

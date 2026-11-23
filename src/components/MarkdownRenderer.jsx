@@ -14,14 +14,14 @@ function renderInline(text) {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} className="font-bold text-slate-900">
+        <strong key={i} className="font-bold text-slate-900 dark:text-white">
           {part.slice(2, -2)}
         </strong>
       );
     }
     if (part.startsWith("*") && part.endsWith("*")) {
       return (
-        <em key={i} className="italic text-slate-800">
+        <em key={i} className="italic text-slate-800 dark:text-slate-200">
           {part.slice(1, -1)}
         </em>
       );
@@ -30,7 +30,7 @@ function renderInline(text) {
       return (
         <code
           key={i}
-          className="bg-slate-100 text-blue-700 font-mono text-xs px-1.5 py-0.5 rounded border border-slate-200"
+          className="bg-slate-100 dark:bg-slate-800 text-blue-700 dark:text-blue-400 font-mono text-xs px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700"
         >
           {part.slice(1, -1)}
         </code>
@@ -61,8 +61,8 @@ export default function MarkdownRenderer({ content }) {
       elements.push(
         <ul key={key} className="space-y-2 my-4 pl-1">
           {items.map((item, idx) => (
-            <li key={idx} className="flex items-start space-x-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0"></span>
+            <li key={idx} className="flex items-start space-x-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-2 shrink-0"></span>
               <span className="flex-1">{renderInline(item)}</span>
             </li>
           ))}
@@ -72,8 +72,8 @@ export default function MarkdownRenderer({ content }) {
       elements.push(
         <ol key={key} className="space-y-2 my-4 pl-1">
           {items.map((item, idx) => (
-            <li key={idx} className="flex items-start space-x-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed">
-              <span className="font-bold text-blue-600 font-mono text-xs shrink-0 mt-0.5">
+            <li key={idx} className="flex items-start space-x-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              <span className="font-bold text-blue-600 dark:text-blue-400 font-mono text-xs shrink-0 mt-0.5">
                 {idx + 1}.
               </span>
               <span className="flex-1">{renderInline(item)}</span>
@@ -98,7 +98,7 @@ export default function MarkdownRenderer({ content }) {
     if (line === "---" || line === "***") {
       flushList();
       elements.push(
-        <hr key={`hr-${index}`} className="my-8 border-slate-200/90" />
+        <hr key={`hr-${index}`} className="my-8 border-slate-200/90 dark:border-slate-800" />
       );
       return;
     }
@@ -109,7 +109,7 @@ export default function MarkdownRenderer({ content }) {
       elements.push(
         <h3
           key={`h3-${index}`}
-          className="text-lg sm:text-xl font-black text-slate-900 tracking-tight pt-5 pb-1 mt-3 flex items-center space-x-2"
+          className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight pt-5 pb-1 mt-3 flex items-center space-x-2"
         >
           <span>{renderInline(line.slice(4))}</span>
         </h3>
@@ -123,7 +123,7 @@ export default function MarkdownRenderer({ content }) {
       elements.push(
         <h4
           key={`h4-${index}`}
-          className="text-sm sm:text-base font-bold text-slate-900 tracking-tight pt-3 pb-0.5 mt-2 text-blue-900"
+          className="text-sm sm:text-base font-bold text-slate-900 dark:text-blue-300 tracking-tight pt-3 pb-0.5 mt-2 text-blue-900"
         >
           {renderInline(line.slice(5))}
         </h4>
@@ -137,7 +137,7 @@ export default function MarkdownRenderer({ content }) {
       elements.push(
         <blockquote
           key={`quote-${index}`}
-          className="border-l-4 border-blue-500 bg-blue-50/70 p-4 my-4 rounded-r-2xl text-xs sm:text-sm text-slate-700 font-medium leading-relaxed italic shadow-2xs"
+          className="border-l-4 border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 p-4 my-4 rounded-r-2xl text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic shadow-2xs"
         >
           {renderInline(line.slice(2))}
         </blockquote>
@@ -175,7 +175,7 @@ export default function MarkdownRenderer({ content }) {
     elements.push(
       <p
         key={`p-${index}`}
-        className="text-xs sm:text-sm text-slate-700 leading-relaxed my-2.5 font-sans"
+        className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed my-2.5 font-sans"
       >
         {renderInline(line)}
       </p>

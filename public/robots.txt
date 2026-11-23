@@ -10,10 +10,14 @@ Allow: /
 
 User-agent: *
 Allow: /
+Allow: /for-you
+Allow: /jobs/
 Allow: /jobs/india
 Allow: /jobs/world
 Allow: /jobs/remote
 Allow: /job/
+Allow: /hiring-radar
+Allow: /hiring-radar/
 Allow: /career-guides
 Allow: /career-guides/
 Allow: /resume
@@ -32,6 +36,8 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /profile
 Disallow: /profile/
+Disallow: /alerts
+Disallow: /unsubscribe
 
 # Disallow deep internal query parameter combinations to prevent duplicate crawl loops
 Disallow: /*?*q=

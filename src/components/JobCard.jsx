@@ -9,6 +9,7 @@ import {
   Bookmark,
   Link2,
   Check,
+  Share2,
 } from "lucide-react";
 import {
   isRemoteJob,
@@ -16,9 +17,11 @@ import {
   getCompanyInitials,
   getCompanyColor,
   getApplyUrl,
+  formatDisplaySalary,
 } from "../utils/jobClassification";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import ShareJobModal from "./ShareJobModal";
 
 export default function JobCard({
   job,
@@ -30,6 +33,7 @@ export default function JobCard({
   const { isJobSaved, toggleSaveJob } = useAuth();
   const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   if (!job) return null;
 
@@ -90,8 +94,9 @@ export default function JobCard({
   };
 
   const isValidBadge = (val) => {
-    if (!val) return false;
+    if (!val || typeof val === "object") return false;
     const str = String(val).trim().toLowerCase();
+    if (str.startsWith("{") || str.startsWith("[") || str.includes("@type")) return false;
     return str !== "" && str !== "null" && str !== "undefined" && str !== "not disclosed" && str !== "competitive" && str !== "n/a";
   };
 
@@ -122,10 +127,10 @@ export default function JobCard({
           handleCardClick();
         }
       }}
-      className={`group relative bg-white border ${
+      className={`group relative bg-white dark:bg-slate-900 border ${
         isSelected
-          ? "border-blue-500 ring-2 ring-blue-500/30 bg-blue-50/10 shadow-xs"
-          : "border-slate-200/90 hover:border-blue-400 hover:shadow-md"
+          ? "border-blue-500 ring-2 ring-blue-500/30 bg-blue-50/10 dark:bg-blue-950/20 shadow-xs"
+          : "border-slate-200/90 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md dark:hover:shadow-slate-950/50"
       } rounded-xl p-3 sm:p-3.5 transition-all duration-150 flex items-center justify-between cursor-pointer w-full min-h-[82px] select-none`}
     >
       {/* Left: Checkbox (Admin Only) + Company Avatar & Job Info */}
@@ -163,26 +168,26 @@ export default function JobCard({
               to={`/job/${job.id}`}
               onClick={(e) => e.stopPropagation()}
               title={job.title}
-              className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 truncate transition-colors leading-snug tracking-tight hover:underline"
+              className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate transition-colors leading-snug tracking-tight hover:underline"
             >
               {job.title}
             </Link>
 
             {isRemote && (
-              <span className="shrink-0 bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
+              <span className="shrink-0 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80 text-[10px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider">
                 Remote
               </span>
             )}
           </div>
 
           {/* Row 2: Company • Location */}
-          <div className="flex items-center space-x-1.5 text-xs text-slate-500 mt-0.5 truncate">
-            <span className="font-semibold text-slate-700 truncate max-w-[130px] sm:max-w-[160px]">
+          <div className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            <span className="font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[130px] sm:max-w-[160px]">
               {job.company || "Company"}
             </span>
-            <span className="text-slate-300">•</span>
-            <span className="flex items-center space-x-1 text-slate-500 text-[11px] truncate max-w-[120px] sm:max-w-[180px]">
-              <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-[120px] sm:max-w-[180px]">
+              <MapPin className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
               <span className="truncate">{job.location || "India"}</span>
             </span>
           </div>
@@ -190,16 +195,16 @@ export default function JobCard({
           {/* Row 3: Metadata Badges (Type, Experience, Salary, ATS) */}
           <div className="flex items-center space-x-1.5 mt-1 text-[10px]">
             {isValidBadge(job.jobType) && (
-              <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
+              <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium px-1.5 py-0.5 rounded">
                 {String(job.jobType).trim()}
               </span>
             )}
-            <span className="bg-slate-100 text-slate-600 font-medium px-1.5 py-0.5 rounded">
+            <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium px-1.5 py-0.5 rounded">
               {displayExperience()}
             </span>
-            {isValidBadge(job.salary) && (
-              <span className="bg-emerald-50 text-emerald-700 font-semibold px-1.5 py-0.5 rounded hidden sm:inline-block truncate max-w-[90px]">
-                {String(job.salary).trim()}
+            {formatDisplaySalary(job.salary) && (
+              <span className="bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-semibold px-1.5 py-0.5 rounded hidden sm:inline-block truncate max-w-[90px]">
+                {formatDisplaySalary(job.salary)}
               </span>
             )}
             <button
@@ -208,9 +213,9 @@ export default function JobCard({
                 navigate(`/job/${job.id}#ats-section`);
               }}
               title="View role-specific ATS keywords & resume screening tips"
-              className="inline-flex items-center space-x-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/90 font-bold px-1.5 py-0.5 rounded transition-all hover:scale-105 active:scale-95"
+              className="inline-flex items-center space-x-1 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200/90 dark:border-amber-800/80 font-bold px-1.5 py-0.5 rounded transition-all hover:scale-105 active:scale-95"
             >
-              <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+              <Sparkles className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" />
               <span>ATS Tips</span>
             </button>
           </div>
@@ -219,24 +224,35 @@ export default function JobCard({
 
       {/* Right: Posted Date & Direct Apply Action */}
       <div className="flex flex-col items-end justify-between self-stretch shrink-0 pl-1">
-        <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium whitespace-nowrap flex items-center space-x-1">
-          <Clock className="w-3 h-3 text-slate-300 hidden sm:inline" />
+        <span className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap flex items-center space-x-1">
+          <Clock className="w-3 h-3 text-slate-300 dark:text-slate-600 hidden sm:inline" />
           <span>{timeAgo(job.createdAt || job.date)}</span>
         </span>
 
         <div className="flex items-center space-x-1 mt-auto">
           <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShareOpen(true);
+            }}
+            title="Share opportunity"
+            className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+            aria-label="Share Job"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={handleCopyLink}
             title={copied ? "Copied!" : "Copy link (Shift+Click to copy full post text)"}
             className={`p-1.5 rounded-lg transition-colors ${
               copied
-                ? "text-emerald-600 bg-emerald-50"
-                : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50"
+                : "text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
             }`}
             aria-label="Copy link to job details"
           >
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             ) : (
               <Link2 className="w-3.5 h-3.5" />
             )}
@@ -246,24 +262,31 @@ export default function JobCard({
             title={saved ? "Remove from saved jobs" : "Save job"}
             className={`p-1.5 rounded-lg transition-colors ${
               saved
-                ? "text-blue-600 bg-blue-50"
-                : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50"
+                : "text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
             }`}
             aria-label={saved ? "Unsave Job" : "Save Job"}
           >
-            <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-blue-600 text-blue-600" : ""}`} />
+            <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-blue-600 dark:fill-blue-400 text-blue-600 dark:text-blue-400" : ""}`} />
           </button>
           <button
             onClick={handleDirectApply}
             title="Apply directly on employer site"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
             aria-label="Direct Apply"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </button>
-          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+          <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
+
+      {/* Share Job Modal */}
+      <ShareJobModal
+        job={job}
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 }

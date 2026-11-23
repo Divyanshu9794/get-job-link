@@ -16,14 +16,22 @@ import {
   ChevronDown,
   LogIn,
   Radio,
+  Bell,
+  SlidersHorizontal,
+  Mail,
 } from "lucide-react";
 import logoImg from "../assets/logo.jpeg";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import ThemeToggle from "./ThemeToggle";
+import PreferencesModal from "./PreferencesModal";
+import NewsletterDigestModal from "./NewsletterDigestModal";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [prefModalOpen, setPrefModalOpen] = useState(false);
+  const [digestModalOpen, setDigestModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const location = useLocation();
@@ -53,6 +61,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Jobs", path: "/jobs/india", icon: Briefcase },
+    { name: "For You", path: "/for-you", icon: Sparkles, badge: "Matches" },
     { name: "Hiring Radar", path: "/hiring-radar", icon: Radio },
     { name: "Career Guides", path: "/career-guides", icon: BookOpen },
     { name: "Resume Builder", path: "/resume", icon: FileText },
@@ -89,7 +98,8 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <>
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
@@ -101,20 +111,20 @@ export default function Navbar() {
             <img
               src={logoImg}
               alt="GetJobLink Logo"
-              className="w-8 h-8 rounded-lg object-contain shadow-xs border border-slate-200 group-hover:scale-105 transition-transform"
+              className="w-8 h-8 rounded-lg object-contain shadow-xs border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform"
             />
             <div className="flex flex-col">
-              <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                GetJob<span className="text-blue-600">Link</span>
+              <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                GetJob<span className="text-blue-600 dark:text-blue-400">Link</span>
               </span>
-              <span className="text-[10px] text-slate-400 font-medium -mt-1 hidden sm:inline">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium -mt-1 hidden sm:inline">
                 Verified Daily Tech Jobs
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/70">
+          <nav className="hidden lg:flex items-center space-x-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.path);
@@ -124,19 +134,31 @@ export default function Navbar() {
                   to={link.path}
                   className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     active
-                      ? "bg-white text-blue-600 shadow-xs font-bold"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                      ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${active ? "text-blue-600" : "text-slate-400"}`} />
+                  <Icon className={`w-3.5 h-3.5 ${active ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`} />
                   <span>{link.name}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right Section: Single Login Button or User Profile Dropdown */}
+          {/* Right Section: Theme Toggle + Login / Profile Dropdown */}
           <div className="hidden sm:flex items-center space-x-2.5">
+            <button
+              type="button"
+              onClick={() => setDigestModalOpen(true)}
+              title="Subscribe to Weekly Tech Jobs Digest"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors shadow-2xs"
+            >
+              <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span className="hidden xl:inline">Weekly Digest</span>
+            </button>
+
+            <ThemeToggle />
+
             {!currentUser ? (
               <button
                 onClick={handleLogin}
@@ -149,16 +171,16 @@ export default function Navbar() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center space-x-2 p-1.5 pr-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all text-xs font-semibold text-slate-800"
+                  className="flex items-center space-x-2 p-1.5 pr-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs font-semibold text-slate-800 dark:text-slate-200"
                 >
                   {currentUser.photoURL ? (
                     <img
                       src={currentUser.photoURL}
                       alt={currentUser.displayName || "User"}
-                      className="w-7 h-7 rounded-lg object-cover border border-slate-200"
+                      className="w-7 h-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
                     />
                   ) : (
-                    <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-xs">
                       {currentUser.displayName ? currentUser.displayName[0].toUpperCase() : "U"}
                     </div>
                   )}
@@ -170,12 +192,12 @@ export default function Navbar() {
 
                 {/* Profile Menu Dropdown */}
                 {userDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in space-y-1">
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs font-bold text-slate-900 truncate">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in space-y-1">
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
                         {currentUser.displayName || "User"}
                       </p>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
                         {currentUser.email}
                       </p>
                     </div>
@@ -183,7 +205,7 @@ export default function Navbar() {
                     <Link
                       to="/profile"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <User className="w-4 h-4 text-slate-400" />
                       <span>My Profile</span>
@@ -192,7 +214,7 @@ export default function Navbar() {
                     <Link
                       to="/profile?tab=resume"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <FileText className="w-4 h-4 text-slate-400" />
                       <span>My Resume</span>
@@ -201,23 +223,56 @@ export default function Navbar() {
                     <Link
                       to="/profile/saved-jobs"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                      className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <div className="flex items-center space-x-2.5">
                         <Bookmark className="w-4 h-4 text-slate-400" />
                         <span>My Saved Jobs</span>
                       </div>
                       {savedJobIds.size > 0 && (
-                        <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-1.5 py-0.5 rounded-full">
+                        <span className="text-[10px] bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold px-1.5 py-0.5 rounded-full">
                           {savedJobIds.size}
                         </span>
                       )}
                     </Link>
 
                     <Link
+                      to="/alerts"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      <Bell className="w-4 h-4 text-slate-400" />
+                      <span>Smart Job Alerts</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        setPrefModalOpen(true);
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                    >
+                      <SlidersHorizontal className="w-4 h-4 text-slate-400" />
+                      <span>Career Preferences</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        setDigestModalOpen(true);
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                    >
+                      <Mail className="w-4 h-4 text-slate-400" />
+                      <span>Weekly Tech Digest</span>
+                    </button>
+
+                    <Link
                       to="/profile?tab=history"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                      className="flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       <History className="w-4 h-4 text-slate-400" />
                       <span>My ATS History</span>
@@ -225,22 +280,22 @@ export default function Navbar() {
 
                     {/* Authorized Admins Only */}
                     {isAdmin && (
-                      <div className="pt-1 border-t border-slate-100">
+                      <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
                         <Link
                           to="/admin"
                           onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center space-x-2.5 px-4 py-2 text-xs font-bold text-amber-700 bg-amber-50/70 hover:bg-amber-100/70 transition-colors"
+                          className="flex items-center space-x-2.5 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-950/40 hover:bg-amber-100/70 dark:hover:bg-amber-900/40 transition-colors"
                         >
-                          <Shield className="w-4 h-4 text-amber-600" />
+                          <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                           <span>Admin Dashboard</span>
                         </Link>
                       </div>
                     )}
 
-                    <div className="pt-1 border-t border-slate-100">
+                    <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                        className="w-full flex items-center space-x-2.5 px-4 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors text-left"
                       >
                         <LogOut className="w-4 h-4 text-rose-500" />
                         <span>Logout</span>
@@ -254,6 +309,8 @@ export default function Navbar() {
 
           {/* Mobile Menu & Auth Button */}
           <div className="flex items-center space-x-2 lg:hidden">
+            <ThemeToggle compact />
+
             {!currentUser ? (
               <button
                 onClick={handleLogin}
@@ -265,7 +322,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/profile"
-                className="p-1 rounded-lg border border-slate-200"
+                className="p-1 rounded-lg border border-slate-200 dark:border-slate-700"
                 aria-label="My Profile"
               >
                 {currentUser.photoURL ? (
@@ -275,14 +332,14 @@ export default function Navbar() {
                     className="w-6 h-6 rounded-md object-cover"
                   />
                 ) : (
-                  <User className="w-4 h-4 text-slate-600" />
+                  <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                 )}
               </Link>
             )}
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 focus:outline-none"
+              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -293,7 +350,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-2 shadow-lg animate-in fade-in">
+        <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 pt-2 pb-4 space-y-2 shadow-lg animate-in fade-in">
           <div className="grid grid-cols-2 gap-1.5 pt-1 pb-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
@@ -305,22 +362,48 @@ export default function Navbar() {
                   onClick={handleNavClick}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                     active
-                      ? "bg-blue-50 text-blue-600 font-bold border border-blue-100"
-                      : "text-slate-600 hover:bg-slate-50 border border-transparent"
+                      ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-bold border border-blue-100 dark:border-blue-900/50"
+                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? "text-blue-600" : "text-slate-400"}`} />
+                  <Icon className={`w-4 h-4 ${active ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`} />
                   <span>{link.name}</span>
                 </Link>
               );
             })}
           </div>
 
+          {/* Quick Preferences & Digest for all mobile users */}
+          <div className="grid grid-cols-2 gap-2 pt-1 pb-1 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => {
+                handleNavClick();
+                setPrefModalOpen(true);
+              }}
+              className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100/70 dark:bg-slate-800/70 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Preferences</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleNavClick();
+                setDigestModalOpen(true);
+              }}
+              className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100/70 dark:bg-slate-800/70 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Weekly Digest</span>
+            </button>
+          </div>
+
           {/* User Profile Links in Mobile Menu */}
           {currentUser && (
-            <div className="pt-2 border-t border-slate-100 space-y-1">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
               <div className="px-2 py-1 flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                   Signed in as {currentUser.displayName || currentUser.email}
                 </span>
               </div>
@@ -328,7 +411,7 @@ export default function Navbar() {
                 <Link
                   to="/profile"
                   onClick={handleNavClick}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
                 >
                   <User className="w-3.5 h-3.5 text-slate-400" />
                   <span>My Profile</span>
@@ -336,7 +419,7 @@ export default function Navbar() {
                 <Link
                   to="/profile?tab=resume"
                   onClick={handleNavClick}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
                 >
                   <FileText className="w-3.5 h-3.5 text-slate-400" />
                   <span>My Resume</span>
@@ -344,7 +427,7 @@ export default function Navbar() {
                 <Link
                   to="/profile/saved-jobs"
                   onClick={handleNavClick}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
                 >
                   <Bookmark className="w-3.5 h-3.5 text-slate-400" />
                   <span>Saved Jobs ({savedJobIds.size})</span>
@@ -352,11 +435,41 @@ export default function Navbar() {
                 <Link
                   to="/profile?tab=history"
                   onClick={handleNavClick}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
                 >
                   <History className="w-3.5 h-3.5 text-slate-400" />
                   <span>ATS History</span>
                 </Link>
+                <Link
+                  to="/alerts"
+                  onClick={handleNavClick}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  <Bell className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Job Alerts</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleNavClick();
+                    setPrefModalOpen(true);
+                  }}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-left"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Preferences</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleNavClick();
+                    setDigestModalOpen(true);
+                  }}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-left"
+                >
+                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Weekly Digest</span>
+                </button>
               </div>
 
               {/* Mobile Admin Link if Admin */}
@@ -365,9 +478,9 @@ export default function Navbar() {
                   <Link
                     to="/admin"
                     onClick={handleNavClick}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200"
+                    className="flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60"
                   >
-                    <Shield className="w-4 h-4 text-amber-600" />
+                    <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span>Admin Dashboard</span>
                   </Link>
                 </div>
@@ -376,7 +489,7 @@ export default function Navbar() {
               <div className="pt-1 flex justify-end">
                 <button
                   onClick={handleLogout}
-                  className="text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-1.5"
+                  className="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 px-3 py-1.5"
                 >
                   Sign Out
                 </button>
@@ -386,5 +499,18 @@ export default function Navbar() {
         </div>
       )}
     </header>
-  );
+
+    {/* Preferences Customizer Modal */}
+    <PreferencesModal
+      isOpen={prefModalOpen}
+      onClose={() => setPrefModalOpen(false)}
+    />
+
+    {/* Weekly Tech Jobs Digest Modal */}
+    <NewsletterDigestModal
+      isOpen={digestModalOpen}
+      onClose={() => setDigestModalOpen(false)}
+    />
+  </>
+);
 }

@@ -233,3 +233,169 @@ export function getJobSkills(job) {
   }
   return [];
 }
+
+/**
+ * Normalizes and extracts timestamp in milliseconds from any job object format.
+ */
+export function getJobTimestamp(job) {
+  if (!job) return null;
+  const raw = job.createdAt || job.date || job.fetchedAt;
+  if (!raw) return null;
+  if (typeof raw === "object" && typeof raw.seconds === "number") {
+    return raw.seconds * 1000;
+  }
+  if (typeof raw === "number") {
+    return raw;
+  }
+  if (typeof raw === "string") {
+    const parsed = new Date(raw).getTime();
+    return isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+/**
+ * Checks whether an experience string denotes a fresher / entry-level / intern position.
+ */
+export function isFresherExperience(rawExp) {
+  if (!rawExp) return false;
+  const exp = String(rawExp).toLowerCase().trim();
+  return (
+    exp.includes("fresher") ||
+    exp.includes("intern") ||
+    exp.includes("0 - 1") ||
+    exp.includes("0-1") ||
+    exp.includes("0 to 1") ||
+    exp.includes("0 year") ||
+    exp.includes("0 yr") ||
+    exp.includes("more than 0") ||
+    exp === "0+ yrs" ||
+    exp === "0 yrs"
+  );
+}
+
+/**
+ * Checks whether a job's experience level matches an experience filter value.
+ * Valid filter values: "fresher", "1-3", "3-5", "5+".
+ */
+export function matchesExperienceFilter(rawExp, filterValue) {
+  if (!filterValue) return true;
+  if (!rawExp) return false;
+
+  const exp = String(rawExp).toLowerCase().trim();
+  const fresher = isFresherExperience(exp);
+
+  if (filterValue === "fresher") {
+    return fresher || exp.includes("entry") || exp.includes("trainee") || exp.includes("apprentice");
+  }
+
+  // Fresher jobs must NOT leak into experienced brackets (1-3, 3-5, 5+)
+  if (fresher) {
+    return false;
+  }
+
+  if (filterValue === "1-3") {
+    if (exp.includes("more than 4") || exp.includes("more than 3") || exp.includes("5+") || exp.includes("senior")) {
+      return false;
+    }
+    return (
+      exp.includes("1 - 2") ||
+      exp.includes("1-2") ||
+      exp.includes("1 to 2") ||
+      exp.includes("1 - 3") ||
+      exp.includes("1-3") ||
+      exp.includes("1 to 3") ||
+      exp.includes("2 - 3") ||
+      exp.includes("2-3") ||
+      exp.includes("2 to 3") ||
+      exp.includes("2 - 4") ||
+      exp.includes("2-4") ||
+      exp.includes("more than 1") ||
+      exp.includes("more than 2") ||
+      exp.includes("1+ yr") ||
+      exp.includes("2+ yr") ||
+      exp.includes("1+ year") ||
+      exp.includes("2+ year") ||
+      exp.includes("junior") ||
+      exp.includes("associate") ||
+      /\b[12]\s*(\+|-|to)?\s*(yrs?|years?)\b/i.test(exp)
+    );
+  }
+
+  if (filterValue === "3-5") {
+    if (exp.includes("more than 5") || exp.includes("6+") || exp.includes("7+")) {
+      return false;
+    }
+    return (
+      exp.includes("3 - 4") ||
+      exp.includes("3-4") ||
+      exp.includes("3 to 4") ||
+      exp.includes("3 - 5") ||
+      exp.includes("3-5") ||
+      exp.includes("3 to 5") ||
+      exp.includes("2 - 4") ||
+      exp.includes("2-4") ||
+      exp.includes("4 - 5") ||
+      exp.includes("4-5") ||
+      exp.includes("more than 3") ||
+      exp.includes("3+ yr") ||
+      exp.includes("4+ yr") ||
+      exp.includes("3+ year") ||
+      exp.includes("4+ year") ||
+      exp.includes("mid") ||
+      /\b[34]\s*(\+|-|to)?\s*(yrs?|years?)\b/i.test(exp)
+    );
+  }
+
+  if (filterValue === "5+") {
+    return (
+      exp.includes("more than 4") ||
+      exp.includes("more than 5") ||
+      exp.includes("5+") ||
+      exp.includes("6+") ||
+      exp.includes("7+") ||
+      exp.includes("8+") ||
+      exp.includes("5 -") ||
+      exp.includes("5-") ||
+      exp.includes("senior") ||
+      exp.includes("lead") ||
+      exp.includes("staff") ||
+      exp.includes("principal") ||
+      exp.includes("architect") ||
+      /\b([5-9]|1[0-9])\s*(\+|-|to)?\s*(yrs?|years?)\b/i.test(exp)
+    );
+  }
+
+  return true;
+}
+
+/**
+ * Cleans and formats salary text for display, stripping raw schema.org JSON strings.
+ */
+export function formatDisplaySalary(rawSalary) {
+  if (!rawSalary) return "";
+  if (typeof rawSalary === "object") {
+    try {
+      const val = rawSalary.value?.value || rawSalary.value?.minValue || rawSalary.minValue || rawSalary.value;
+      const currency = rawSalary.currency === "INR" ? "₹" : (rawSalary.currency === "EUR" ? "€" : (rawSalary.currency === "USD" ? "$" : (rawSalary.currency || "")));
+      if (val) return `${currency}${val}`;
+    } catch {
+      return "";
+    }
+  }
+  const str = String(rawSalary).trim();
+  if (str.startsWith("{") || str.startsWith("[") || str.includes("@type")) {
+    try {
+      const parsed = JSON.parse(str);
+      return formatDisplaySalary(parsed);
+    } catch {
+      return "";
+    }
+  }
+  const lower = str.toLowerCase();
+  if (lower === "null" || lower === "undefined" || lower === "not disclosed" || lower === "competitive" || lower === "n/a") {
+    return "";
+  }
+  return str;
+}
+

@@ -46,6 +46,8 @@ import { useAuth } from "../context/AuthContext";
 import { extractPdfText } from "../utils/pdfExtractor";
 import { useToast } from "../context/ToastContext";
 import SEO from "../components/SEO";
+import ShareJobModal from "../components/ShareJobModal";
+import { calculateJobMatch } from "../utils/jobMatchEngine";
 
 export default function JobDetailPage() {
   const { jobId } = useParams();
@@ -68,6 +70,7 @@ export default function JobDetailPage() {
   const [matchResult, setMatchResult] = useState(null);
   const [extractingPdf, setExtractingPdf] = useState(false);
   const [usingDefaultResume, setUsingDefaultResume] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Reporting modal state
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -134,13 +137,23 @@ export default function JobDetailPage() {
 
   const saved = isJobSaved(jobId);
 
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      showToast("Job link copied to clipboard!");
-    } else {
-      showToast("Share URL: " + window.location.href, "info");
+  // Compute Job Match Intelligence against user preferences
+  const jobMatch = useMemo(() => {
+    if (!job) return null;
+    let prefs = userProfile?.preferences;
+    if (!prefs) {
+      try {
+        const stored = localStorage.getItem("gjl_user_preferences");
+        if (stored) prefs = JSON.parse(stored);
+      } catch (e) {
+        console.warn("Could not read local preferences:", e);
+      }
     }
+    return calculateJobMatch(prefs, job);
+  }, [job, userProfile]);
+
+  const handleShare = () => {
+    setShareOpen(true);
   };
 
   const handleToggleBookmark = async () => {
@@ -379,7 +392,7 @@ export default function JobDetailPage() {
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-slate-50 transition-colors"
+          className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Opportunities</span>
@@ -388,16 +401,16 @@ export default function JobDetailPage() {
         {/* Quick jump to ATS Section */}
         <button
           onClick={scrollToAts}
-          className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3.5 py-2 rounded-xl shadow-2xs transition-all hover:scale-105 active:scale-95"
+          className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-900 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800/80 px-3.5 py-2 rounded-xl shadow-2xs transition-all hover:scale-105 active:scale-95"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          <span>Check ATS Score & Tips</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          <span>Check ATS Score &amp; Tips</span>
         </button>
       </div>
 
       {/* Main Job Card Header */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8 mb-6 transition-colors duration-150">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-start space-x-4">
             {/* Company Avatar */}
             <div
@@ -408,29 +421,29 @@ export default function JobDetailPage() {
 
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
                   {job.title}
                 </h1>
                 {isRemote && (
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                  <span className="bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
                     Remote
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-1">
-                <span className="font-bold text-slate-900 text-sm flex items-center space-x-1">
-                  <Building2 className="w-3.5 h-3.5 text-blue-600" />
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 dark:text-slate-400 pt-1">
+                <span className="font-bold text-slate-900 dark:text-white text-sm flex items-center space-x-1">
+                  <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                   <span>{job.company}</span>
                 </span>
-                <span className="text-slate-300">•</span>
-                <span className="flex items-center space-x-1 text-slate-500">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <span className="flex items-center space-x-1 text-slate-500 dark:text-slate-400">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                   <span>{job.location || "India"}</span>
                 </span>
-                <span className="text-slate-300">•</span>
-                <span className="flex items-center space-x-1 text-slate-500">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <span className="flex items-center space-x-1 text-slate-500 dark:text-slate-400">
+                  <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                   <span>Posted {timeAgo(job.createdAt || job.date)}</span>
                 </span>
               </div>
@@ -443,17 +456,17 @@ export default function JobDetailPage() {
               onClick={handleToggleBookmark}
               className={`p-2.5 rounded-xl border transition-colors shadow-2xs ${
                 saved
-                  ? "border-blue-300 bg-blue-50 text-blue-600"
-                  : "border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-slate-50"
+                  ? "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400"
+                  : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
               title={saved ? "Remove from bookmarks" : "Save this job"}
               aria-label="Bookmark Job"
             >
-              <Bookmark className={`w-4 h-4 ${saved ? "fill-blue-600 text-blue-600" : ""}`} />
+              <Bookmark className={`w-4 h-4 ${saved ? "fill-blue-600 dark:fill-blue-400 text-blue-600 dark:text-blue-400" : ""}`} />
             </button>
             <button
               onClick={handleShare}
-              className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-2xs"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs"
               title="Share job link"
               aria-label="Share Job"
             >
@@ -461,7 +474,7 @@ export default function JobDetailPage() {
             </button>
             <button
               onClick={() => setReportModalOpen(true)}
-              className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors shadow-2xs"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors shadow-2xs"
               title="Report expired or incorrect listing"
               aria-label="Report Listing"
             >
@@ -492,40 +505,81 @@ export default function JobDetailPage() {
           </div>
         </div>
 
+        {/* Career Match Intelligence Banner */}
+        {jobMatch && (
+          <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-purple-950/40 border border-blue-200/80 dark:border-blue-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`text-xs font-black px-2.5 py-0.5 rounded-lg border ${
+                    jobMatch.score >= 85
+                      ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
+                      : jobMatch.score >= 70
+                      ? "bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700"
+                  }`}
+                >
+                  ⚡ {jobMatch.percentage} Career Match
+                </span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  {jobMatch.level}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300">
+                {jobMatch.explanations?.[0] || "Calculated based on your target skills, role preferences, and experience level."}
+              </p>
+              {jobMatch.missingSkills?.length > 0 && (
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">Skills to highlight: </span>
+                  {jobMatch.missingSkills.join(", ")}
+                </div>
+              )}
+            </div>
+
+            <Link
+              to="/for-you"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold shadow-2xs transition-colors shrink-0 self-start sm:self-auto"
+            >
+              <span>Explore My Feed</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
+
         {/* Highlights / Metadata Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 text-xs">
-          <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
               Job Type
             </span>
-            <span className="font-bold text-slate-800 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
               {job.jobType || "Full Time"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
               Experience
             </span>
-            <span className="font-bold text-slate-800 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
               {job.experience || "More than 0 year"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
               Compensation
             </span>
-            <span className="font-bold text-emerald-700 text-xs sm:text-sm">
+            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm">
               {job.salary || "Competitive"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
               Domain
             </span>
-            <span className="font-bold text-slate-800 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
               {job.domain || "Engineering"}
             </span>
           </div>
@@ -534,16 +588,16 @@ export default function JobDetailPage() {
 
       {/* Skills Section (if present) */}
       {skills.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm mb-6">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-2">
-            <Award className="w-4 h-4 text-blue-600" />
-            <span>Required & Preferred Skills</span>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-7 shadow-sm mb-6 transition-colors duration-150">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 flex items-center space-x-2">
+            <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span>Required &amp; Preferred Skills</span>
           </h2>
           <div className="flex flex-wrap gap-2">
             {skills.map((skill, idx) => (
               <span
                 key={idx}
-                className="bg-blue-50/70 text-blue-700 border border-blue-100 font-semibold text-xs px-3 py-1 rounded-lg"
+                className="bg-blue-50/70 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/60 font-semibold text-xs px-3 py-1 rounded-lg"
               >
                 {skill}
               </span>
@@ -918,21 +972,21 @@ export default function JobDetailPage() {
       </section>
 
       {/* Job Description Body */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 mb-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 mb-6 transition-colors duration-150">
         <div>
-          <h2 className="text-base font-bold text-slate-900 pb-3 border-b border-slate-100">
-            About the Role & Requirements
+          <h2 className="text-base font-bold text-slate-900 dark:text-white pb-3 border-b border-slate-100 dark:border-slate-800">
+            About the Role &amp; Requirements
           </h2>
-          <div className="pt-4 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line space-y-3 font-sans selection:bg-blue-100">
+          <div className="pt-4 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line space-y-3 font-sans selection:bg-blue-100 dark:selection:bg-blue-900">
             {description}
           </div>
         </div>
 
         {/* Direct Apply Guarantee Box */}
-        <div className="bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-4 sm:p-5 flex items-start space-x-3.5">
-          <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-          <div className="text-xs text-emerald-900 space-y-1">
-            <h4 className="font-bold text-emerald-950">Direct Application Guarantee</h4>
+        <div className="bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-4 sm:p-5 flex items-start space-x-3.5">
+          <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+          <div className="text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
+            <h4 className="font-bold text-emerald-950 dark:text-emerald-100">Direct Application Guarantee</h4>
             <p className="leading-relaxed">
               GetJobLink never acts as a middleman or charges application fees. The &ldquo;Apply Now&rdquo;
               button takes you directly to the verified employer&apos;s application tracking system
@@ -943,7 +997,7 @@ export default function JobDetailPage() {
       </div>
 
       {/* Bottom Action Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-slate-900 dark:bg-slate-850 text-white rounded-2xl p-6 shadow-md border border-transparent dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <h3 className="font-extrabold text-base tracking-tight">Ready to apply at {job.company}?</h3>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -964,31 +1018,31 @@ export default function JobDetailPage() {
       {/* REPORT ISSUE MODAL */}
       {reportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center space-x-2">
-                <Flag className="w-4 h-4 text-amber-600" />
-                <h3 className="font-bold text-sm text-slate-900">Report Job Listing</h3>
+                <Flag className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">Report Job Listing</h3>
               </div>
               <button
                 onClick={() => setReportModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Help us keep GetJobLink 100% clean and active. If this job is expired, filled, or broken, let our curation team know:
             </p>
 
             <form onSubmit={handleSubmitReport} className="space-y-3 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Issue Type</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Issue Type</label>
                 <select
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold text-slate-800 dark:text-slate-200"
                 >
                   <option value="expired">Job Expired / Requisition Closed</option>
                   <option value="broken_link">Broken Apply Link (404 / Error)</option>
@@ -999,13 +1053,13 @@ export default function JobDetailPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Additional Details (Optional)</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Additional Details (Optional)</label>
                 <textarea
                   value={reportDetails}
                   onChange={(e) => setReportDetails(e.target.value)}
                   placeholder="Provide any specific note or error message seen..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -1013,7 +1067,7 @@ export default function JobDetailPage() {
                 <button
                   type="button"
                   onClick={() => setReportModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold"
                 >
                   Cancel
                 </button>
@@ -1030,6 +1084,12 @@ export default function JobDetailPage() {
           </div>
         </div>
       )}
+      {/* Share Job Modal */}
+      <ShareJobModal
+        job={job}
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 }

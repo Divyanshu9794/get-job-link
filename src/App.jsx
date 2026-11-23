@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -25,6 +26,10 @@ const DisclaimerPage = lazy(() => import("./pages/DisclaimerPage"));
 const EditorialPolicyPage = lazy(() => import("./pages/EditorialPolicyPage"));
 const HiringRadarPage = lazy(() => import("./pages/HiringRadarPage"));
 const CompanyIntelligencePage = lazy(() => import("./pages/CompanyIntelligencePage"));
+const ForYouFeedPage = lazy(() => import("./pages/ForYouFeedPage"));
+const JobAlertsPage = lazy(() => import("./pages/JobAlertsPage"));
+const SeoJobCategoryPage = lazy(() => import("./pages/SeoJobCategoryPage"));
+const UnsubscribePage = lazy(() => import("./pages/UnsubscribePage"));
 
 function PageLoading() {
   return (
@@ -38,8 +43,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ToastProvider>
-          <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
+        <ThemeProvider>
+          <ToastProvider>
+            <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-150 antialiased selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100">
             {/* Responsive Navbar with Single Login & Profile Dropdown */}
             <Navbar />
 
@@ -52,6 +58,13 @@ export default function App() {
                   <Route path="/jobs/india" element={<JobListingPage />} />
                   <Route path="/jobs/world" element={<JobListingPage />} />
                   <Route path="/jobs/remote" element={<JobListingPage />} />
+                  <Route path="/jobs/:categorySlug" element={<SeoJobCategoryPage />} />
+
+                  {/* Personalized For You Feed */}
+                  <Route path="/for-you" element={<ForYouFeedPage />} />
+
+                  {/* Candidate Workflow: Smart Job Alerts */}
+                  <Route path="/alerts" element={<JobAlertsPage />} />
 
                   {/* Dedicated Job Detail Route */}
                   <Route path="/job/:jobId" element={<JobDetailPage />} />
@@ -83,6 +96,7 @@ export default function App() {
                   <Route path="/privacy-policy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/terms-and-conditions" element={<TermsPage />} />
+                  <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
                   {/* Separate Secure Admin Gateway */}
                   <Route path="/admin" element={<AdminPage />} />
@@ -100,7 +114,8 @@ export default function App() {
             <FloatingFeedbackWidget />
           </div>
         </ToastProvider>
-      </AuthProvider>
+      </ThemeProvider>
+    </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -52,6 +52,16 @@ service cloud.firestore {
       match /resumes/{resumeId} {
         allow read, write: if isOwner(userId) || isAdmin();
       }
+
+      // Smart Job Alerts: users/{userId}/alerts/{alertId}
+      match /alerts/{alertId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      // Career Preferences: users/{userId}/preferences/{prefId}
+      match /preferences/{prefId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
     }
 
     // 3. Reports & Feedback (Public create, Admin read/manage)
@@ -83,6 +93,17 @@ service cloud.firestore {
     match /company_analytics/{companySlug} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // 8. Weekly Tech Jobs Digest Subscribers (Public opt-in, Admin read/manage)
+    match /newsletter_subscribers/{subscriberId} {
+      allow create, update: if true;
+      allow read, delete: if isAdmin();
+    }
+
+    // 9. Admin Job Staging & Auto-Fetch Queue (Admin only)
+    match /staging_jobs/{stagingJobId} {
+      allow read, write: if isAdmin();
     }
   }
 }

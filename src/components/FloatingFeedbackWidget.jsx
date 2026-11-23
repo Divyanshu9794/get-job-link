@@ -91,13 +91,13 @@ export default function FloatingFeedbackWidget() {
   return (
     <>
       {/* Floating Pill Button */}
-      <aside aria-label="Feedback widget" className="fixed bottom-6 right-6 z-40 flex items-center bg-white/95 backdrop-blur-md border border-slate-300/80 rounded-full shadow-lg hover:shadow-xl transition-all duration-200">
+      <aside aria-label="Feedback widget" className="fixed bottom-6 right-6 z-40 flex items-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-300/80 dark:border-slate-700/80 rounded-full shadow-lg hover:shadow-xl transition-all duration-200">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-2 pl-4 pr-2.5 py-2.5 text-xs font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer select-none"
+          className="flex items-center space-x-2 pl-4 pr-2.5 py-2.5 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer select-none"
           title="Give feedback"
         >
-          <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
             <MessageSquare className="w-3.5 h-3.5" />
           </div>
           <span>Feedback</span>
@@ -105,7 +105,7 @@ export default function FloatingFeedbackWidget() {
 
         <button
           onClick={handleDismiss}
-          className="pr-3 pl-1.5 py-2.5 text-slate-400 hover:text-rose-600 border-l border-slate-200 transition-colors cursor-pointer"
+          className="pr-3 pl-1.5 py-2.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 border-l border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
           title="Don't show this again"
           aria-label="Dismiss feedback button permanently"
         >
@@ -116,22 +116,22 @@ export default function FloatingFeedbackWidget() {
       {/* Feedback Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in">
-          <div className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 my-8">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 my-8 transition-colors">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <MessageSquare className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900">Platform Feedback</h3>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">Platform Feedback</h3>
                   <p className="text-[11px] text-slate-400">Help us make GetJobLink better for candidates</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 aria-label="Close feedback modal"
               >
                 <X className="w-5 h-5" />
@@ -142,14 +142,14 @@ export default function FloatingFeedbackWidget() {
             {!currentUser ? (
               /* Signed-out state: Prompt Google Login */
               <div className="text-center py-6 space-y-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto border border-amber-200">
+                <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto border border-amber-200 dark:border-amber-800">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-slate-900">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                     Sign In Required to Submit Feedback
                   </h4>
-                  <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto leading-relaxed">
                     Feedback submission is reserved for authenticated members so our product team can follow up directly on your experience.
                   </p>
                 </div>
@@ -162,9 +162,9 @@ export default function FloatingFeedbackWidget() {
                         showToast("Sign in failed: " + err.message, "error");
                       }
                     }}
-                    className="inline-flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+                    className="inline-flex items-center space-x-2 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
                   >
-                    <LogIn className="w-4 h-4 text-blue-400" />
+                    <LogIn className="w-4 h-4 text-blue-400 dark:text-white" />
                     <span>Sign In with Google</span>
                   </button>
                 </div>
@@ -172,11 +172,11 @@ export default function FloatingFeedbackWidget() {
             ) : submitted ? (
               /* Success state */
               <div className="text-center py-8 space-y-3">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-black text-slate-900">Thank You for Your Feedback!</h4>
-                <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                <h4 className="text-sm font-black text-slate-900 dark:text-white">Thank You for Your Feedback!</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                   Your feedback has been delivered directly to the team.
                 </p>
               </div>
@@ -184,21 +184,21 @@ export default function FloatingFeedbackWidget() {
               /* Authenticated Feedback Form */
               <form onSubmit={handleSubmit} className="space-y-4 text-xs">
                 {/* User Identification Banner */}
-                <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl">
                   <div className="flex items-center space-x-2 min-w-0">
-                    <User className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                    <span className="font-semibold text-slate-800 truncate">
+                    <User className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
                       {currentUser.displayName || currentUser.email}
                     </span>
                   </div>
-                  <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider shrink-0">
+                  <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/80 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider shrink-0">
                     Verified Member
                   </span>
                 </div>
 
                 {/* Rating Picker */}
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     How would you rate your experience? *
                   </label>
                   <div className="flex items-center space-x-1.5">
@@ -209,14 +209,14 @@ export default function FloatingFeedbackWidget() {
                         onClick={() => setRating(star)}
                         className={`p-2 rounded-xl border transition-all cursor-pointer ${
                           star <= rating
-                            ? "bg-amber-50 border-amber-300 text-amber-500 shadow-2xs"
-                            : "bg-slate-50 border-slate-200 text-slate-300 hover:text-amber-400"
+                            ? "bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-500 dark:text-amber-400 shadow-2xs"
+                            : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 hover:text-amber-400"
                         }`}
                       >
                         <Star className={`w-4 h-4 ${star <= rating ? "fill-amber-400" : ""}`} />
                       </button>
                     ))}
-                    <span className="text-xs font-bold text-slate-600 pl-2">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 pl-2">
                       {rating === 5 && "⭐ Excellent"}
                       {rating === 4 && "⭐ Very Good"}
                       {rating === 3 && "⭐ Good"}
@@ -228,13 +228,13 @@ export default function FloatingFeedbackWidget() {
 
                 {/* Category Picker */}
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Feedback Category *
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
                   >
                     <option value="Platform Experience">Overall Platform &amp; UI Experience</option>
                     <option value="ATS Matcher">Role-Wise ATS Evaluation Tool</option>
@@ -247,7 +247,7 @@ export default function FloatingFeedbackWidget() {
 
                 {/* Feedback Textarea */}
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Your Feedback &amp; Suggestions *
                   </label>
                   <textarea
@@ -256,7 +256,7 @@ export default function FloatingFeedbackWidget() {
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     placeholder="Tell us what you like, what felt confusing, or what features would help your job search..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
 
@@ -264,7 +264,7 @@ export default function FloatingFeedbackWidget() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2.5 text-slate-600 hover:text-slate-900 font-bold transition-colors cursor-pointer"
+                    className="px-4 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>

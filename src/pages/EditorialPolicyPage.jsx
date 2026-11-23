@@ -4,32 +4,32 @@ import SEO from "../components/SEO";
 
 export default function EditorialPolicyPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 antialiased pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased pb-16 transition-colors duration-200">
       <SEO
         title="Editorial Policy & Curation Standards"
         description="Learn how GetJobLink curates daily tech job openings, prevents recruitment fraud, verifies application links, and authors technical career roadmaps."
         canonicalUrl="/editorial-policy"
       />
 
-      <section className="bg-white border-b border-slate-200 py-10 sm:py-14">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-10 sm:py-14 transition-colors">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-3">
-          <div className="inline-flex items-center space-x-2 bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+          <div className="inline-flex items-center space-x-2 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span>Editorial Standards</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
             GetJobLink Editorial &amp; Curation Policy
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
             Our strict standards for listing verification, fraud prevention, and original career publications.
           </p>
         </div>
       </section>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10">
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs space-y-8 text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xs space-y-8 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
               1. Job Curation &amp; Verification Principles
             </h2>
             <p>
@@ -39,31 +39,31 @@ export default function EditorialPolicyPage() {
             </p>
             <div className="space-y-2 pt-1">
               <div className="flex items-start space-x-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Official ATS Destination:</strong> The application link must route directly to an
+                  <strong className="text-slate-900 dark:text-white">Official ATS Destination:</strong> The application link must route directly to an
                   authenticated corporate career portal (e.g. Greenhouse, Lever, Workday, SmartRecruiters) or
                   the employer&apos;s verified primary domain.
                 </span>
               </div>
               <div className="flex items-start space-x-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Zero Intermediary Forms:</strong> We never capture, hold, or sell user resumes as an
+                  <strong className="text-slate-900 dark:text-white">Zero Intermediary Forms:</strong> We never capture, hold, or sell user resumes as an
                   intermediary. Candidates apply directly on the employer&apos;s system.
                 </span>
               </div>
               <div className="flex items-start space-x-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>No Fee Prohibition:</strong> Any employer, recruiter, or listing requesting application
+                  <strong className="text-slate-900 dark:text-white">No Fee Prohibition:</strong> Any employer, recruiter, or listing requesting application
                   fees, interview fees, or training costs is permanently blacklisted.
                 </span>
               </div>
               <div className="flex items-start space-x-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Clean Metadata Integrity:</strong> We preserve original job descriptions, company
+                  <strong className="text-slate-900 dark:text-white">Clean Metadata Integrity:</strong> We preserve original job descriptions, company
                   names, and requirements without fabricating salary data or distorting qualifications.
                 </span>
               </div>
@@ -71,11 +71,11 @@ export default function EditorialPolicyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
               2. Career Guides &amp; Educational Publications
             </h2>
             <p>
-              Our <Link to="/career-guides" className="text-blue-600 font-semibold hover:underline">Career Guides</Link> are
+              Our <Link to="/career-guides" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Career Guides</Link> are
               researched and authored by senior technical contributors and industry practitioners. We reject
               content-farm spam and thin automated summaries.
             </p>
@@ -90,7 +90,7 @@ export default function EditorialPolicyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
               3. Corrections &amp; Listing Removal Policy
             </h2>
             <p>

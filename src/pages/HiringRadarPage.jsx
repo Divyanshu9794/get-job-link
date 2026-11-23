@@ -145,7 +145,7 @@ export default function HiringRadarPage() {
   }, [radarData, skillsRange]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 antialiased pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased pb-20 transition-colors duration-150">
       <SEO
         title="Hiring Radar — Tech Companies Actively Hiring & In-Demand Skills | GetJobLink"
         description="Discover which tech companies are actively posting jobs, popular engineering skills in demand, and newly verified tech employers on GetJobLink."
@@ -153,10 +153,10 @@ export default function HiringRadarPage() {
       />
 
       {/* Hero Banner */}
-      <section className="bg-gradient-to-b from-white via-slate-50 to-slate-100 border-b border-slate-200 py-10 sm:py-14">
+      <section className="bg-gradient-to-b from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 border-b border-slate-200 dark:border-slate-800 py-10 sm:py-14 transition-colors duration-150">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl space-y-3">
-            <div className="inline-flex items-center space-x-2 bg-blue-50 border border-blue-200/80 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center space-x-2 bg-blue-50 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
@@ -165,11 +165,11 @@ export default function HiringRadarPage() {
               <span>Real-Time Hiring Intelligence</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
               GetJobLink Hiring Radar
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
               Track companies with increasing job postings, discover multi-role engineering employers,
               and benchmark in-demand tech skills—derived strictly from authenticated direct ATS listings.
             </p>
@@ -183,20 +183,20 @@ export default function HiringRadarPage() {
           <div className="space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-28 bg-white border border-slate-200 rounded-2xl animate-pulse p-5" />
+                <div key={i} className="h-28 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl animate-pulse p-5" />
               ))}
             </div>
-            <div className="h-64 bg-white border border-slate-200 rounded-2xl animate-pulse p-6" />
+            <div className="h-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl animate-pulse p-6" />
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-rose-800 flex items-center justify-between">
+          <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-6 text-rose-800 dark:text-rose-200 flex items-center justify-between">
             <p className="text-xs sm:text-sm font-semibold">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-3.5 py-1.5 bg-white text-rose-700 border border-rose-200 rounded-xl text-xs font-bold hover:bg-rose-100 transition-colors"
+              className="px-3.5 py-1.5 bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors"
             >
               Retry
             </button>
@@ -210,54 +210,54 @@ export default function HiringRadarPage() {
             {/* ========================================================================= */}
             <section className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Platform Hiring Snapshot
                 </h2>
-                <span className="text-[11px] text-slate-500 flex items-center space-x-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center space-x-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                   <span>Calculated from {radarData.totalActiveJobs?.toLocaleString()} verified listings</span>
                 </span>
               </div>
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Metric 1: Companies Currently Hiring */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="text-xs font-bold text-slate-600">Companies Hiring</span>
-                    <Building2 className="w-4 h-4 text-blue-600" />
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-slate-500">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Companies Hiring</span>
+                    <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                     {radarData.overview?.companiesHiring?.toLocaleString() || radarData.overview?.totalCompanies}
                   </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     Across {radarData.overview?.totalCompanies} indexed tech employers
                   </div>
                 </div>
 
                 {/* Metric 2: New Companies Discovered This Week */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="text-xs font-bold text-slate-600">New Companies (7d)</span>
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-slate-500">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">New Companies (7d)</span>
+                    <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight">
                     +{radarData.overview?.newCompaniesThisWeek?.toLocaleString() || 0}
                   </div>
-                  <div className="text-[11px] text-emerald-800 font-medium flex items-center space-x-1">
+                  <div className="text-[11px] text-emerald-800 dark:text-emerald-300 font-medium flex items-center space-x-1">
                     <span>First observed on GetJobLink in past 7 days</span>
                   </div>
                 </div>
 
                 {/* Metric 3: New Jobs Added This Week */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="text-xs font-bold text-slate-600">New Listings (7d)</span>
-                    <TrendingUp className="w-4 h-4 text-indigo-600" />
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-slate-500">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">New Listings (7d)</span>
+                    <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-indigo-700 tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-black text-indigo-700 dark:text-indigo-400 tracking-tight">
                     +{radarData.overview?.newJobsThisWeek?.toLocaleString() || 0}
                   </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     {radarData.overview?.newJobsPrevWeek > 0
                       ? `${radarData.overview.newJobsPrevWeek} listings added in previous 7d`
                       : "Fresh verified openings"}
@@ -265,15 +265,15 @@ export default function HiringRadarPage() {
                 </div>
 
                 {/* Metric 4: Companies Hiring Across Multiple Roles */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-2">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="text-xs font-bold text-slate-600">Multi-Role Employers</span>
-                    <Layers className="w-4 h-4 text-amber-600" />
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-slate-500">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Multi-Role Employers</span>
+                    <Layers className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-amber-700 tracking-tight">
+                  <div className="text-2xl sm:text-3xl font-black text-amber-700 dark:text-amber-400 tracking-tight">
                     {radarData.overview?.multiRoleCompanies?.toLocaleString() || 0}
                   </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     Hiring for 2+ distinct engineering roles
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export default function HiringRadarPage() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Search company or skill..."
-                      className="pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-44 sm:w-56"
+                      className="pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 w-44 sm:w-56"
                     />
                   </div>
 
@@ -316,7 +316,7 @@ export default function HiringRadarPage() {
                   <select
                     value={workModeFilter}
                     onChange={(e) => setWorkModeFilter(e.target.value)}
-                    className="text-xs bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="all">All Modes</option>
                     <option value="remote">Remote Only</option>
@@ -327,7 +327,7 @@ export default function HiringRadarPage() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="text-xs bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="velocity">Fastest Growing (7d)</option>
                     <option value="active">Most Active Jobs</option>
@@ -345,7 +345,7 @@ export default function HiringRadarPage() {
                   return (
                     <div
                       key={comp.slug}
-                      className="bg-white border border-slate-200/90 hover:border-blue-400 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                      className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
                     >
                       <div className="space-y-3">
                         {/* Company Header */}
@@ -359,18 +359,18 @@ export default function HiringRadarPage() {
                             <div>
                               <Link
                                 to={`/hiring-radar/company/${comp.slug}`}
-                                className="font-extrabold text-sm text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 hover:underline"
+                                className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 hover:underline"
                               >
                                 {comp.companyName}
                               </Link>
-                              <div className="flex items-center space-x-1.5 text-xs text-slate-500 mt-0.5">
-                                <span className="font-bold text-slate-700">
+                              <div className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                <span className="font-bold text-slate-700 dark:text-slate-300">
                                   {comp.activeJobs} active {comp.activeJobs === 1 ? "job" : "jobs"}
                                 </span>
                                 {comp.isMultiRole && (
                                   <>
                                     <span>•</span>
-                                    <span className="text-blue-600 font-semibold text-[11px]">
+                                    <span className="text-blue-600 dark:text-blue-400 font-semibold text-[11px]">
                                       {comp.distinctRolesCount} roles
                                     </span>
                                   </>
@@ -383,12 +383,12 @@ export default function HiringRadarPage() {
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${
                               comp.trend === "Surging"
-                                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
                                 : comp.trend === "Increasing"
-                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                ? "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
                                 : comp.trend === "New This Week"
-                                ? "bg-amber-50 text-amber-800 border-amber-200"
-                                : "bg-slate-100 text-slate-600 border-slate-200"
+                                ? "bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
                             }`}
                           >
                             {comp.trend}
@@ -396,20 +396,20 @@ export default function HiringRadarPage() {
                         </div>
 
                         {/* Recent Activity Indicators */}
-                        <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-750">
                           <div>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase block">
                               Last 7 Days
                             </span>
-                            <span className="font-extrabold text-slate-900">
+                            <span className="font-extrabold text-slate-900 dark:text-white">
                               {comp.jobsLast7d > 0 ? `+${comp.jobsLast7d} jobs` : "0 new"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase block">
                               Last 30 Days
                             </span>
-                            <span className="font-extrabold text-slate-900">
+                            <span className="font-extrabold text-slate-900 dark:text-white">
                               {comp.jobsLast30d > 0 ? `+${comp.jobsLast30d} jobs` : "0 new"}
                             </span>
                           </div>
@@ -421,7 +421,7 @@ export default function HiringRadarPage() {
                             {comp.topSkills.slice(0, 4).map((skill) => (
                               <span
                                 key={skill}
-                                className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium"
+                                className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md font-medium"
                               >
                                 {skill}
                               </span>
@@ -431,7 +431,7 @@ export default function HiringRadarPage() {
 
                         {/* Location Preview */}
                         {comp.topLocations && comp.topLocations.length > 0 && (
-                          <div className="flex items-center space-x-1 text-slate-500 text-[11px] truncate">
+                          <div className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 text-[11px] truncate">
                             <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                             <span className="truncate">{comp.topLocations.join(", ")}</span>
                           </div>
@@ -441,7 +441,7 @@ export default function HiringRadarPage() {
                       {/* Footer CTA */}
                       <Link
                         to={`/hiring-radar/company/${comp.slug}`}
-                        className="w-full inline-flex items-center justify-center space-x-1 text-xs font-bold py-2 px-3 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl transition-all"
+                        className="w-full inline-flex items-center justify-center space-x-1 text-xs font-bold py-2 px-3 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-600 dark:hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white dark:hover:text-white rounded-xl transition-all"
                       >
                         <span>View Company Intelligence</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -452,8 +452,8 @@ export default function HiringRadarPage() {
               </div>
 
               {/* Factual Disclaimer Banner */}
-              <div className="bg-slate-100 border border-slate-200/80 rounded-2xl p-4 flex items-start space-x-3 text-xs text-slate-500">
-                <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 flex items-start space-x-3 text-xs text-slate-500 dark:text-slate-400">
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
                   <strong>Methodology Note:</strong> Hiring trends reflect actual verified job postings discovered and validated on GetJobLink. Increased posting activity establishes active hiring initiatives on the platform, not necessarily company-wide headcount expansion.
                 </p>
@@ -466,26 +466,26 @@ export default function HiringRadarPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left 2 Cols: In-Demand Skills */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                   <div>
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                       Most In-Demand Technologies &amp; Skills
                     </h2>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       Frequency of technical requirements extracted across active job listings
                     </p>
                   </div>
 
                   {/* Skills Time Filter */}
-                  <div className="flex bg-slate-100 p-1 rounded-xl text-xs self-start sm:self-auto">
+                  <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs self-start sm:self-auto border border-slate-200/50 dark:border-slate-700">
                     {["7d", "30d", "90d", "all"].map((r) => (
                       <button
                         key={r}
                         onClick={() => setSkillsRange(r)}
                         className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                           skillsRange === r
-                            ? "bg-white text-blue-600 shadow-2xs"
-                            : "text-slate-600 hover:text-slate-900"
+                            ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-2xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         }`}
                       >
                         {r === "7d" ? "7 Days" : r === "30d" ? "30 Days" : r === "90d" ? "90 Days" : "All Time"}
@@ -495,25 +495,25 @@ export default function HiringRadarPage() {
                 </div>
 
                 {/* Skills Progress List */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-3.5">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-3.5">
                   {currentSkills.slice(0, 12).map((skill, index) => (
                     <div key={skill.name} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center space-x-2">
-                          <span className="font-mono text-slate-400 text-[11px] w-4">
+                          <span className="font-mono text-slate-400 dark:text-slate-500 text-[11px] w-4">
                             #{index + 1}
                           </span>
-                          <span className="font-bold text-slate-900">{skill.name}</span>
+                          <span className="font-bold text-slate-900 dark:text-white">{skill.name}</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-slate-500 text-[11px]">
+                        <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-400 text-[11px]">
                           <span>{skill.count} jobs</span>
-                          <span className="text-slate-300">•</span>
-                          <span className="font-semibold text-blue-600">{skill.percentage}% of roles</span>
+                          <span className="text-slate-300 dark:text-slate-700">•</span>
+                          <span className="font-semibold text-blue-600 dark:text-blue-400">{skill.percentage}% of roles</span>
                         </div>
                       </div>
 
                       {/* Visual Bar */}
-                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                         <div
                           className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${Math.min(100, Math.max(8, skill.percentage * 2))}%` }}
@@ -526,16 +526,16 @@ export default function HiringRadarPage() {
 
               {/* Right 1 Col: Newly Discovered Companies */}
               <div className="space-y-4">
-                <div className="border-b border-slate-200 pb-3">
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                     Newly Discovered
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Companies indexed on GetJobLink for the first time
                   </p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs divide-y divide-slate-100">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs divide-y divide-slate-100 dark:divide-slate-800">
                   {radarData.newlyDiscoveredCompanies?.slice(0, 7).map((comp) => {
                     const initials = getCompanyInitials(comp.companyName);
                     const color = getCompanyColor(comp.companyName);
@@ -544,7 +544,7 @@ export default function HiringRadarPage() {
                       <Link
                         key={comp.slug}
                         to={`/hiring-radar/company/${comp.slug}`}
-                        className="py-3 first:pt-0 last:pb-0 flex items-center justify-between group hover:bg-slate-50 -mx-2 px-2 rounded-xl transition-colors"
+                        className="py-3 first:pt-0 last:pb-0 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/60 -mx-2 px-2 rounded-xl transition-colors"
                       >
                         <div className="flex items-center space-x-2.5 min-w-0">
                           <div
@@ -553,16 +553,16 @@ export default function HiringRadarPage() {
                             {initials}
                           </div>
                           <div className="min-w-0">
-                            <span className="font-bold text-xs text-slate-900 group-hover:text-blue-600 transition-colors block truncate">
+                            <span className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors block truncate">
                               {comp.companyName}
                             </span>
-                            <span className="text-[11px] text-slate-400 block truncate">
+                            <span className="text-[11px] text-slate-400 dark:text-slate-500 block truncate">
                               {comp.activeJobs} open {comp.activeJobs === 1 ? "position" : "positions"}
                             </span>
                           </div>
                         </div>
 
-                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0" />
                       </Link>
                     );
                   })}
@@ -573,12 +573,12 @@ export default function HiringRadarPage() {
             {/* ========================================================================= */}
             {/* SECTION E: HIRING BY LOCATION                                             */}
             {/* ========================================================================= */}
-            <section className="space-y-4 pt-4 border-t border-slate-200">
+            <section className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
               <div>
-                <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                   Hiring Hotspots by Location
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Top engineering hubs with direct authenticated job listings
                 </p>
               </div>
@@ -587,16 +587,16 @@ export default function HiringRadarPage() {
                 {radarData.locations?.slice(0, 8).map((loc) => (
                   <div
                     key={loc.city}
-                    className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-2 hover:border-blue-400 transition-colors"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs space-y-2 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-sm text-slate-900">{loc.city}</span>
-                      <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                      <span className="font-extrabold text-sm text-slate-900 dark:text-white">{loc.city}</span>
+                      <span className="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 text-xs font-bold px-2 py-0.5 rounded-full">
                         {loc.count} jobs
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-slate-500 line-clamp-1">
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
                       {loc.topCompanies?.length > 0 && (
                         <span>Hiring: {loc.topCompanies.join(", ")}</span>
                       )}
@@ -609,22 +609,22 @@ export default function HiringRadarPage() {
             {/* ========================================================================= */}
             {/* BEHIND THE RADAR — CREATOR & TRANSPARENCY CALLOUT                         */}
             {/* ========================================================================= */}
-            <section className="pt-4 border-t border-slate-200">
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+            <section className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-5 transition-colors duration-150">
                 <div className="flex items-start space-x-3.5">
                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
                     DS
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">
                         Behind the Radar
                       </h3>
-                      <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.2 rounded-full border border-slate-200">
+                      <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.2 rounded-full border border-slate-200 dark:border-slate-700">
                         Built by Divyanshu Singh
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
                       Hiring Radar is part of GetJobLink, an independently built platform by Divyanshu Singh. It transforms job listing data into useful hiring activity insights to help candidates discover companies, roles and in-demand technologies.
                     </p>
                   </div>
@@ -633,16 +633,16 @@ export default function HiringRadarPage() {
                 <div className="flex items-center space-x-3 shrink-0 self-start sm:self-auto text-xs font-bold pt-1 sm:pt-0">
                   <Link
                     to="/about#meet-the-builder"
-                    className="text-blue-600 hover:text-blue-700 hover:underline"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                   >
                     About GetJobLink
                   </Link>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-300 dark:text-slate-700">•</span>
                   <a
                     href="https://github.com/Divyanshu9794/get-job-link"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-slate-600 hover:text-slate-900 hover:underline"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:underline"
                   >
                     GitHub
                   </a>

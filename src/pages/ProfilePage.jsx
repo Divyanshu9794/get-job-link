@@ -399,15 +399,15 @@ export default function ProfilePage() {
   if (!currentUser) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-sm space-y-5">
-          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-xs space-y-5">
+          <div className="w-14 h-14 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto">
             <User className="w-7 h-7" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
               Sign In to Access Your Profile
             </h1>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Maintain your saved jobs, manage your default resume, and review your historical ATS
               evaluations across job applications.
             </p>
@@ -420,7 +420,7 @@ export default function ProfilePage() {
             <span>Sign in with Google</span>
           </button>
           <div className="pt-2">
-            <Link to="/jobs/india" className="text-xs text-slate-400 hover:text-slate-700">
+            <Link to="/jobs/india" className="text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
               ← Browse active jobs
             </Link>
           </div>
@@ -435,33 +435,33 @@ export default function ProfilePage() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
       <SEO title="User Profile & Resume Management" noIndex={true} />
       {/* Profile Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs mb-8 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs mb-8 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
           {currentUser.photoURL ? (
             <img
               src={currentUser.photoURL}
               alt={currentUser.displayName || "User"}
-              className="w-20 h-20 rounded-2xl object-cover border-2 border-slate-200 shadow-xs"
+              className="w-20 h-20 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-xs"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-blue-100 text-blue-700 font-black text-2xl flex items-center justify-center border-2 border-blue-200">
+            <div className="w-20 h-20 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 font-black text-2xl flex items-center justify-center border-2 border-blue-200 dark:border-blue-800">
               {currentUser.displayName ? currentUser.displayName[0].toUpperCase() : "U"}
             </div>
           )}
 
           <div className="space-y-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 {currentUser.displayName || "Job Seeker"}
               </h1>
-              <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center space-x-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+              <span className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/80 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center space-x-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                 <span>Verified Account</span>
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">{currentUser.email}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{currentUser.email}</p>
             {userProfile?.headline && (
-              <p className="text-xs font-semibold text-slate-700 pt-0.5">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 pt-0.5">
                 {userProfile.headline}
               </p>
             )}
@@ -469,19 +469,19 @@ export default function ProfilePage() {
         </div>
 
         {/* Quick Stats Pill */}
-        <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/90 p-3 rounded-2xl self-stretch sm:self-auto justify-around sm:justify-start">
+        <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/80 p-3 rounded-2xl self-stretch sm:self-auto justify-around sm:justify-start">
           <div className="text-center px-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Saved Jobs</span>
-            <span className="text-base font-black text-slate-900">{savedJobIds.size}</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-400 block">Saved Jobs</span>
+            <span className="text-base font-black text-slate-900 dark:text-white">{savedJobIds.size}</span>
           </div>
-          <div className="w-px h-8 bg-slate-200" />
+          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
           <div className="text-center px-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Default Resume</span>
-            <span className="text-xs font-bold text-slate-800 flex items-center justify-center space-x-1 mt-0.5">
+            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-400 block">Default Resume</span>
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center space-x-1 mt-0.5">
               {defaultResume ? (
-                <span className="text-emerald-600 font-bold">Active</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">Active</span>
               ) : (
-                <span className="text-slate-400">None</span>
+                <span className="text-slate-400 dark:text-slate-500">None</span>
               )}
             </span>
           </div>
@@ -489,13 +489,13 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center space-x-1.5 bg-slate-200/60 p-1 rounded-2xl border border-slate-200 mb-6 overflow-x-auto">
+      <div className="flex items-center space-x-1.5 bg-slate-200/60 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 mb-6 overflow-x-auto">
         <button
           onClick={() => navigate("/profile?tab=profile")}
           className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "profile"
-              ? "bg-white text-blue-600 shadow-xs"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700/50"
           }`}
         >
           <User className="w-3.5 h-3.5" />
@@ -506,8 +506,8 @@ export default function ProfilePage() {
           onClick={() => navigate("/profile?tab=resume")}
           className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "resume"
-              ? "bg-white text-blue-600 shadow-xs"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700/50"
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -519,14 +519,14 @@ export default function ProfilePage() {
           onClick={() => navigate("/profile/saved-jobs")}
           className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "saved"
-              ? "bg-white text-blue-600 shadow-xs"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700/50"
           }`}
         >
           <Bookmark className="w-3.5 h-3.5" />
           <span>Saved Jobs</span>
           {savedJobIds.size > 0 && (
-            <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.2 rounded-full font-bold">
+            <span className="text-[10px] bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 px-1.5 py-0.2 rounded-full font-bold">
               {savedJobIds.size}
             </span>
           )}
@@ -536,8 +536,8 @@ export default function ProfilePage() {
           onClick={() => navigate("/profile?tab=history")}
           className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "history"
-              ? "bg-white text-blue-600 shadow-xs"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700/50"
           }`}
         >
           <History className="w-3.5 h-3.5" />
@@ -548,8 +548,8 @@ export default function ProfilePage() {
           onClick={() => navigate("/profile?tab=feedback")}
           className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "feedback"
-              ? "bg-white text-blue-600 shadow-xs"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-white/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-700/50"
           }`}
         >
           <ThumbsUp className="w-3.5 h-3.5" />
@@ -559,68 +559,68 @@ export default function ProfilePage() {
 
       {/* TAB 1: PROFILE INFORMATION */}
       {activeTab === "profile" && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
           <div>
-            <h2 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center space-x-2">
-              <User className="w-4 h-4 text-blue-600" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
+              <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>Personal Career Profile</span>
             </h2>
-            <p className="text-xs text-slate-500 pt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
               Keep your profile up to date to get tailored role alerts and auto-populate your ATS evaluations.
             </p>
           </div>
 
           <form onSubmit={handleSaveProfile} className="space-y-4 max-w-2xl">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
               <input
                 type="text"
                 disabled
                 value={currentUser.displayName || ""}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-600 dark:text-slate-400 cursor-not-allowed"
               />
-              <span className="text-[10px] text-slate-400 mt-1 block">Synchronized from Google account</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Synchronized from Google account</span>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
               <input
                 type="email"
                 disabled
                 value={currentUser.email || ""}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-600 dark:text-slate-400 cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Professional Headline</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Professional Headline</label>
               <input
                 type="text"
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="e.g. Senior Frontend Engineer | React & TypeScript Enthusiast"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Target Role Category</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Target Role Category</label>
                 <input
                   type="text"
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="e.g. Full Stack Developer"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Experience Level</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Experience Level</label>
                 <select
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="fresher">Fresher (0-1 yr)</option>
                   <option value="1-3 years">1-3 Years</option>
@@ -632,13 +632,13 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Primary Tech Skills (comma-separated)</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Primary Tech Skills (comma-separated)</label>
               <input
                 type="text"
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
                 placeholder="React, TypeScript, Node.js, PostgreSQL, AWS"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -658,28 +658,28 @@ export default function ProfilePage() {
 
       {/* TAB 2: RESUME MANAGEMENT */}
       {activeTab === "resume" && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
           <div>
-            <h2 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center space-x-2">
-              <FileText className="w-4 h-4 text-blue-600" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2">
+              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>Default Resume & ATS Profile</span>
             </h2>
           </div>
 
           {/* Current Saved Resume Card */}
           {defaultResume ? (
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 max-w-2xl">
+            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 space-y-4 max-w-2xl">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div className="space-y-0.5">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-bold text-sm text-slate-900 max-w-xs truncate">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white max-w-xs truncate">
                         {defaultResume.fileName}
                       </h3>
-                      <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.2 rounded-md">
+                      <span className="bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.2 rounded-md">
                         Default Resume
                       </span>
                     </div>
@@ -695,7 +695,7 @@ export default function ProfilePage() {
                       href={defaultResume.downloadUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 text-slate-600 hover:text-blue-600 hover:bg-white rounded-xl border border-slate-200 transition-colors shadow-2xs"
+                      className="p-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
                       title="Preview Resume"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -703,7 +703,7 @@ export default function ProfilePage() {
                   )}
                   <button
                     onClick={handleDeleteResume}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors"
+                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
                     title="Delete Resume"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -712,25 +712,25 @@ export default function ProfilePage() {
               </div>
 
               {defaultResume.extractedText ? (
-                <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-xs text-slate-600 space-y-1">
-                  <span className="font-bold text-slate-800 flex items-center space-x-1.5 text-[11px] uppercase tracking-wider text-slate-400">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                  <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center space-x-1.5 text-[11px] uppercase tracking-wider text-slate-400">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Parsed Content Ready for Automatic ATS Matching</span>
                   </span>
-                  <p className="line-clamp-2 text-[11px] text-slate-500 font-mono">
+                  <p className="line-clamp-2 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                     {defaultResume.extractedText.slice(0, 220)}...
                   </p>
                 </div>
               ) : (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3">
                   Text parsing not available for this file type. You can replace it with a text-selectable PDF.
                 </p>
               )}
 
               {/* Replace Resume Action */}
               <div className="pt-2 flex items-center space-x-3">
-                <label className="cursor-pointer inline-flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-xl shadow-2xs transition-colors">
-                  <Upload className="w-3.5 h-3.5 text-blue-600" />
+                <label className="cursor-pointer inline-flex items-center space-x-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-semibold px-4 py-2 rounded-xl shadow-2xs transition-colors">
+                  <Upload className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                   <span>Replace With New File</span>
                   <input
                     type="file"
@@ -742,7 +742,7 @@ export default function ProfilePage() {
                 </label>
                 <Link
                   to="/resume"
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   Or build a new ATS resume
                 </Link>
@@ -750,13 +750,13 @@ export default function ProfilePage() {
             </div>
           ) : (
             /* Empty State: Upload Prompt */
-            <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 sm:p-12 text-center max-w-2xl space-y-4">
-              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl p-8 sm:p-12 text-center max-w-2xl space-y-4">
+              <div className="w-14 h-14 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto">
                 <Upload className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-sm text-slate-900">Upload Your Default Resume</h3>
-                <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">Upload Your Default Resume</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                   Upload your PDF or DOCX resume once. When browsing tech jobs on GetJobLink, you can
                   run instant, 1-click ATS score benchmarks without having to copy-paste your resume each time.
                 </p>
@@ -776,7 +776,7 @@ export default function ProfilePage() {
                 </label>
               </div>
 
-              <p className="text-[11px] text-slate-400">Maximum file size: 5MB • Formats: PDF, DOCX</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">Maximum file size: 5MB • Formats: PDF, DOCX</p>
             </div>
           )}
         </div>
@@ -784,18 +784,18 @@ export default function ProfilePage() {
 
       {/* TAB 3: SAVED JOBS */}
       {activeTab === "saved" && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
           <div>
-            <h2 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Bookmark className="w-4 h-4 text-blue-600" />
+                <Bookmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>My Bookmarked Opportunities</span>
               </div>
               <span className="text-xs font-semibold text-slate-400">
                 {savedJobsList.length} saved
               </span>
             </h2>
-            <p className="text-xs text-slate-500 pt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
               Review and apply directly to roles you bookmarked while browsing.
             </p>
           </div>
@@ -803,16 +803,16 @@ export default function ProfilePage() {
           {loadingSavedJobs ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse" />
+                <div key={i} className="h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : savedJobsList.length === 0 ? (
             <div className="text-center py-12 space-y-3">
-              <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
                 <Bookmark className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-sm text-slate-800">No Saved Jobs Yet</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">No Saved Jobs Yet</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 Click the bookmark button on any job card to save it here for quick access later.
               </p>
               <div className="pt-2">
@@ -830,23 +830,23 @@ export default function ProfilePage() {
               {savedJobsList.map((job) => (
                 <div
                   key={job.id}
-                  className="bg-slate-50/70 hover:bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors"
+                  className="bg-slate-50/70 hover:bg-slate-50 dark:bg-slate-800/40 dark:hover:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors"
                 >
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center space-x-2">
                       <Link
                         to={`/job/${job.jobId || job.id}`}
-                        className="font-bold text-sm text-slate-900 hover:text-blue-600 truncate transition-colors"
+                        className="font-bold text-sm text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate transition-colors"
                       >
                         {job.title}
                       </Link>
-                      <span className="text-[10px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.2 rounded">
+                      <span className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold px-2 py-0.2 rounded">
                         {job.jobType || "Full Time"}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
-                      <span className="font-semibold text-slate-700">{job.company}</span>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{job.company}</span>
                       <span>•</span>
                       <span className="flex items-center space-x-1">
                         <MapPin className="w-3 h-3 text-slate-400" />
@@ -862,23 +862,23 @@ export default function ProfilePage() {
                   <div className="flex items-center space-x-2 self-end sm:self-auto shrink-0">
                     <button
                       onClick={() => handleCopyJobLink(job.jobId || job.id)}
-                      className={`p-1.5 rounded-xl border border-slate-200 transition-colors ${
+                      className={`p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors ${
                         copiedJobId === (job.jobId || job.id)
-                          ? "text-emerald-600 bg-emerald-50 border-emerald-200"
-                          : "text-slate-400 hover:text-blue-600 hover:bg-white"
+                          ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800"
+                          : "text-slate-400 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-700"
                       }`}
                       title={copiedJobId === (job.jobId || job.id) ? "Link copied!" : "Copy link to job details"}
                       aria-label="Copy link to job details"
                     >
                       {copiedJobId === (job.jobId || job.id) ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       ) : (
                         <Link2 className="w-3.5 h-3.5" />
                       )}
                     </button>
                     <Link
                       to={`/job/${job.jobId || job.id}`}
-                      className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-white text-xs font-semibold transition-colors"
+                      className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 text-xs font-semibold transition-colors"
                     >
                       View Details
                     </Link>
@@ -895,7 +895,7 @@ export default function ProfilePage() {
                     )}
                     <button
                       onClick={() => handleRemoveSavedJob(job)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
                       title="Remove from saved jobs"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -910,18 +910,18 @@ export default function ProfilePage() {
 
       {/* TAB 4: ATS EVALUATION HISTORY */}
       {activeTab === "history" && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-in fade-in">
           <div>
-            <h2 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <History className="w-4 h-4 text-blue-600" />
+                <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>My ATS Evaluation History</span>
               </div>
               <span className="text-xs font-semibold text-slate-400">
                 {atsHistoryList.length} records
               </span>
             </h2>
-            <p className="text-xs text-slate-500 pt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
               Track how well your resume scored across different job positions.
             </p>
           </div>
@@ -929,16 +929,16 @@ export default function ProfilePage() {
           {loadingHistory ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse" />
+                <div key={i} className="h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : atsHistoryList.length === 0 ? (
             <div className="text-center py-12 space-y-3">
-              <div className="w-12 h-12 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-sm text-slate-800">No ATS Evaluations Yet</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">No ATS Evaluations Yet</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 Evaluate your resume against any job posting to automatically save your score benchmarks here.
               </p>
               <div className="pt-2">
@@ -956,25 +956,25 @@ export default function ProfilePage() {
               {atsHistoryList.map((entry) => (
                 <div
                   key={entry.id}
-                  className="bg-slate-50/70 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  className="bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-center space-x-4 min-w-0 flex-1">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-base shrink-0 ${
                         entry.score >= 75
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400"
                           : entry.score >= 55
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-rose-100 text-rose-700"
+                          ? "bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400"
+                          : "bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-400"
                       }`}
                     >
                       {entry.score}%
                     </div>
                     <div className="space-y-0.5 min-w-0 flex-1">
-                      <h4 className="font-bold text-sm text-slate-900 truncate">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
                         {entry.jobTitle || "Evaluated Role"}
                       </h4>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {entry.company ? `${entry.company} • ` : ""}
                         Evaluated {timeAgo(entry.evaluatedAt)}
                       </p>
@@ -983,7 +983,7 @@ export default function ProfilePage() {
                           {entry.matchedKeywords.slice(0, 5).map((k, i) => (
                             <span
                               key={i}
-                              className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded font-semibold"
+                              className="text-[10px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.2 rounded font-semibold"
                             >
                               {k}
                             </span>
@@ -997,14 +997,14 @@ export default function ProfilePage() {
                     {entry.jobId && (
                       <Link
                         to={`/job/${entry.jobId}`}
-                        className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-white text-xs font-semibold transition-colors"
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 text-xs font-semibold transition-colors"
                       >
                         View Job
                       </Link>
                     )}
                     <button
                       onClick={() => handleDeleteAtsHistoryItem(entry.id)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
                       title="Delete Record"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -1021,18 +1021,18 @@ export default function ProfilePage() {
       {activeTab === "feedback" && (
         <div className="space-y-6 animate-in fade-in">
           {/* Submission Card */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
             <div>
-              <h2 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <ThumbsUp className="w-4 h-4 text-blue-600" />
+                  <ThumbsUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>Submit Platform Feedback &amp; Feature Requests</span>
                 </div>
-                <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-0.5 rounded-full">
                   Verified Member
                 </span>
               </h2>
-              <p className="text-xs text-slate-500 pt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
                 Your feedback directly shapes our product roadmap, ATS engine enhancements, and job curation.
               </p>
             </div>
@@ -1040,7 +1040,7 @@ export default function ProfilePage() {
             <form onSubmit={handleFeedbackSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     Experience Rating *
                   </label>
                   <div className="flex items-center space-x-1.5">
@@ -1051,14 +1051,14 @@ export default function ProfilePage() {
                         onClick={() => setFeedbackRating(star)}
                         className={`p-2 rounded-xl border transition-all ${
                           star <= feedbackRating
-                            ? "bg-amber-50 border-amber-300 text-amber-500 shadow-2xs"
-                            : "bg-slate-50 border-slate-200 text-slate-300 hover:text-amber-400"
+                            ? "bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-500 dark:text-amber-400 shadow-2xs"
+                            : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 hover:text-amber-400"
                         }`}
                       >
                         <Star className={`w-4 h-4 ${star <= feedbackRating ? "fill-amber-400" : ""}`} />
                       </button>
                     ))}
-                    <span className="text-xs font-bold text-slate-600 pl-2">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 pl-2">
                       {feedbackRating === 5 && "⭐ Excellent"}
                       {feedbackRating === 4 && "⭐ Very Good"}
                       {feedbackRating === 3 && "⭐ Good"}
@@ -1069,13 +1069,13 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Category *
                   </label>
                   <select
                     value={feedbackCategory}
                     onChange={(e) => setFeedbackCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
                   >
                     <option value="Platform Experience">Overall Platform &amp; UI Experience</option>
                     <option value="ATS Matcher">Role-Wise ATS Evaluation Tool</option>
@@ -1088,7 +1088,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   Your Feedback *
                 </label>
                 <textarea
@@ -1097,7 +1097,7 @@ export default function ProfilePage() {
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
                   placeholder="Tell us what you love, what felt friction-heavy, or what tools would accelerate your job search..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
@@ -1115,8 +1115,8 @@ export default function ProfilePage() {
           </div>
 
           {/* Previous Feedback History */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-4">
-            <h3 className="font-bold text-sm text-slate-900 pb-2 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-4">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <span>My Previously Submitted Feedback</span>
               <span className="text-xs text-slate-400 font-normal">{myFeedbacks.length} submissions</span>
             </h3>
@@ -1124,20 +1124,20 @@ export default function ProfilePage() {
             {loadingFeedbacks ? (
               <div className="space-y-3">
                 {Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="h-16 bg-slate-100 rounded-2xl animate-pulse" />
+                  <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" />
                 ))}
               </div>
             ) : myFeedbacks.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-400">
+              <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">
                 You haven&apos;t submitted any feedback yet. Your submissions will be saved here.
               </div>
             ) : (
               <div className="space-y-3">
                 {myFeedbacks.map((f) => (
-                  <div key={f.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+                  <div key={f.id} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-md">
                           {f.category}
                         </span>
                         <div className="flex text-amber-400">
@@ -1156,7 +1156,7 @@ export default function ProfilePage() {
                           : "Recently"}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-700 leading-relaxed">{f.feedback}</p>
+                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{f.feedback}</p>
                   </div>
                 ))}
               </div>
