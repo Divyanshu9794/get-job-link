@@ -614,3 +614,127 @@ export function normalizeFantasticJob(item, source = {}) {
     status: "pending_approval",
   };
 }
+
+// -------------------------------------------------------------
+// Persistent Storage for Auto-Fetched Admin Staging Queue
+// Uses IndexedDB for full large-capacity storage with localStorage fallback
+// -------------------------------------------------------------
+
+const STAGING_DB_NAME = "GetJobLinkDB";
+const STAGING_STORE_NAME = "admin_staging";
+const STAGING_DB_VERSION = 1;
+const STAGING_LOCAL_STORAGE_KEY = "gjl_admin_staged_jobs_cache";
+
+function openStagingDB() {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined" || !window.indexedDB) {
+      return reject(new Error("IndexedDB not available in current environment"));
+    }
+    const req = window.indexedDB.open(STAGING_DB_NAME, STAGING_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STAGING_STORE_NAME)) {
+        db.createObjectStore(STAGING_STORE_NAME);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/**
+ * Persists staged jobs so that refreshing the page or switching tabs retains them.
+ * @param {Array} jobs - List of unapproved staged job objects
+ */
+export async function saveStagedJobsPersistent(jobs) {
+  if (!Array.isArray(jobs)) return;
+
+  // 1. Try IndexedDB first (virtually unlimited capacity, handles long JDs seamlessly)
+  try {
+    const db = await openStagingDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STAGING_STORE_NAME, "readwrite");
+      const store = tx.objectStore(STAGING_STORE_NAME);
+      const req = store.put(jobs, "staged_jobs_list");
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    // If IndexedDB is blocked or private browsing mode, fallback to localStorage
+  }
+
+  // 2. Synchronous / quick fallback to localStorage if available
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      window.localStorage.setItem(STAGING_LOCAL_STORAGE_KEY, JSON.stringify(jobs));
+    } catch {
+      // Ignore QuotaExceededError if payload is too large for localStorage
+    }
+  }
+}
+
+/**
+ * Loads staged jobs from persistent storage (IndexedDB or localStorage fallback).
+ * @returns {Promise<Array>} Staged jobs array or empty array
+ */
+export async function loadStagedJobsPersistent() {
+  // 1. Try IndexedDB
+  try {
+    const db = await openStagingDB();
+    const jobs = await new Promise((resolve, reject) => {
+      const tx = db.transaction(STAGING_STORE_NAME, "readonly");
+      const store = tx.objectStore(STAGING_STORE_NAME);
+      const req = store.get("staged_jobs_list");
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    if (Array.isArray(jobs) && jobs.length > 0) {
+      return jobs;
+    }
+  } catch {
+    // Fall through to localStorage
+  }
+
+  // 2. Fallback to localStorage
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      const raw = window.localStorage.getItem(STAGING_LOCAL_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return [];
+}
+
+/**
+ * Clears staged jobs from persistent storage when queue is cleared or emptied.
+ */
+export async function clearStagedJobsPersistent() {
+  try {
+    const db = await openStagingDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STAGING_STORE_NAME, "readwrite");
+      const store = tx.objectStore(STAGING_STORE_NAME);
+      const req = store.delete("staged_jobs_list");
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    // Ignore
+  }
+
+  if (typeof window !== "undefined" && window.localStorage) {
+    try {
+      window.localStorage.removeItem(STAGING_LOCAL_STORAGE_KEY);
+    } catch {
+      // Ignore
+    }
+  }
+}

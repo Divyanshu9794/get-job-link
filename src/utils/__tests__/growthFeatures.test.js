@@ -17,6 +17,9 @@ import {
   extractSkillsFromText,
   normalizeFantasticJob,
   isTechJob,
+  saveStagedJobsPersistent,
+  loadStagedJobsPersistent,
+  clearStagedJobsPersistent,
 } from "../jobFetchEngine.js";
 
 import {
@@ -325,5 +328,33 @@ describe("Job Classification & Filter Intelligence", () => {
 
     const isoStr = "2026-11-23T12:00:00.000Z";
     assert.equal(getJobTimestamp({ fetchedAt: isoStr }), new Date(isoStr).getTime());
+  });
+
+  it("persists auto-fetched staged jobs and restores them across simulated page refreshes", async () => {
+    const store = new Map();
+    globalThis.window = {
+      localStorage: {
+        getItem: (k) => store.get(k) || null,
+        setItem: (k, v) => store.set(k, String(v)),
+        removeItem: (k) => store.delete(k),
+      },
+    };
+
+    const mockStagedJobs = [
+      { externalId: "job_1", title: "Frontend Engineer", company: "Acme Corp" },
+      { externalId: "job_2", title: "Backend Engineer", company: "Globex" },
+    ];
+
+    await saveStagedJobsPersistent(mockStagedJobs);
+    const loaded = await loadStagedJobsPersistent();
+    assert.equal(loaded.length, 2);
+    assert.equal(loaded[0].externalId, "job_1");
+    assert.equal(loaded[1].company, "Globex");
+
+    await clearStagedJobsPersistent();
+    const emptyLoaded = await loadStagedJobsPersistent();
+    assert.equal(emptyLoaded.length, 0);
+
+    delete globalThis.window;
   });
 });

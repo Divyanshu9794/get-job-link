@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Download,
   RotateCcw,
@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ChevronLeft,
   X,
+  Database,
 } from "lucide-react";
 import { collection, addDoc, doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { db } from "../firebase";
@@ -20,6 +21,9 @@ import {
   fetchJobsFromSource,
   isJobDuplicate,
   isTechJob,
+  saveStagedJobsPersistent,
+  loadStagedJobsPersistent,
+  clearStagedJobsPersistent,
 } from "../utils/jobFetchEngine";
 import { getCompanyInitials, getCompanyColor, formatDisplaySalary } from "../utils/jobClassification";
 import { useToast } from "../context/ToastContext";
@@ -33,6 +37,8 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
   const [fetching, setFetching] = useState(false);
   const [fetchProgress, setFetchProgress] = useState("");
   const [stagingJobs, setStagingJobs] = useState([]);
+  const [loadingSavedStaging, setLoadingSavedStaging] = useState(true);
+  const hasLoadedFromStorage = useRef(false);
   const [selectedStagingIds, setSelectedStagingIds] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -40,6 +46,40 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
   const [dedupCompanies, setDedupCompanies] = useState(true);
   const [techOnly, setTechOnly] = useState(true);
   const PAGE_SIZE = 15;
+
+  // Restore unapproved auto-fetched jobs from persistent storage (IndexedDB / localStorage)
+  useEffect(() => {
+    let isMounted = true;
+    loadStagedJobsPersistent()
+      .then((saved) => {
+        if (isMounted) {
+          if (Array.isArray(saved) && saved.length > 0) {
+            setStagingJobs(saved);
+          }
+          hasLoadedFromStorage.current = true;
+          setLoadingSavedStaging(false);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load persisted staging jobs:", err);
+        if (isMounted) {
+          hasLoadedFromStorage.current = true;
+          setLoadingSavedStaging(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Persist staging jobs across page refreshes and tab switches whenever the queue updates
+  useEffect(() => {
+    if (!hasLoadedFromStorage.current) return;
+    saveStagedJobsPersistent(stagingJobs).catch((err) => {
+      console.warn("Failed persisting staging jobs queue:", err);
+    });
+  }, [stagingJobs]);
 
   // Edit Modal State
   const [editingJob, setEditingJob] = useState(null);
@@ -207,6 +247,7 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
     if (!window.confirm("Clear all jobs from the staging approval queue?")) return;
     setStagingJobs([]);
     setSelectedStagingIds(new Set());
+    clearStagedJobsPersistent().catch(() => {});
     showToast("Staging queue cleared.");
   };
 
@@ -506,6 +547,16 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
               {filteredStaging.length} matches found
             </span>
           )}
+
+          {stagingJobs.length > 0 && (
+            <span
+              className="hidden lg:inline-flex items-center space-x-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/80 dark:border-emerald-800/80 px-2.5 py-1 rounded-xl"
+              title="Unapproved jobs stay in your browser across page refreshes and tab switches until approved or cleared."
+            >
+              <Database className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+              <span>Queue auto-saved</span>
+            </span>
+          )}
         </div>
 
         {/* Bulk Action Buttons */}
@@ -546,7 +597,17 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
 
       {/* 3. Staging Jobs Queue Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xs overflow-hidden">
-        {filteredStaging.length === 0 ? (
+        {loadingSavedStaging ? (
+          <div className="p-12 text-center space-y-3">
+            <RotateCcw className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin mx-auto" />
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              Restoring Persistent Staging Queue...
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Loading unapproved jobs previously auto-fetched from storage.
+            </p>
+          </div>
+        ) : filteredStaging.length === 0 ? (
           <div className="p-12 text-center space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-6 h-6" />

@@ -12,6 +12,7 @@ import {
   ChevronUp,
   RotateCcw,
 } from "lucide-react";
+import { formatDisplaySalary } from "../utils/jobClassification";
 
 export default function LinkedInBatchShareModal({
   isOpen,
@@ -140,8 +141,9 @@ export default function LinkedInBatchShareModal({
       lines.push(`${num}️⃣ ${title} — ${company}`);
       lines.push(`   📍 Location: ${location}`);
       lines.push(`   💼 Experience: ${exp}`);
-      if (job.salary && String(job.salary).toLowerCase() !== "null" && job.salary !== "Not Disclosed") {
-        lines.push(`   💰 Salary: ${job.salary}`);
+      const displaySal = formatDisplaySalary(job.salary);
+      if (displaySal) {
+        lines.push(`   💰 Salary: ${displaySal}`);
       }
       lines.push(`   🔗 View Details & Apply: ${jobUrl}\n`);
     });

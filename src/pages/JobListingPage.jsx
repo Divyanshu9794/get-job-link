@@ -34,6 +34,7 @@ import {
   isRemoteJob,
   matchesExperienceFilter,
   getJobTimestamp,
+  formatDisplaySalary,
 } from "../utils/jobClassification";
 
 const PAGE_SIZE = 50;
@@ -485,8 +486,9 @@ export default function JobListingPage() {
       lines.push(`${num}️⃣ ${title} — ${company}`);
       lines.push(`   📍 Location: ${location}`);
       lines.push(`   💼 Experience: ${exp}`);
-      if (job.salary && String(job.salary).toLowerCase() !== "null" && job.salary !== "Not Disclosed") {
-        lines.push(`   💰 Salary: ${job.salary}`);
+      const displaySal = formatDisplaySalary(job.salary);
+      if (displaySal) {
+        lines.push(`   💰 Salary: ${displaySal}`);
       }
       lines.push(`   🔗 View Details & Apply: ${jobUrl}\n`);
     });
