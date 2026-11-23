@@ -36,6 +36,7 @@ import {
   getApplyUrl,
   getJobDescription,
   getJobSkills,
+  formatDisplaySalary,
 } from "../utils/jobClassification";
 import {
   getRoleSpecificAtsTips,
@@ -548,38 +549,38 @@ export default function JobDetailPage() {
 
         {/* Highlights / Metadata Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 text-xs">
-          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3 min-w-0 overflow-hidden">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5 truncate">
               Job Type
             </span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm block truncate" title={job.jobType || "Full Time"}>
               {job.jobType || "Full Time"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3 min-w-0 overflow-hidden">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5 truncate">
               Experience
             </span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm block truncate" title={job.experience || "More than 0 year"}>
               {job.experience || "More than 0 year"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3 min-w-0 overflow-hidden">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5 truncate">
               Compensation
             </span>
-            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm">
-              {job.salary || "Competitive"}
+            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm block truncate" title={formatDisplaySalary(job.salary) || "Competitive"}>
+              {formatDisplaySalary(job.salary) || "Competitive"}
             </span>
           </div>
 
-          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5">
+          <div className="bg-slate-50/70 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-750 rounded-xl p-3 min-w-0 overflow-hidden">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-0.5 truncate">
               Domain
             </span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
+            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm block truncate" title={job.domain || "Engineering"}>
               {job.domain || "Engineering"}
             </span>
           </div>

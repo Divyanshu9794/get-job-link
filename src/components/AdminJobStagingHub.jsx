@@ -21,7 +21,7 @@ import {
   isJobDuplicate,
   isTechJob,
 } from "../utils/jobFetchEngine";
-import { getCompanyInitials, getCompanyColor } from "../utils/jobClassification";
+import { getCompanyInitials, getCompanyColor, formatDisplaySalary } from "../utils/jobClassification";
 import { useToast } from "../context/ToastContext";
 
 export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }) {
@@ -638,7 +638,7 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="font-semibold text-slate-800 dark:text-slate-200">{job.experience}</div>
-                        <div className="text-[11px] text-blue-600 dark:text-blue-400 font-bold">{job.salary}</div>
+                        <div className="text-[11px] text-blue-600 dark:text-blue-400 font-bold">{formatDisplaySalary(job.salary) || "Competitive"}</div>
                       </td>
                       <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 truncate max-w-[180px]">
                         {job.skills || "Engineering"}

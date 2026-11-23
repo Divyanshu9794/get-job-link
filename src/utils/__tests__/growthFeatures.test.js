@@ -255,6 +255,7 @@ describe("Smart Job Alert Engine", () => {
     ];
 
     const alert = { role: "React", active: true };
+    assert.equal(filterJobsByTimeWindow(jobs, 24).length, 2);
     const matches = getDailyAlertMatches(alert, jobs);
     assert.equal(matches.length, 2);
     assert.equal(matches[0].job.id, "fresh");
@@ -304,7 +305,10 @@ describe("Job Classification & Filter Intelligence", () => {
 
   it("cleans schema.org JSON stringified salaries and preserves normal salaries", () => {
     const jsonSalary = '{"@type":"MonetaryAmount","currency":"EUR","value":{"@type":"QuantitativeValue","minValue":50000}}';
-    assert.equal(formatDisplaySalary(jsonSalary), "€50000");
+    assert.equal(formatDisplaySalary(jsonSalary), "€50k");
+
+    const phpSalary = '{"@type":"MonetaryAmount","currency":"PHP","value":{"@type":"QuantitativeValue","minValue":2160000,"maxValue":2760000,"unitText":"YEAR"}}';
+    assert.equal(formatDisplaySalary(phpSalary), "₱2.2M - ₱2.8M /yr");
 
     assert.equal(formatDisplaySalary("$120,000 / yr"), "$120,000 / yr");
     assert.equal(formatDisplaySalary("₹12 - ₹18 LPA"), "₹12 - ₹18 LPA");

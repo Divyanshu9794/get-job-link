@@ -26,6 +26,7 @@ import {
   getCompanyInitials,
   timeAgo,
   getApplyUrl,
+  formatDisplaySalary,
 } from "../utils/jobClassification";
 import SEO from "../components/SEO";
 
@@ -323,11 +324,11 @@ export default function CompanyIntelligencePage() {
                               </span>
                             </>
                           )}
-                          {job.salary && job.salary !== "null" && (
+                          {formatDisplaySalary(job.salary) && (
                             <>
                               <span className="text-slate-300 dark:text-slate-700">•</span>
                               <span className="text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
-                                {job.salary}
+                                {formatDisplaySalary(job.salary)}
                               </span>
                             </>
                           )}

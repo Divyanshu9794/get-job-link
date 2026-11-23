@@ -376,13 +376,61 @@ export function formatDisplaySalary(rawSalary) {
   if (!rawSalary) return "";
   if (typeof rawSalary === "object") {
     try {
-      const val = rawSalary.value?.value || rawSalary.value?.minValue || rawSalary.minValue || rawSalary.value;
-      const currency = rawSalary.currency === "INR" ? "₹" : (rawSalary.currency === "EUR" ? "€" : (rawSalary.currency === "USD" ? "$" : (rawSalary.currency || "")));
-      if (val) return `${currency}${val}`;
+      const qVal = rawSalary.value || {};
+      const min = qVal.minValue || rawSalary.minValue || qVal.value || rawSalary.value;
+      const max = qVal.maxValue || rawSalary.maxValue;
+      const unit = qVal.unitText || rawSalary.unitText || "";
+
+      let curSymbol = rawSalary.currency || "";
+      if (curSymbol === "INR") curSymbol = "₹";
+      else if (curSymbol === "USD") curSymbol = "$";
+      else if (curSymbol === "EUR") curSymbol = "€";
+      else if (curSymbol === "GBP") curSymbol = "£";
+      else if (curSymbol === "PHP") curSymbol = "₱";
+
+      const formatNum = (n) => {
+        const num = Number(n);
+        if (isNaN(num)) return n;
+        if (curSymbol === "₹" && num >= 100000) {
+          const lpa = num / 100000;
+          return `${Number(lpa.toFixed(1))} LPA`;
+        }
+        if (num >= 1000000) {
+          return `${(num / 1000000).toFixed(1)}M`;
+        }
+        if (num >= 1000) {
+          return `${(num / 1000).toFixed(0)}k`;
+        }
+        return num.toLocaleString();
+      };
+
+      if (min && max && min !== max) {
+        if (curSymbol === "₹" && Number(min) >= 100000) {
+          return `₹${formatNum(min)} - ₹${formatNum(max)}`;
+        }
+        const suffix = unit.toLowerCase().includes("year")
+          ? " /yr"
+          : unit.toLowerCase().includes("month")
+          ? " /mo"
+          : unit.toLowerCase().includes("hour")
+          ? " /hr"
+          : "";
+        return `${curSymbol}${formatNum(min)} - ${curSymbol}${formatNum(max)}${suffix}`;
+      } else if (min) {
+        const suffix = unit.toLowerCase().includes("year")
+          ? " /yr"
+          : unit.toLowerCase().includes("month")
+          ? " /mo"
+          : unit.toLowerCase().includes("hour")
+          ? " /hr"
+          : "";
+        return `${curSymbol}${formatNum(min)}${suffix}`;
+      }
     } catch {
       return "";
     }
   }
+
   const str = String(rawSalary).trim();
   if (str.startsWith("{") || str.startsWith("[") || str.includes("@type")) {
     try {
@@ -392,6 +440,7 @@ export function formatDisplaySalary(rawSalary) {
       return "";
     }
   }
+
   const lower = str.toLowerCase();
   if (lower === "null" || lower === "undefined" || lower === "not disclosed" || lower === "competitive" || lower === "n/a") {
     return "";
