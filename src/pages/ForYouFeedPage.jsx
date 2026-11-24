@@ -13,6 +13,7 @@ import {
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { calculateJobMatch } from "../utils/jobMatchEngine";
+import { extractSkillsFromText } from "../utils/jobFetchEngine";
 import JobCard from "../components/JobCard";
 import PreferencesModal from "../components/PreferencesModal";
 import SEO from "../components/SEO";
@@ -37,7 +38,7 @@ export default function ForYouFeedPage() {
     }
   });
 
-  // Load preferences from profile or localStorage
+  // Load preferences from profile, local storage, or auto-extract from uploaded resume
   useEffect(() => {
     let prefs = userProfile?.preferences;
     if (!prefs) {
@@ -48,6 +49,22 @@ export default function ForYouFeedPage() {
         console.warn("Could not parse local preferences:", e);
       }
     }
+
+    // If no manual preferences are set yet, but candidate has uploaded a resume to their profile:
+    if ((!prefs || !prefs.skills?.length) && userProfile?.defaultResume?.extractedText) {
+      const resumeSkills = extractSkillsFromText(userProfile.defaultResume.extractedText);
+      if (resumeSkills.length > 0) {
+        prefs = {
+          preferredRoles: prefs?.preferredRoles || [],
+          skills: resumeSkills,
+          experienceLevel: prefs?.experienceLevel || "Fresher (0 - 1 Years)",
+          workMode: prefs?.workMode || "Any",
+          preferredLocations: prefs?.preferredLocations || [],
+          fromResume: true,
+        };
+      }
+    }
+
     setPreferences(prefs || null);
 
     const handlePrefBroadcast = (e) => {
@@ -190,7 +207,17 @@ export default function ForYouFeedPage() {
 
             {/* Current Preferences Badges */}
             <div className="flex flex-wrap items-center gap-1.5 pt-2">
-              {preferences?.preferredRoles && preferences.preferredRoles.length > 0 ? (
+              {preferences?.fromResume ? (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] font-bold bg-emerald-500/25 text-emerald-200 border border-emerald-400/30 px-2.5 py-0.5 rounded-lg flex items-center space-x-1">
+                    <span>📄 Extracted from Resume:</span>
+                    <span className="font-normal text-white">{preferences.skills?.slice(0, 4).join(", ")}</span>
+                  </span>
+                  <span className="text-xs text-amber-300 font-semibold">
+                    Click &quot;Customize Preferences&quot; to fine-tune roles &amp; locations!
+                  </span>
+                </div>
+              ) : preferences?.preferredRoles && preferences.preferredRoles.length > 0 ? (
                 preferences.preferredRoles.map((r) => (
                   <span
                     key={r}

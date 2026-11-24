@@ -442,7 +442,14 @@ export function formatDisplaySalary(rawSalary) {
   }
 
   const lower = str.toLowerCase();
-  if (lower === "null" || lower === "undefined" || lower === "not disclosed" || lower === "competitive" || lower === "n/a") {
+  if (
+    lower.includes("undefined") ||
+    lower.includes("null") ||
+    lower.includes("nan") ||
+    lower === "not disclosed" ||
+    lower === "competitive" ||
+    lower === "n/a"
+  ) {
     return "";
   }
   return str;

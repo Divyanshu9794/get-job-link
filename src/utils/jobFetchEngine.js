@@ -438,7 +438,12 @@ export async function fetchJobsFromSource(source) {
           url: item.url,
           jobType: item.jobType?.includes("Intern") ? "Internship" : "Full Time",
           experience: extractExperienceFromText(title, plainJd),
-          salary: extractSalaryFromText(plainJd) || item.annualSalaryMin ? `$${item.annualSalaryMin}k-$${item.annualSalaryMax}k` : "Competitive",
+          salary:
+            item.annualSalaryMin && item.annualSalaryMax
+              ? `$${item.annualSalaryMin}k - $${item.annualSalaryMax}k`
+              : item.annualSalaryMin
+              ? `$${item.annualSalaryMin}k`
+              : extractSalaryFromText(plainJd) || "Competitive",
           domain: "Engineering",
           isRemote: true,
           skills: extractSkillsFromText(`${title}\n${plainJd}`).join(", "),

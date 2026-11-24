@@ -315,6 +315,8 @@ describe("Job Classification & Filter Intelligence", () => {
 
     assert.equal(formatDisplaySalary("$120,000 / yr"), "$120,000 / yr");
     assert.equal(formatDisplaySalary("₹12 - ₹18 LPA"), "₹12 - ₹18 LPA");
+    assert.equal(formatDisplaySalary("$undefinedk-$undefinedk"), "");
+    assert.equal(formatDisplaySalary("$null"), "");
     assert.equal(formatDisplaySalary("Competitive"), "");
     assert.equal(formatDisplaySalary(null), "");
   });
