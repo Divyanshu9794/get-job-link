@@ -6,6 +6,7 @@ import { ToastProvider } from "./context/ToastContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingFeedbackWidget from "./components/FloatingFeedbackWidget";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Critical landing page loaded synchronously for immediate render
 import JobListingPage from "./pages/JobListingPage";
@@ -51,7 +52,8 @@ export default function App() {
 
             {/* Application Routes */}
             <div className="flex-1">
-              <Suspense fallback={<PageLoading />}>
+              <ErrorBoundary>
+                <Suspense fallback={<PageLoading />}>
                 <Routes>
                   {/* Home & Job Categories */}
                   <Route path="/" element={<JobListingPage />} />
@@ -105,6 +107,7 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/jobs/india" replace />} />
                 </Routes>
               </Suspense>
+            </ErrorBoundary>
             </div>
 
             {/* Global Footer */}

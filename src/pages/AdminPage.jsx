@@ -54,6 +54,7 @@ import {
   timeAgo,
   sanitizeJobUrl,
   isRemoteJob,
+  getJobTimestamp,
 } from "../utils/jobClassification";
 import SEO from "../components/SEO";
 import AdminHiringAnalytics from "../components/AdminHiringAnalytics";
@@ -285,22 +286,8 @@ export default function AdminPage() {
 
       // Sort descending by creation date or date string (newest first)
       list.sort((a, b) => {
-        const timeA = a.createdAt
-          ? typeof a.createdAt === "object" && a.createdAt.seconds
-            ? a.createdAt.seconds * 1000
-            : new Date(a.createdAt).getTime()
-          : a.date
-          ? new Date(a.date).getTime()
-          : 0;
-
-        const timeB = b.createdAt
-          ? typeof b.createdAt === "object" && b.createdAt.seconds
-            ? b.createdAt.seconds * 1000
-            : new Date(b.createdAt).getTime()
-          : b.date
-          ? new Date(b.date).getTime()
-          : 0;
-
+        const timeA = getJobTimestamp(a) || 0;
+        const timeB = getJobTimestamp(b) || 0;
         return (timeB || 0) - (timeA || 0);
       });
 
@@ -323,12 +310,23 @@ export default function AdminPage() {
   const stats = useMemo(() => {
     const total = jobs.length;
     const active = jobs.length; // all in collection are live
-    const todayStr = new Date().toISOString().split("T")[0];
+    let todayStr = "";
+    try {
+      todayStr = new Date().toISOString().split("T")[0];
+    } catch {
+      todayStr = "";
+    }
+
     const todayCount = jobs.filter((j) => {
       if (j.date === todayStr) return true;
-      if (j.createdAt) {
-        const d = new Date(j.createdAt).toISOString().split("T")[0];
-        return d === todayStr;
+      const ts = getJobTimestamp(j);
+      if (ts) {
+        try {
+          const d = new Date(ts).toISOString().split("T")[0];
+          return d === todayStr;
+        } catch {
+          return false;
+        }
       }
       return false;
     }).length;

@@ -195,8 +195,15 @@ export function processHiringRadarData(jobs = [], options = {}) {
 
     // Daily trends aggregation
     if (jobTime > 0) {
-      const dayKey = new Date(jobTime).toISOString().split("T")[0];
-      dailyJobCounts.set(dayKey, (dailyJobCounts.get(dayKey) || 0) + 1);
+      try {
+        const d = new Date(jobTime);
+        if (!isNaN(d.getTime())) {
+          const dayKey = d.toISOString().split("T")[0];
+          dailyJobCounts.set(dayKey, (dailyJobCounts.get(dayKey) || 0) + 1);
+        }
+      } catch {
+        // Ignore invalid time value
+      }
     }
 
     // Skills aggregation by time window

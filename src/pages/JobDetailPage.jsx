@@ -37,6 +37,7 @@ import {
   getJobDescription,
   getJobSkills,
   formatDisplaySalary,
+  getJobTimestamp,
 } from "../utils/jobClassification";
 import {
   getRoleSpecificAtsTips,
@@ -285,15 +286,18 @@ export default function JobDetailPage() {
       "@type": "JobPosting",
       title: job.title || "Software Engineering Role",
       description: description.replace(/<[^>]*>/g, ""),
-      datePosted:
-        job.date ||
-        (job.createdAt
-          ? new Date(
-              typeof job.createdAt === "object" && job.createdAt.seconds
-                ? job.createdAt.seconds * 1000
-                : job.createdAt
-            ).toISOString().split("T")[0]
-          : "2026-01-01"),
+      datePosted: (() => {
+        if (job.date) return job.date;
+        const ts = getJobTimestamp(job);
+        if (ts) {
+          try {
+            return new Date(ts).toISOString().split("T")[0];
+          } catch {
+            return "2026-01-01";
+          }
+        }
+        return "2026-01-01";
+      })(),
       employmentType:
         job.jobType?.toUpperCase() === "INTERNSHIP"
           ? "INTERN"

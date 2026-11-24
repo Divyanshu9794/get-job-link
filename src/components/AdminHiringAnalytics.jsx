@@ -101,8 +101,8 @@ export default function AdminHiringAnalytics({ jobs = [], isAdmin = false, showT
         c.isMultiRole ? "Yes" : "No",
         `"${(c.topLocations || []).join(", ").replace(/"/g, '""')}"`,
         `"${(c.topSkills || []).join(", ").replace(/"/g, '""')}"`,
-        c.firstObservedAt ? new Date(c.firstObservedAt).toISOString().split("T")[0] : "",
-        c.lastJobAddedAt ? new Date(c.lastJobAddedAt).toISOString().split("T")[0] : "",
+        c.firstObservedAt ? (() => { try { const d = new Date(c.firstObservedAt); return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0]; } catch { return ""; } })() : "",
+        c.lastJobAddedAt ? (() => { try { const d = new Date(c.lastJobAddedAt); return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0]; } catch { return ""; } })() : "",
       ]);
 
       const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
