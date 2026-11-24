@@ -14,6 +14,7 @@ import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { calculateJobMatch } from "../utils/jobMatchEngine";
 import { extractSkillsFromText } from "../utils/jobFetchEngine";
+import { getJobTimestamp } from "../utils/jobClassification";
 import JobCard from "../components/JobCard";
 import PreferencesModal from "../components/PreferencesModal";
 import SEO from "../components/SEO";
@@ -85,18 +86,47 @@ export default function ForYouFeedPage() {
     };
   }, [userProfile]);
 
-  // Fetch recent active jobs from Firestore
+  // Helper to ensure strictly newest timestamp first
+  const sortByLatest = (a, b) => {
+    const timeA = getJobTimestamp(a) || 0;
+    const timeB = getJobTimestamp(b) || 0;
+    return (timeB || 0) - (timeA || 0);
+  };
+
+  // Fetch recent active jobs from Firestore with instantaneous session cache
   useEffect(() => {
     let isMounted = true;
     async function loadJobs() {
-      setLoading(true);
+      // 1. Instant render from cache (0ms perceived load)
+      try {
+        const cached = sessionStorage.getItem("gjl_foryou_jobs_cache");
+        if (cached) {
+          const { timestamp, list } = JSON.parse(cached);
+          if (Date.now() - timestamp < 3 * 60 * 1000 && Array.isArray(list) && list.length > 0) {
+            list.sort(sortByLatest);
+            setJobs(list);
+            setLoading(false);
+          }
+        }
+      } catch (e) {
+        console.warn("Session cache error:", e);
+      }
+
+      // 2. Fresh background fetch
       try {
         const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(120));
         const snap = await getDocs(q);
         if (!isMounted) return;
 
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        let list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        list.sort(sortByLatest);
         setJobs(list);
+
+        try {
+          sessionStorage.setItem("gjl_foryou_jobs_cache", JSON.stringify({ timestamp: Date.now(), list }));
+        } catch (e) {
+          console.debug("Cache write skipped:", e);
+        }
       } catch (err) {
         console.error("Error fetching jobs for For-You feed:", err);
       } finally {
@@ -117,7 +147,7 @@ export default function ForYouFeedPage() {
     });
   }, [jobs, preferences]);
 
-  // Filter & partition into tailored feeds
+  // Filter & partition into tailored feeds with newest strictly on top
   const categorizedFeeds = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
     const filtered = jobsWithMatches.filter((job) => {
@@ -129,33 +159,45 @@ export default function ForYouFeedPage() {
       return title.includes(term) || comp.includes(term) || loc.includes(term) || skills.includes(term);
     });
 
-    // 1. Recommended: Sorted by highest match score
-    const recommended = [...filtered].sort(
-      (a, b) => b.matchIntelligence.score - a.matchIntelligence.score
-    );
-
-    // 2. New Since Last Visit
-    const newSinceVisit = filtered.filter((job) => {
-      const t = job.createdAt?.seconds ? job.createdAt.seconds * 1000 : new Date(job.createdAt || job.date).getTime();
-      return t > lastVisitTimestamp;
+    // 1. Recommended: Sorted by match score first, but strictly latest added on top for ties or close scores!
+    const recommended = [...filtered].sort((a, b) => {
+      const scoreDiff = b.matchIntelligence.score - a.matchIntelligence.score;
+      if (Math.abs(scoreDiff) >= 10) return scoreDiff;
+      return sortByLatest(a, b);
     });
 
-    // 3. Best Skill Matches: At least 2 matching skills
+    // 2. New Since Last Visit: ALWAYS newest first
+    const newSinceVisit = filtered
+      .filter((job) => {
+        const t = getJobTimestamp(job) || 0;
+        return t > lastVisitTimestamp;
+      })
+      .sort(sortByLatest);
+
+    // 3. Best Skill Matches: Top matching skills, with newest first for ties
     const bestSkills = [...filtered]
       .filter((j) => j.matchIntelligence.matchedSkills.length > 0)
-      .sort((a, b) => b.matchIntelligence.matchedSkills.length - a.matchIntelligence.matchedSkills.length);
+      .sort((a, b) => {
+        const skillDiff = b.matchIntelligence.matchedSkills.length - a.matchIntelligence.matchedSkills.length;
+        if (skillDiff !== 0) return skillDiff;
+        return sortByLatest(a, b);
+      });
 
-    // 4. Fresher Opportunities
-    const freshers = filtered.filter((job) => {
-      const exp = (job.experience || "").toLowerCase();
-      const title = (job.title || "").toLowerCase();
-      return exp.includes("fresher") || exp.includes("0") || exp.includes("intern") || title.includes("intern");
-    });
+    // 4. Fresher Opportunities: ALWAYS newest first
+    const freshers = filtered
+      .filter((job) => {
+        const exp = (job.experience || "").toLowerCase();
+        const title = (job.title || "").toLowerCase();
+        return exp.includes("fresher") || exp.includes("0") || exp.includes("intern") || title.includes("intern");
+      })
+      .sort(sortByLatest);
 
-    // 5. Remote Opportunities
-    const remotes = filtered.filter(
-      (job) => job.isRemote === true || (job.location || "").toLowerCase().includes("remote")
-    );
+    // 5. Remote Opportunities: ALWAYS newest first
+    const remotes = filtered
+      .filter(
+        (job) => job.isRemote === true || (job.location || "").toLowerCase().includes("remote")
+      )
+      .sort(sortByLatest);
 
     return {
       recommended,

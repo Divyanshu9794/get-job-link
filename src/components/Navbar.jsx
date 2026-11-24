@@ -100,8 +100,8 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-150">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2">
           {/* Logo & Brand */}
           <Link
             to="/jobs/india"
@@ -124,7 +124,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+          <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1.5 shrink-0">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.path);
@@ -132,13 +132,13 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`inline-flex items-center space-x-1.5 px-2.5 xl:px-3 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
                     active
-                      ? "bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold"
-                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
+                      ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-800/80"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${active ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`} />
                   <span>{link.name}</span>
                 </Link>
               );
@@ -146,15 +146,15 @@ export default function Navbar() {
           </nav>
 
           {/* Right Section: Theme Toggle + Login / Profile Dropdown */}
-          <div className="hidden sm:flex items-center space-x-2.5">
+          <div className="hidden sm:flex items-center space-x-2 shrink-0">
             <button
               type="button"
               onClick={() => setDigestModalOpen(true)}
               title="Subscribe to Weekly Tech Jobs Digest"
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors shadow-2xs"
+              className="inline-flex items-center space-x-1.5 px-2.5 xl:px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors shadow-2xs shrink-0"
             >
-              <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span className="hidden xl:inline">Weekly Digest</span>
+              <Mail className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+              <span className="hidden xl:inline whitespace-nowrap">Weekly Digest</span>
             </button>
 
             <ThemeToggle />
@@ -162,32 +162,32 @@ export default function Navbar() {
             {!currentUser ? (
               <button
                 onClick={handleLogin}
-                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-all hover:scale-102 active:scale-98"
+                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-all hover:scale-102 active:scale-98 shrink-0"
               >
-                <LogIn className="w-3.5 h-3.5" />
+                <LogIn className="w-3.5 h-3.5 shrink-0" />
                 <span>Login</span>
               </button>
             ) : (
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative shrink-0" ref={dropdownRef}>
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center space-x-2 p-1.5 pr-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs font-semibold text-slate-800 dark:text-slate-200"
+                  className="flex items-center space-x-1.5 p-1.5 pr-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs font-semibold text-slate-800 dark:text-slate-200"
                 >
                   {currentUser.photoURL ? (
                     <img
                       src={currentUser.photoURL}
                       alt={currentUser.displayName || "User"}
-                      className="w-7 h-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                      className="w-7 h-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
                     />
                   ) : (
-                    <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-xs shrink-0">
                       {currentUser.displayName ? currentUser.displayName[0].toUpperCase() : "U"}
                     </div>
                   )}
-                  <span className="max-w-[100px] truncate">
+                  <span className="max-w-[75px] xl:max-w-[110px] truncate">
                     {currentUser.displayName || "Account"}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
 
                 {/* Profile Menu Dropdown */}

@@ -113,15 +113,28 @@ export default function JobListingPage() {
     }
   };
 
-  // Fetch count of jobs added today
+  // Fetch count of jobs added today (cached in sessionStorage for high performance)
   useEffect(() => {
     let isMounted = true;
     async function calculateTodayJobs() {
       try {
+        const cachedStat = sessionStorage.getItem("gjl_today_job_stat");
+        if (cachedStat) {
+          const parsed = JSON.parse(cachedStat);
+          if (Date.now() - parsed.timestamp < 10 * 60 * 1000) {
+            if (isMounted) setTodayJobInfo(parsed.info);
+            return;
+          }
+        }
+      } catch (err) {
+        console.debug("Cache read skipped:", err);
+      }
+
+      try {
         const q = query(
           collection(db, "jobs"),
           orderBy("createdAt", "desc"),
-          limit(150)
+          limit(80)
         );
         const snap = await getDocs(q);
         if (!isMounted) return;
@@ -139,18 +152,7 @@ export default function JobListingPage() {
 
         snap.docs.forEach((d) => {
           const data = d.data();
-          const rawTime = data.createdAt || data.date;
-          let jobTime = 0;
-          if (rawTime) {
-            if (typeof rawTime === "object" && rawTime.seconds) {
-              jobTime = rawTime.seconds * 1000;
-            } else if (typeof rawTime === "number") {
-              jobTime = rawTime;
-            } else {
-              const parsed = new Date(rawTime).getTime();
-              jobTime = isNaN(parsed) ? 0 : parsed;
-            }
-          }
+          const jobTime = getJobTimestamp(data) || 0;
           if (jobTime >= startOfToday) {
             todayCount++;
           }
@@ -159,12 +161,20 @@ export default function JobListingPage() {
           }
         });
 
+        let newInfo;
         if (todayCount > 0) {
-          setTodayJobInfo({ count: todayCount, isToday: true });
+          newInfo = { count: todayCount, isToday: true };
         } else if (past24hCount > 0) {
-          setTodayJobInfo({ count: past24hCount, isToday: false });
+          newInfo = { count: past24hCount, isToday: false };
         } else {
-          setTodayJobInfo({ count: snap.docs.length > 0 ? snap.docs.length : 24, isToday: false });
+          newInfo = { count: snap.docs.length > 0 ? snap.docs.length : 24, isToday: false };
+        }
+
+        setTodayJobInfo(newInfo);
+        try {
+          sessionStorage.setItem("gjl_today_job_stat", JSON.stringify({ timestamp: Date.now(), info: newInfo }));
+        } catch (err) {
+          console.debug("Cache write skipped:", err);
         }
       } catch (err) {
         console.warn("Could not calculate today jobs count:", err);
@@ -339,10 +349,10 @@ export default function JobListingPage() {
         let lastDocSnapshot = cursorDoc;
         let hitEnd = false;
         let attempts = 0;
-        const maxAttempts = 6; // fetch up to 6 batches to fill 50 matching items
+        const maxAttempts = 3; // Fast fetch limit
 
-        // Batch size for Firestore limit
-        const BATCH_SIZE = 60;
+        // Increased batch size for single-roundtrip fast loading
+        const BATCH_SIZE = 100;
 
         while (collected.length < PAGE_SIZE && !hitEnd && attempts < maxAttempts) {
           attempts++;
@@ -389,6 +399,9 @@ export default function JobListingPage() {
             hitEnd = true;
           }
         }
+
+        // Strictly sort collected jobs newest first so newest added is always on top
+        collected.sort((a, b) => (getJobTimestamp(b) || 0) - (getJobTimestamp(a) || 0));
 
         if (isMounted) {
           setPageCache((prev) => ({ ...prev, [currentPage]: collected }));
