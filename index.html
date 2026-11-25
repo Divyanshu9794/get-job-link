@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Immediate Canonical Domain Redirect: Redirects *.web.app and *.firebaseapp.com to custom domain getjoblink.in -->
+    <script>
+      (function() {
+        var h = window.location.hostname;
+        if (h === 'get-job-link.web.app' || h === 'get-job-link.firebaseapp.com') {
+          window.location.replace('https://getjoblink.in' + window.location.pathname + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
     <title>GetJobLink | Clean Daily Tech Jobs & Verified Career Portals</title>
     <meta name="description" content="Verified daily tech jobs across India and worldwide. 100% direct company application links with free ATS resume score evaluations and role-specific career guides." />
     <meta name="theme-color" content="#2563eb" />
