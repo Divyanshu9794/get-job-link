@@ -216,7 +216,7 @@ function fantasticJobsDevPlugin() {
           const urlObj = new URL(req.url, 'http://localhost');
           const targetUrl =
             urlObj.searchParams.get('url') ||
-            'https://data.fantastic.jobs/v1/active-ats?time_frame=24h&limit=20&description_format=text&title=%22Developer%22';
+            'https://data.fantastic.jobs/v1/active-ats?time_frame=7d&limit=100&description_format=text&title=%22Developer%22&location=India';
 
           const envFilePath = path.resolve(__dirname, '.env');
           let apiKey = process.env.VITE_FANTASTIC_JOBS_API_KEY || '';

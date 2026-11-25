@@ -20,19 +20,35 @@ import { formatDisplaySalary } from "./jobClassification.js";
 
 // Curated ATS Sources
 export const JOB_SOURCES = [
-  // 1. Fantastic.jobs Active ATS Feed (High Freshness Verified ATS Aggregator)
+  // 1. Live Active ATS Aggregators (High Freshness Verified ATS Feeds)
+  {
+    id: "fetchjobs_india",
+    name: "FetchJobs API (India Live ATS)",
+    type: "fetchjobs",
+    url: "https://api.fetchjobs.in/mcp",
+    category: "india",
+    limit: 50,
+  },
+  {
+    id: "fetchjobs_global",
+    name: "FetchJobs API (Global Live ATS)",
+    type: "fetchjobs",
+    url: "https://api.fetchjobs.in/mcp",
+    category: "remote",
+    limit: 50,
+  },
   {
     id: "fantastic_jobs_india",
     name: "Fantastic Jobs (India Active ATS)",
     type: "fantastic_jobs",
-    url: "https://data.fantastic.jobs/v1/active-ats?time_frame=24h&limit=20&location=India&description_format=text&title=%22Developer%22",
+    url: "https://data.fantastic.jobs/v1/active-ats?time_frame=7d&limit=100&description_format=text&title=%22Developer%22&location=India",
     category: "india",
   },
   {
     id: "fantastic_jobs_global",
     name: "Fantastic Jobs (Global Active ATS)",
     type: "fantastic_jobs",
-    url: "https://data.fantastic.jobs/v1/active-ats?time_frame=24h&limit=20&description_format=text&title=%22Developer%22",
+    url: "https://data.fantastic.jobs/v1/active-ats?time_frame=7d&limit=100&description_format=text&title=%22Developer%22",
     category: "remote",
   },
 
@@ -500,7 +516,16 @@ export async function fetchJobsFromSource(source) {
             ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
           },
         });
-        if (!res.ok) throw new Error(`Fantastic Jobs responded with ${res.status}`);
+        if (!res.ok) {
+          let errDetail = `${res.status}`;
+          try {
+            const errJson = await res.json();
+            if (errJson.detail) errDetail += ` (${errJson.detail})`;
+          } catch (e) {
+            console.debug("Could not parse error JSON:", e);
+          }
+          throw new Error(`Fantastic Jobs responded with ${errDetail}`);
+        }
       } catch (directErr) {
         // Fallback to local dev proxy if browser environment blocks direct cross-origin
         try {
@@ -522,6 +547,90 @@ export async function fetchJobsFromSource(source) {
       console.log(jobsList.length, "jobs,", creditsUsed, "credits used");
 
       return jobsList.map((item) => normalizeFantasticJob(item, source));
+    }
+
+    // 7. FetchJobs MCP API (JSON-RPC 2.0 Live Direct ATS)
+    if (source.type === "fetchjobs") {
+      const limit = source.limit || 50;
+      const res = await fetch(source.url || "https://api.fetchjobs.in/mcp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 3,
+          method: "tools/call",
+          params: {
+            name: "search_jobs",
+            arguments: {
+              source: "live",
+              limit: limit,
+              page: 1,
+            },
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error(`FetchJobs API error: ${res.status}`);
+      const data = await res.json();
+      const rawText = data?.result?.content?.[0]?.text;
+      let parsed = {};
+      try {
+        parsed = typeof rawText === "string" ? JSON.parse(rawText) : (data.jobs ? data : {});
+      } catch (e) {
+        console.warn("Could not parse FetchJobs inner text:", e);
+      }
+
+      const list = (Array.isArray(parsed.jobs) ? parsed.jobs : [])
+        .filter((item) => isTechJob(item.role || item.title || ""));
+
+      return list.map((item) => {
+        const title = item.role || item.title || "Software Engineer";
+        const company = item.company || "Tech Company";
+        const location = item.location || (source.category === "india" ? "Bangalore, India" : "Remote");
+        const isRemote =
+          location.toLowerCase().includes("remote") ||
+          title.toLowerCase().includes("remote") ||
+          source.category === "remote";
+        const applyUrl = item.applyLink || item.url || "";
+        const level = item.level || "";
+        const plainJd = `We are actively hiring for ${title} at ${company} (${location}). Apply directly via official company careers portal.`;
+
+        let exp;
+        if (level === "intern" || title.toLowerCase().includes("intern")) {
+          exp = "Internship";
+        } else if (level === "entry" || level === "junior") {
+          exp = "Fresher (0 - 1 Years)";
+        } else if (level === "mid" || level === "mid-level") {
+          exp = "1 - 3 Years";
+        } else if (level === "senior" || level === "lead") {
+          exp = "3 - 5 Years";
+        } else {
+          exp = extractExperienceFromText(title, plainJd);
+        }
+
+        return {
+          sourceId: source.id,
+          sourceName: source.name,
+          externalId: `fetchjobs_${item.id || item.careersJobId || Math.random().toString(36).slice(2)}`,
+          title,
+          company,
+          location,
+          url: applyUrl,
+          jobType: title.toLowerCase().includes("intern") || level === "intern" ? "Internship" : "Full Time",
+          experience: exp,
+          salary: item.salary || extractSalaryFromText(plainJd) || "Competitive",
+          domain: "Engineering",
+          isRemote,
+          skills: extractSkillsFromText(`${title} ${plainJd}`).join(", "),
+          jd: plainJd,
+          fetchedAt: new Date().toISOString(),
+          status: "pending_approval",
+        };
+      });
     }
 
     return [];
