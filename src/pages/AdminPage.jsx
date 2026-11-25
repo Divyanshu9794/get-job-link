@@ -10,6 +10,7 @@ import {
   writeBatch,
   query,
   orderBy,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   Shield,
@@ -300,11 +301,37 @@ export default function AdminPage() {
     }
   }, [isAdmin, showToast]);
 
+  // Real-time live synchronization for admin portal: updates automatically when jobs are uploaded or modified
   useEffect(() => {
-    if (isAdmin) {
-      loadAdminJobs();
-    }
-  }, [isAdmin, loadAdminJobs]);
+    if (!isAdmin) return;
+    setLoadingJobs(true);
+
+    const q = query(collection(db, "jobs"));
+    const unsubscribe = onSnapshot(
+      q,
+      (snap) => {
+        const list = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+
+        list.sort((a, b) => {
+          const timeA = getJobTimestamp(a) || 0;
+          const timeB = getJobTimestamp(b) || 0;
+          return (timeB || 0) - (timeA || 0);
+        });
+
+        setJobs(list);
+        setLoadingJobs(false);
+      },
+      (err) => {
+        console.error("Admin real-time sync error:", err);
+        setLoadingJobs(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [isAdmin]);
 
   // Dashboard Stats
   const stats = useMemo(() => {

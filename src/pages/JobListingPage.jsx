@@ -7,6 +7,7 @@ import {
   limit,
   getDocs,
   startAfter,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   Briefcase,
@@ -429,6 +430,105 @@ export default function JobListingPage() {
     };
   }, [currentPage, matchJob, pageCache]);
 
+  // Real-time live synchronization for new job postings: updates feed automatically without page refresh
+  useEffect(() => {
+    let isMounted = true;
+    let isInitialSnapshot = true;
+
+    // Listen to the latest 40 jobs in real-time
+    const liveQuery = query(
+      collection(db, "jobs"),
+      orderBy("createdAt", "desc"),
+      limit(40)
+    );
+
+    const unsubscribe = onSnapshot(
+      liveQuery,
+      (snapshot) => {
+        if (!isMounted) return;
+
+        // Skip notifying on initial load, only handle live updates
+        if (isInitialSnapshot) {
+          isInitialSnapshot = false;
+          return;
+        }
+
+        const changes = snapshot.docChanges();
+        if (changes.length === 0) return;
+
+        let hasNewMatchingJobs = false;
+        let latestJobTitle = "";
+        let latestJobCompany = "";
+
+        setPageCache((prevCache) => {
+          const currentPage1Jobs = [...(prevCache[1] || [])];
+          let updated = false;
+
+          changes.forEach((change) => {
+            const data = { id: change.doc.id, ...change.doc.data() };
+
+            if (change.type === "added") {
+              if (matchJob(data)) {
+                const existingIndex = currentPage1Jobs.findIndex((j) => j.id === data.id);
+                if (existingIndex === -1) {
+                  currentPage1Jobs.unshift(data);
+                  hasNewMatchingJobs = true;
+                  latestJobTitle = data.title || "New Opening";
+                  latestJobCompany = data.company || "";
+                  updated = true;
+                }
+              }
+            } else if (change.type === "modified") {
+              const existingIndex = currentPage1Jobs.findIndex((j) => j.id === data.id);
+              if (existingIndex !== -1) {
+                if (matchJob(data)) {
+                  currentPage1Jobs[existingIndex] = data;
+                } else {
+                  currentPage1Jobs.splice(existingIndex, 1);
+                }
+                updated = true;
+              }
+            } else if (change.type === "removed") {
+              const existingIndex = currentPage1Jobs.findIndex((j) => j.id === data.id);
+              if (existingIndex !== -1) {
+                currentPage1Jobs.splice(existingIndex, 1);
+                updated = true;
+              }
+            }
+          });
+
+          if (!updated) return prevCache;
+
+          // Always ensure newest first
+          currentPage1Jobs.sort((a, b) => (getJobTimestamp(b) || 0) - (getJobTimestamp(a) || 0));
+
+          return {
+            ...prevCache,
+            1: currentPage1Jobs,
+          };
+        });
+
+        if (hasNewMatchingJobs) {
+          showToast(
+            `⚡ New opening live: "${latestJobTitle}"${latestJobCompany ? ` at ${latestJobCompany}` : ""}!`,
+            "info"
+          );
+          setTodayJobInfo((prev) =>
+            prev ? { ...prev, count: prev.count + 1 } : { count: 1, isToday: true }
+          );
+        }
+      },
+      (err) => {
+        console.error("Live jobs listener error:", err);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [matchJob, showToast]);
+
   const currentJobs = useMemo(() => {
     return pageCache[currentPage] || [];
   }, [pageCache, currentPage]);
@@ -643,9 +743,18 @@ export default function JobListingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
-              <div className="inline-flex items-center space-x-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
-                <span>{categoryHeader.badge}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center space-x-1.5 bg-blue-50 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
+                  <span>{categoryHeader.badge}</span>
+                </div>
+                <span className="inline-flex items-center space-x-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                  </span>
+                  <span>Live Feed Active</span>
+                </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {categoryHeader.title}

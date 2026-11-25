@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import {
   Sparkles,
   SlidersHorizontal,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { calculateJobMatch } from "../utils/jobMatchEngine";
 import { extractSkillsFromText } from "../utils/jobFetchEngine";
 import { getJobTimestamp } from "../utils/jobClassification";
@@ -21,6 +22,7 @@ import SEO from "../components/SEO";
 
 export default function ForYouFeedPage() {
   const { userProfile } = useAuth();
+  const { showToast } = useToast();
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,51 +95,68 @@ export default function ForYouFeedPage() {
     return (timeB || 0) - (timeA || 0);
   };
 
-  // Fetch recent active jobs from Firestore with instantaneous session cache
+  // Real-time live synchronization: when new jobs get uploaded, they appear automatically without refreshing
   useEffect(() => {
     let isMounted = true;
-    async function loadJobs() {
-      // 1. Instant render from cache (0ms perceived load)
-      try {
-        const cached = sessionStorage.getItem("gjl_foryou_jobs_cache");
-        if (cached) {
-          const { timestamp, list } = JSON.parse(cached);
-          if (Date.now() - timestamp < 3 * 60 * 1000 && Array.isArray(list) && list.length > 0) {
-            list.sort(sortByLatest);
-            setJobs(list);
-            setLoading(false);
-          }
-        }
-      } catch (e) {
-        console.warn("Session cache error:", e);
-      }
+    let isInitialSnapshot = true;
 
-      // 2. Fresh background fetch
-      try {
-        const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(120));
-        const snap = await getDocs(q);
+    // 1. Instant render from cache (0ms perceived load)
+    try {
+      const cached = sessionStorage.getItem("gjl_foryou_jobs_cache");
+      if (cached) {
+        const { timestamp, list } = JSON.parse(cached);
+        if (Date.now() - timestamp < 3 * 60 * 1000 && Array.isArray(list) && list.length > 0) {
+          list.sort(sortByLatest);
+          setJobs(list);
+          setLoading(false);
+        }
+      }
+    } catch (e) {
+      console.warn("Session cache error:", e);
+    }
+
+    // 2. Real-time Firestore snapshot listener
+    const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(120));
+    const unsubscribe = onSnapshot(
+      q,
+      (snap) => {
         if (!isMounted) return;
 
         let list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         list.sort(sortByLatest);
         setJobs(list);
+        setLoading(false);
+
+        // Notify user if a new opening was uploaded live
+        if (!isInitialSnapshot) {
+          const addedChanges = snap.docChanges().filter((c) => c.type === "added");
+          if (addedChanges.length > 0) {
+            const first = addedChanges[0].doc.data();
+            showToast(
+              `⚡ New opening live: "${first.title}" at ${first.company || "Leading Firm"}!`,
+              "info"
+            );
+          }
+        }
+        isInitialSnapshot = false;
 
         try {
           sessionStorage.setItem("gjl_foryou_jobs_cache", JSON.stringify({ timestamp: Date.now(), list }));
         } catch (e) {
           console.debug("Cache write skipped:", e);
         }
-      } catch (err) {
-        console.error("Error fetching jobs for For-You feed:", err);
-      } finally {
+      },
+      (err) => {
+        console.error("Error with live sync on For-You feed:", err);
         if (isMounted) setLoading(false);
       }
-    }
-    loadJobs();
+    );
+
     return () => {
       isMounted = false;
+      unsubscribe();
     };
-  }, []);
+  }, [showToast]);
 
   // Compute Match Intelligence for every job against active preferences
   const jobsWithMatches = useMemo(() => {
@@ -235,9 +254,18 @@ export default function ForYouFeedPage() {
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center space-x-1.5 text-xs font-bold bg-white/10 border border-white/20 text-blue-200 px-3 py-1 rounded-full uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Personalized Intelligence</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center space-x-1.5 text-xs font-bold bg-white/10 border border-white/20 text-blue-200 px-3 py-1 rounded-full uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Personalized Intelligence</span>
+              </div>
+              <span className="inline-flex items-center space-x-1.5 text-[11px] font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-2.5 py-0.5 rounded-full">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                </span>
+                <span>Live Real-Time Sync</span>
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               For You: Verified Career Matches
