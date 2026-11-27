@@ -8,6 +8,7 @@ import {
   getDocs,
   startAfter,
   onSnapshot,
+  where,
 } from "firebase/firestore";
 import {
   Briefcase,
@@ -118,11 +119,19 @@ export default function JobListingPage() {
   useEffect(() => {
     let isMounted = true;
     async function calculateTodayJobs() {
+      const now = new Date();
+      const todayLocalStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      const todayUtcStr = now.toISOString().slice(0, 10);
+      const startOfTodayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const startOfTodayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+      const minTodayMs = Math.min(startOfTodayLocal, startOfTodayUtc);
+      const past24Hours = now.getTime() - 24 * 60 * 60 * 1000;
+
       try {
         const cachedStat = sessionStorage.getItem("gjl_today_job_stat");
         if (cachedStat) {
           const parsed = JSON.parse(cachedStat);
-          if (Date.now() - parsed.timestamp < 10 * 60 * 1000) {
+          if (parsed.dateStr === todayUtcStr && Date.now() - parsed.timestamp < 5 * 60 * 1000) {
             if (isMounted) setTodayJobInfo(parsed.info);
             return;
           }
@@ -131,56 +140,89 @@ export default function JobListingPage() {
         console.debug("Cache read skipped:", err);
       }
 
+      let todayCount = 0;
+      let past24hCount = 0;
+      const seenJobIds = new Set();
+
+      const inspectJobDoc = (data, id) => {
+        if (!data || (id && seenJobIds.has(id))) return;
+        if (id) seenJobIds.add(id);
+
+        const jobTime = getJobTimestamp(data) || 0;
+        const isDateToday = data.date === todayLocalStr || data.date === todayUtcStr;
+        const isTimeToday = jobTime >= minTodayMs;
+        const isCreatedStrToday =
+          typeof data.createdAt === "string" &&
+          (data.createdAt.startsWith(todayLocalStr) || data.createdAt.startsWith(todayUtcStr));
+
+        if (isDateToday || isTimeToday || isCreatedStrToday) {
+          todayCount++;
+        } else if (jobTime >= past24Hours) {
+          past24hCount++;
+        }
+      };
+
       try {
-        const q = query(
+        // 1. Try querying jobs matching today's date field
+        try {
+          const dateQueries = [todayUtcStr];
+          if (todayLocalStr !== todayUtcStr) dateQueries.push(todayLocalStr);
+          const qDate = query(collection(db, "jobs"), where("date", "in", dateQueries));
+          const dateSnap = await getDocs(qDate);
+          dateSnap.docs.forEach((d) => inspectJobDoc(d.data(), d.id));
+        } catch (e) {
+          console.debug("Date query fallback:", e);
+        }
+
+        // 2. Query recent jobs by createdAt to count all recent additions
+        const qRecent = query(
           collection(db, "jobs"),
           orderBy("createdAt", "desc"),
-          limit(80)
+          limit(120)
         );
-        const snap = await getDocs(q);
-        if (!isMounted) return;
+        const recentSnap = await getDocs(qRecent);
+        recentSnap.docs.forEach((d) => inspectJobDoc(d.data(), d.id));
 
-        const now = new Date();
-        const startOfToday = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate()
-        ).getTime();
-        const past24Hours = now.getTime() - 24 * 60 * 60 * 1000;
-
-        let todayCount = 0;
-        let past24hCount = 0;
-
-        snap.docs.forEach((d) => {
-          const data = d.data();
-          const jobTime = getJobTimestamp(data) || 0;
-          if (jobTime >= startOfToday) {
-            todayCount++;
-          }
-          if (jobTime >= past24Hours) {
-            past24hCount++;
+        // 3. Also inspect jobs in pageCache if already loaded
+        Object.values(pageCache).forEach((pageJobs) => {
+          if (Array.isArray(pageJobs)) {
+            pageJobs.forEach((j) => inspectJobDoc(j, j.id));
           }
         });
+
+        if (!isMounted) return;
 
         let newInfo;
         if (todayCount > 0) {
           newInfo = { count: todayCount, isToday: true };
         } else if (past24hCount > 0) {
-          newInfo = { count: past24hCount, isToday: false };
+          newInfo = { count: past24hCount, isToday: false, isPast24h: true };
         } else {
-          newInfo = { count: snap.docs.length > 0 ? snap.docs.length : 24, isToday: false };
+          newInfo = { count: 0, isToday: true };
         }
 
         setTodayJobInfo(newInfo);
         try {
-          sessionStorage.setItem("gjl_today_job_stat", JSON.stringify({ timestamp: Date.now(), info: newInfo }));
+          sessionStorage.setItem(
+            "gjl_today_job_stat",
+            JSON.stringify({ timestamp: Date.now(), dateStr: todayUtcStr, info: newInfo })
+          );
         } catch (err) {
           console.debug("Cache write skipped:", err);
         }
       } catch (err) {
         console.warn("Could not calculate today jobs count:", err);
         if (isMounted) {
-          setTodayJobInfo({ count: 24, isToday: true });
+          let localToday = 0;
+          Object.values(pageCache).forEach((pageJobs) => {
+            if (Array.isArray(pageJobs)) {
+              pageJobs.forEach((j) => {
+                const jt = getJobTimestamp(j) || 0;
+                if (j.date === todayLocalStr || j.date === todayUtcStr || jt >= minTodayMs) localToday++;
+              });
+            }
+          });
+          setTodayJobInfo({ count: localToday, isToday: true });
         }
       }
     }
@@ -190,7 +232,7 @@ export default function JobListingPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [pageCache]);
 
   // Sync state to URL params without full page reload
   useEffect(() => {
@@ -468,6 +510,10 @@ export default function JobListingPage() {
             const data = { id: change.doc.id, ...change.doc.data() };
 
             if (change.type === "added") {
+              setTodayJobInfo((prev) => {
+                if (!prev) return { count: 1, isToday: true };
+                return { ...prev, count: (prev.count || 0) + 1, isToday: true };
+              });
               if (matchJob(data)) {
                 const existingIndex = currentPage1Jobs.findIndex((j) => j.id === data.id);
                 if (existingIndex === -1) {
@@ -718,7 +764,11 @@ export default function JobListingPage() {
               </span>
               <div className="flex items-center space-x-2 flex-wrap min-w-0">
                 <span className="font-extrabold text-amber-300 tracking-tight">
-                  {todayJobInfo.count} {todayJobInfo.count === 1 ? "Job" : "Jobs"} Added {todayJobInfo.isToday ? "Today" : "Recently"}
+                  {todayJobInfo.count > 0 ? (
+                    `${todayJobInfo.count} ${todayJobInfo.count === 1 ? "Job" : "Jobs"} Added ${todayJobInfo.isToday ? "Today" : "in the Last 24h"}`
+                  ) : (
+                    "0 Jobs Added Today (Updated live)"
+                  )}
                 </span>
                 <span className="text-blue-200 hidden sm:inline">•</span>
                 <span className="text-blue-100 text-xs hidden sm:inline truncate">

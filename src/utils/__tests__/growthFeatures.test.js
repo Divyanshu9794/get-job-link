@@ -330,6 +330,31 @@ describe("Job Classification & Filter Intelligence", () => {
 
     const isoStr = "2026-11-23T12:00:00.000Z";
     assert.equal(getJobTimestamp({ fetchedAt: isoStr }), new Date(isoStr).getTime());
+
+    const methodTimestamp = { toMillis: () => 1795760880000 };
+    assert.equal(getJobTimestamp({ createdAt: methodTimestamp }), 1795760880000);
+
+    const toDateTimestamp = { toDate: () => new Date("2026-11-27T10:00:00Z") };
+    assert.equal(getJobTimestamp({ createdAt: toDateTimestamp }), new Date("2026-11-27T10:00:00Z").getTime());
+  });
+
+  it("identifies jobs added today versus older jobs accurately", () => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    const jobTodayDate = { title: "Dev 1", date: todayStr };
+    const jobTodayCreated = { title: "Dev 2", createdAt: startOfToday + 3600000 };
+    const jobYesterday = { title: "Dev 3", createdAt: startOfToday - 86400000 };
+
+    const isToday = (j) => {
+      const ts = getJobTimestamp(j);
+      return j.date === todayStr || (ts && ts >= startOfToday);
+    };
+
+    assert.equal(isToday(jobTodayDate), true);
+    assert.equal(isToday(jobTodayCreated), true);
+    assert.equal(isToday(jobYesterday), false);
   });
 
   it("persists auto-fetched staged jobs and restores them across simulated page refreshes", async () => {

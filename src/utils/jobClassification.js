@@ -241,13 +241,21 @@ export function getJobTimestamp(job) {
   if (!job) return null;
   const raw = job.createdAt || job.date || job.fetchedAt;
   if (!raw) return null;
-  if (typeof raw === "object" && typeof raw.seconds === "number") {
-    return raw.seconds * 1000;
+  if (typeof raw === "object") {
+    if (typeof raw.toMillis === "function") return raw.toMillis();
+    if (typeof raw.toDate === "function") return raw.toDate().getTime();
+    if (typeof raw.seconds === "number") {
+      return raw.seconds * 1000 + (raw.nanoseconds ? Math.floor(raw.nanoseconds / 1000000) : 0);
+    }
   }
   if (typeof raw === "number") {
     return raw;
   }
   if (typeof raw === "string") {
+    if (/^\d{10,13}$/.test(raw.trim())) {
+      const num = parseInt(raw.trim(), 10);
+      return num < 10000000000 ? num * 1000 : num;
+    }
     const parsed = new Date(raw).getTime();
     return isNaN(parsed) ? null : parsed;
   }
