@@ -177,8 +177,9 @@ export default function JobListingPage() {
         // 2. Query recent jobs by createdAt to count all recent additions
         const qRecent = query(
           collection(db, "jobs"),
+          where("createdAt", ">=", 0),
           orderBy("createdAt", "desc"),
-          limit(120)
+          limit(150)
         );
         const recentSnap = await getDocs(qRecent);
         recentSnap.docs.forEach((d) => inspectJobDoc(d.data(), d.id));
@@ -392,7 +393,7 @@ export default function JobListingPage() {
         let lastDocSnapshot = cursorDoc;
         let hitEnd = false;
         let attempts = 0;
-        const maxAttempts = 3; // Fast fetch limit
+        const maxAttempts = 5; // Fast fetch limit scanning up to 500 documents
 
         // Increased batch size for single-roundtrip fast loading
         const BATCH_SIZE = 100;
@@ -402,6 +403,7 @@ export default function JobListingPage() {
 
           let q = query(
             collection(db, "jobs"),
+            where("createdAt", ">=", 0),
             orderBy("createdAt", "desc"),
             limit(BATCH_SIZE)
           );
@@ -409,6 +411,7 @@ export default function JobListingPage() {
           if (lastDocSnapshot) {
             q = query(
               collection(db, "jobs"),
+              where("createdAt", ">=", 0),
               orderBy("createdAt", "desc"),
               startAfter(lastDocSnapshot),
               limit(BATCH_SIZE)
@@ -480,6 +483,7 @@ export default function JobListingPage() {
     // Listen to the latest 40 jobs in real-time
     const liveQuery = query(
       collection(db, "jobs"),
+      where("createdAt", ">=", 0),
       orderBy("createdAt", "desc"),
       limit(40)
     );

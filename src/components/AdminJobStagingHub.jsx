@@ -14,7 +14,7 @@ import {
   X,
   Database,
 } from "lucide-react";
-import { collection, addDoc, doc, serverTimestamp, writeBatch } from "firebase/firestore";
+import { collection, addDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from "../firebase";
 import {
   JOB_SOURCES,
@@ -163,7 +163,8 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
         isRemote: job.isRemote || false,
         skills: job.skills || "",
         jd: job.jd || "",
-        createdAt: serverTimestamp(),
+        createdAt: Date.now(),
+        date: new Date().toISOString().split("T")[0],
         publishedVia: "admin_auto_fetch_approval",
       };
 
@@ -211,7 +212,8 @@ export default function AdminJobStagingHub({ existingJobs = [], onJobPublished }
           isRemote: j.isRemote || false,
           skills: j.skills || "",
           jd: j.jd || "",
-          createdAt: serverTimestamp(),
+          createdAt: Date.now(),
+          date: new Date().toISOString().split("T")[0],
           publishedVia: "admin_bulk_approval",
         });
         publishedCount++;

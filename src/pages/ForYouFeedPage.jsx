@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, limit, onSnapshot, where } from "firebase/firestore";
 import {
   Sparkles,
   SlidersHorizontal,
@@ -116,7 +116,12 @@ export default function ForYouFeedPage() {
     }
 
     // 2. Real-time Firestore snapshot listener
-    const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(120));
+    const q = query(
+      collection(db, "jobs"),
+      where("createdAt", ">=", 0),
+      orderBy("createdAt", "desc"),
+      limit(150)
+    );
     const unsubscribe = onSnapshot(
       q,
       (snap) => {

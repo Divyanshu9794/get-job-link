@@ -35,6 +35,8 @@ import {
   isFresherExperience,
   formatDisplaySalary,
   getJobTimestamp,
+  isWorldJob,
+  isRemoteJob,
 } from "../jobClassification.js";
 
 describe("Job Match Intelligence Engine", () => {
@@ -355,6 +357,28 @@ describe("Job Classification & Filter Intelligence", () => {
     assert.equal(isToday(jobTodayDate), true);
     assert.equal(isToday(jobTodayCreated), true);
     assert.equal(isToday(jobYesterday), false);
+  });
+
+  it("strictly sorts world and remote jobs so newest added is always on top", () => {
+    const worldJobs = [
+      { id: "w_old", title: "Software Engineer", location: "Berlin, Germany", createdAt: 1795000000000 },
+      { id: "w_new", title: "DevOps Engineer", location: "San Francisco, USA", createdAt: 1795858000000 },
+      { id: "w_mid", title: "Data Scientist", location: "London, England", createdAt: 1795500000000 },
+    ];
+
+    const remoteJobs = [
+      { id: "r_old", title: "Backend Dev", isRemote: true, createdAt: 1795000000000 },
+      { id: "r_new", title: "Fullstack Dev", location: "Remote", createdAt: 1795858000000 },
+    ];
+
+    const sortedWorld = worldJobs.filter(isWorldJob).sort((a, b) => (getJobTimestamp(b) || 0) - (getJobTimestamp(a) || 0));
+    assert.equal(sortedWorld[0].id, "w_new");
+    assert.equal(sortedWorld[1].id, "w_mid");
+    assert.equal(sortedWorld[2].id, "w_old");
+
+    const sortedRemote = remoteJobs.filter(isRemoteJob).sort((a, b) => (getJobTimestamp(b) || 0) - (getJobTimestamp(a) || 0));
+    assert.equal(sortedRemote[0].id, "r_new");
+    assert.equal(sortedRemote[1].id, "r_old");
   });
 
   it("persists auto-fetched staged jobs and restores them across simulated page refreshes", async () => {

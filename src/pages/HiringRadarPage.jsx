@@ -8,6 +8,7 @@ import {
   query,
   orderBy,
   limit,
+  where,
 } from "firebase/firestore";
 import {
   TrendingUp,
@@ -63,7 +64,12 @@ export default function HiringRadarPage() {
         }
 
         // 2. Fallback: Query jobs collection and process live
-        const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(800));
+        const q = query(
+          collection(db, "jobs"),
+          where("createdAt", ">=", 0),
+          orderBy("createdAt", "desc"),
+          limit(800)
+        );
         const jobsSnap = await getDocs(q);
 
         if (!isMounted) return;

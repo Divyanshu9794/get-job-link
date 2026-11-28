@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, where } from "firebase/firestore";
 import {
   Briefcase,
   Sparkles,
@@ -101,7 +101,12 @@ export default function SeoJobCategoryPage() {
     async function loadJobs() {
       setLoading(true);
       try {
-        const q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(120));
+        const q = query(
+          collection(db, "jobs"),
+          where("createdAt", ">=", 0),
+          orderBy("createdAt", "desc"),
+          limit(150)
+        );
         const snap = await getDocs(q);
         if (!isMounted) return;
         setJobs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
