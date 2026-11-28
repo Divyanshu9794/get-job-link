@@ -67,7 +67,14 @@ export default function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState("all");
   const [modalOpen, setModalOpen] = useState(false);
-  const [upvotedIds, setUpvotedIds] = useState(new Set());
+  const [upvotedIds, setUpvotedIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem("gjl_community_upvotes");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
 
   // New post state
   const [newPost, setNewPost] = useState({
@@ -102,22 +109,32 @@ export default function CommunityPage() {
   }, []);
 
   const handleUpvote = (postId) => {
+    const isCurrentlyUpvoted = upvotedIds.has(postId);
+    const delta = isCurrentlyUpvoted ? -1 : 1;
+
     setUpvotedIds((prev) => {
       const next = new Set(prev);
-      const isUpvoted = next.has(postId);
-      if (isUpvoted) next.delete(postId);
-      else next.add(postId);
-
-      setPosts((prevPosts) =>
-        prevPosts.map((p) => {
-          if (p.id === postId) {
-            return { ...p, upvotes: p.upvotes + (isUpvoted ? -1 : 1) };
-          }
-          return p;
-        })
-      );
+      if (isCurrentlyUpvoted) {
+        next.delete(postId);
+      } else {
+        next.add(postId);
+      }
+      try {
+        localStorage.setItem("gjl_community_upvotes", JSON.stringify(Array.from(next)));
+      } catch {
+        // ignore
+      }
       return next;
     });
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
+        if (p.id === postId) {
+          return { ...p, upvotes: Math.max(0, (p.upvotes || 0) + delta) };
+        }
+        return p;
+      })
+    );
   };
 
   const handleCreatePost = async (e) => {
