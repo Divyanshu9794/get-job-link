@@ -19,7 +19,6 @@ import {
   Share2,
   Copy,
   Check,
-  X,
 } from "lucide-react";
 import { db } from "../firebase";
 import JobCard from "../components/JobCard";
@@ -95,145 +94,6 @@ export default function JobListingPage() {
   const [quickCopied, setQuickCopied] = useState(false);
   const [selectedJobIds, setSelectedJobIds] = useState(new Set());
   const [customSelectCount, setCustomSelectCount] = useState("10");
-
-  // Top notification: count of jobs added today
-  const [todayJobInfo, setTodayJobInfo] = useState(null);
-  const [showNotification, setShowNotification] = useState(() => {
-    try {
-      return sessionStorage.getItem("gjl_today_notif_dismissed") !== "true";
-    } catch {
-      return true;
-    }
-  });
-
-  const handleDismissNotification = () => {
-    setShowNotification(false);
-    try {
-      sessionStorage.setItem("gjl_today_notif_dismissed", "true");
-    } catch {
-      // ignore
-    }
-  };
-
-  // Fetch count of jobs added today (cached in sessionStorage for high performance)
-  useEffect(() => {
-    let isMounted = true;
-    async function calculateTodayJobs() {
-      const now = new Date();
-      const todayLocalStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-      const todayUtcStr = now.toISOString().slice(0, 10);
-      const startOfTodayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      const startOfTodayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-      const minTodayMs = Math.min(startOfTodayLocal, startOfTodayUtc);
-      const past24Hours = now.getTime() - 24 * 60 * 60 * 1000;
-
-      try {
-        const cachedStat = sessionStorage.getItem("gjl_today_job_stat");
-        if (cachedStat) {
-          const parsed = JSON.parse(cachedStat);
-          if (parsed.dateStr === todayUtcStr && Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-            if (isMounted) setTodayJobInfo(parsed.info);
-            return;
-          }
-        }
-      } catch (err) {
-        console.debug("Cache read skipped:", err);
-      }
-
-      let todayCount = 0;
-      let past24hCount = 0;
-      const seenJobIds = new Set();
-
-      const inspectJobDoc = (data, id) => {
-        if (!data || (id && seenJobIds.has(id))) return;
-        if (id) seenJobIds.add(id);
-
-        const jobTime = getJobTimestamp(data) || 0;
-        const isDateToday = data.date === todayLocalStr || data.date === todayUtcStr;
-        const isTimeToday = jobTime >= minTodayMs;
-        const isCreatedStrToday =
-          typeof data.createdAt === "string" &&
-          (data.createdAt.startsWith(todayLocalStr) || data.createdAt.startsWith(todayUtcStr));
-
-        if (isDateToday || isTimeToday || isCreatedStrToday) {
-          todayCount++;
-        } else if (jobTime >= past24Hours) {
-          past24hCount++;
-        }
-      };
-
-      try {
-        // 1. Try querying jobs matching today's date field
-        try {
-          const dateQueries = [todayUtcStr];
-          if (todayLocalStr !== todayUtcStr) dateQueries.push(todayLocalStr);
-          const qDate = query(collection(db, "jobs"), where("date", "in", dateQueries));
-          const dateSnap = await getDocs(qDate);
-          dateSnap.docs.forEach((d) => inspectJobDoc(d.data(), d.id));
-        } catch (e) {
-          console.debug("Date query fallback:", e);
-        }
-
-        // 2. Query recent jobs by createdAt to count all recent additions
-        const qRecent = query(
-          collection(db, "jobs"),
-          where("createdAt", ">=", 0),
-          orderBy("createdAt", "desc"),
-          limit(150)
-        );
-        const recentSnap = await getDocs(qRecent);
-        recentSnap.docs.forEach((d) => inspectJobDoc(d.data(), d.id));
-
-        // 3. Also inspect jobs in pageCache if already loaded
-        Object.values(pageCache).forEach((pageJobs) => {
-          if (Array.isArray(pageJobs)) {
-            pageJobs.forEach((j) => inspectJobDoc(j, j.id));
-          }
-        });
-
-        if (!isMounted) return;
-
-        let newInfo;
-        if (todayCount > 0) {
-          newInfo = { count: todayCount, isToday: true };
-        } else if (past24hCount > 0) {
-          newInfo = { count: past24hCount, isToday: false, isPast24h: true };
-        } else {
-          newInfo = { count: 0, isToday: true };
-        }
-
-        setTodayJobInfo(newInfo);
-        try {
-          sessionStorage.setItem(
-            "gjl_today_job_stat",
-            JSON.stringify({ timestamp: Date.now(), dateStr: todayUtcStr, info: newInfo })
-          );
-        } catch (err) {
-          console.debug("Cache write skipped:", err);
-        }
-      } catch (err) {
-        console.warn("Could not calculate today jobs count:", err);
-        if (isMounted) {
-          let localToday = 0;
-          Object.values(pageCache).forEach((pageJobs) => {
-            if (Array.isArray(pageJobs)) {
-              pageJobs.forEach((j) => {
-                const jt = getJobTimestamp(j) || 0;
-                if (j.date === todayLocalStr || j.date === todayUtcStr || jt >= minTodayMs) localToday++;
-              });
-            }
-          });
-          setTodayJobInfo({ count: localToday, isToday: true });
-        }
-      }
-    }
-
-    calculateTodayJobs();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [pageCache]);
 
   // Sync state to URL params without full page reload
   useEffect(() => {
@@ -514,10 +374,6 @@ export default function JobListingPage() {
             const data = { id: change.doc.id, ...change.doc.data() };
 
             if (change.type === "added") {
-              setTodayJobInfo((prev) => {
-                if (!prev) return { count: 1, isToday: true };
-                return { ...prev, count: (prev.count || 0) + 1, isToday: true };
-              });
               if (matchJob(data)) {
                 const existingIndex = currentPage1Jobs.findIndex((j) => j.id === data.id);
                 if (existingIndex === -1) {
@@ -562,9 +418,6 @@ export default function JobListingPage() {
           showToast(
             `⚡ New opening live: "${latestJobTitle}"${latestJobCompany ? ` at ${latestJobCompany}` : ""}!`,
             "info"
-          );
-          setTodayJobInfo((prev) =>
-            prev ? { ...prev, count: prev.count + 1 } : { count: 1, isToday: true }
           );
         }
       },
@@ -756,41 +609,6 @@ export default function JobListingPage() {
         canonicalUrl={categoryHeader.canonical}
         jsonLd={homeJsonLd}
       />
-
-      {/* Top Notification Bar: Jobs Added Today */}
-      {showNotification && todayJobInfo && (
-        <div className="bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800 text-white shadow-xs border-b border-blue-400/20 py-2.5 px-4 text-xs sm:text-sm transition-all duration-300">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-2.5 flex-1 min-w-0">
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
-              </span>
-              <div className="flex items-center space-x-2 flex-wrap min-w-0">
-                <span className="font-extrabold text-amber-300 tracking-tight">
-                  {todayJobInfo.count > 0 ? (
-                    `${todayJobInfo.count} ${todayJobInfo.count === 1 ? "Job" : "Jobs"} Added ${todayJobInfo.isToday ? "Today" : "in the Last 24h"}`
-                  ) : (
-                    "0 Jobs Added Today (Updated live)"
-                  )}
-                </span>
-                <span className="text-blue-200 hidden sm:inline">•</span>
-                <span className="text-blue-100 text-xs hidden sm:inline truncate">
-                  Direct authenticated ATS openings from top verified companies
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={handleDismissNotification}
-              className="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors shrink-0 ml-3"
-              aria-label="Dismiss notification"
-              title="Dismiss notification"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Category Hero / Title Section */}
       <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 sm:py-10 transition-colors duration-150">

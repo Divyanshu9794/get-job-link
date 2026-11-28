@@ -31,6 +31,7 @@ const ForYouFeedPage = lazy(() => import("./pages/ForYouFeedPage"));
 const JobAlertsPage = lazy(() => import("./pages/JobAlertsPage"));
 const SeoJobCategoryPage = lazy(() => import("./pages/SeoJobCategoryPage"));
 const UnsubscribePage = lazy(() => import("./pages/UnsubscribePage"));
+const OpportunityMapPage = lazy(() => import("./pages/OpportunityMapPage"));
 
 function PageLoading() {
   return (
@@ -72,6 +73,7 @@ export default function App() {
                   <Route path="/job/:jobId" element={<JobDetailPage />} />
 
                   {/* Public Hiring Radar & Company Intelligence */}
+                  <Route path="/opportunity-map" element={<OpportunityMapPage />} />
                   <Route path="/hiring-radar" element={<HiringRadarPage />} />
                   <Route path="/hiring-radar/company/:companySlug" element={<CompanyIntelligencePage />} />
 
