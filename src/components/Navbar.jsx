@@ -39,7 +39,6 @@ import { useToast } from "../context/ToastContext";
 import ThemeToggle from "./ThemeToggle";
 import PreferencesModal from "./PreferencesModal";
 import NewsletterDigestModal from "./NewsletterDigestModal";
-import { useActiveUsers } from "../utils/useActiveUsers";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,8 +47,6 @@ export default function Navbar() {
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [prefModalOpen, setPrefModalOpen] = useState(false);
   const [digestModalOpen, setDigestModalOpen] = useState(false);
-
-  const activeUsers = useActiveUsers();
 
   const dropdownRef = useRef(null);
   const exploreRef = useRef(null);
@@ -445,19 +442,6 @@ export default function Navbar() {
 
             {/* Right Section: Digest, Theme Toggle & Profile/Login */}
             <div className="hidden sm:flex items-center space-x-2 shrink-0">
-              {/* Real-Time Total Active Users on Website */}
-              <div
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-emerald-500/50 dark:border-emerald-600/70 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold select-none shadow-2xs transition-all hover:scale-102"
-                title={`${activeUsers} verified active job seekers on GetJobLink right now`}
-              >
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="font-extrabold tabular-nums tracking-tight">{activeUsers}</span>
-                <span className="text-[11px] text-emerald-800/90 dark:text-emerald-300/90 font-medium whitespace-nowrap">Active Online</span>
-              </div>
-
               <button
                 type="button"
                 onClick={() => setDigestModalOpen(true)}
@@ -626,18 +610,6 @@ export default function Navbar() {
 
             {/* Mobile Menu Toggle & Theme Button */}
             <div className="flex items-center space-x-1.5 sm:space-x-2 lg:hidden">
-              {/* Real-Time Total Active Users on Website (Mobile) */}
-              <div
-                className="inline-flex items-center space-x-1 px-2 py-1 rounded-full border border-emerald-500/50 dark:border-emerald-600/70 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold select-none"
-                title={`${activeUsers} active users on website right now`}
-              >
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                </span>
-                <span className="tabular-nums font-black">{activeUsers}</span>
-              </div>
-
               <ThemeToggle compact />
 
               {!currentUser ? (
