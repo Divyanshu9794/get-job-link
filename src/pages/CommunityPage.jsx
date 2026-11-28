@@ -7,6 +7,8 @@ import {
   ThumbsUp,
   ChevronRight,
   Plus,
+  Send,
+  CornerDownRight,
 } from "lucide-react";
 import { db } from "../firebase";
 import SEO from "../components/SEO";
@@ -26,7 +28,54 @@ const ANONYMOUS_HANDLES = [
   "Anonymous Architect",
   "Anonymous Developer",
   "Anonymous Algorist",
+  "Anonymous Specialist",
+  "Anonymous Builder",
 ];
+
+const INITIAL_COMMENTS = {
+  "p-1": [
+    {
+      id: "c-1-1",
+      authorName: "Anonymous Developer",
+      content: "Did they ask about LRU cache eviction policy edge cases (concurrent reads/writes)?",
+      timeAgo: "2 hours ago",
+    },
+    {
+      id: "c-1-2",
+      authorName: "Anonymous Architect",
+      content: "Yes, standard ReadWriteMutex in Golang or ReentrantReadWriteLock in Java was expected to ensure thread-safety.",
+      timeAgo: "1 hour ago",
+    },
+  ],
+  "p-2": [
+    {
+      id: "c-2-1",
+      authorName: "Anonymous Candidate",
+      content: "Were standard library data structures allowed or did we need to code the segment tree from scratch?",
+      timeAgo: "4 hours ago",
+    },
+    {
+      id: "c-2-2",
+      authorName: "Anonymous Falcon",
+      content: "You have to implement custom tree updates for range queries in C++ / Java, standard STL isn't enough for the second question.",
+      timeAgo: "3 hours ago",
+    },
+  ],
+  "p-3": [
+    {
+      id: "c-3-1",
+      authorName: "Anonymous Specialist",
+      content: "What ATS format worked best for you? Single column minimal LaTeX or Word doc?",
+      timeAgo: "6 hours ago",
+    },
+    {
+      id: "c-3-2",
+      authorName: "Anonymous Developer",
+      content: "Single column minimal LaTeX template converted to PDF parsed 100% cleanly in the GetJobLink ATS checker.",
+      timeAgo: "5 hours ago",
+    },
+  ],
+};
 
 const SAMPLE_POSTS = [
   {
@@ -137,6 +186,68 @@ export default function CommunityPage() {
     );
   };
 
+  const [commentsByPost, setCommentsByPost] = useState(() => {
+    try {
+      const stored = localStorage.getItem("gjl_community_comments");
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // ignore
+    }
+    return INITIAL_COMMENTS;
+  });
+
+  const [commentInputs, setCommentInputs] = useState({});
+  const [collapsedComments, setCollapsedComments] = useState(new Set());
+
+  const toggleComments = (postId) => {
+    setCollapsedComments((prev) => {
+      const next = new Set(prev);
+      if (next.has(postId)) next.delete(postId);
+      else next.add(postId);
+      return next;
+    });
+  };
+
+  const handleAddComment = (e, postId) => {
+    e.preventDefault();
+    const text = (commentInputs[postId] || "").trim();
+    if (!text) return;
+
+    const randomHandle =
+      ANONYMOUS_HANDLES[Math.floor(Math.random() * ANONYMOUS_HANDLES.length)];
+
+    const newComment = {
+      id: `c-${Date.now()}`,
+      authorName: randomHandle,
+      content: text,
+      timeAgo: "Just now",
+    };
+
+    setCommentsByPost((prev) => {
+      const current = prev[postId] || [];
+      const updated = [...current, newComment];
+      const next = { ...prev, [postId]: updated };
+      try {
+        localStorage.setItem("gjl_community_comments", JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
+        if (p.id === postId) {
+          return { ...p, commentsCount: (p.commentsCount || 0) + 1 };
+        }
+        return p;
+      })
+    );
+
+    setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
+    showToast("Anonymous reply posted!", "success");
+  };
+
   const handleCreatePost = async (e) => {
     e.preventDefault();
     if (!newPost.title.trim() || !newPost.content.trim()) {
@@ -242,6 +353,8 @@ export default function CommunityPage() {
         <div className="space-y-4">
           {filteredPosts.map((post) => {
             const hasUpvoted = upvotedIds.has(post.id);
+            const postComments = commentsByPost[post.id] || [];
+            const isCollapsed = collapsedComments.has(post.id);
             return (
               <article
                 key={post.id}
@@ -281,14 +394,76 @@ export default function CommunityPage() {
                       <span>{post.upvotes} Upvotes</span>
                     </button>
 
-                    <div className="inline-flex items-center space-x-1.5 text-slate-500 font-medium">
+                    <button
+                      type="button"
+                      onClick={() => toggleComments(post.id)}
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      title={isCollapsed ? "Show comments" : "Hide comments"}
+                    >
                       <MessageSquare className="w-3.5 h-3.5" />
-                      <span>{post.commentsCount} comments</span>
-                    </div>
+                      <span>{postComments.length} {postComments.length === 1 ? "comment" : "comments"}</span>
+                    </button>
                   </div>
 
                   <span className="text-[10px] text-slate-400">Anonymous Safe Space</span>
                 </div>
+
+                {/* Visible Community Comments Thread */}
+                {!isCollapsed && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      <span className="flex items-center space-x-1.5">
+                        <CornerDownRight className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        <span>Discussion & Replies ({postComments.length})</span>
+                      </span>
+                      <span className="text-slate-400 font-normal">Visible to all • 100% Anonymous</span>
+                    </div>
+
+                    {/* Comments List */}
+                    {postComments.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {postComments.map((comment) => (
+                          <div
+                            key={comment.id}
+                            className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850/80 border border-slate-100 dark:border-slate-800 text-xs"
+                          >
+                            <div className="flex items-center justify-between mb-1 text-[11px]">
+                              <span className="font-bold text-blue-600 dark:text-blue-400">
+                                {comment.authorName}
+                              </span>
+                              <span className="text-slate-400">{comment.timeAgo}</span>
+                            </div>
+                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                              {comment.content}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">No replies yet. Be the first to share your thoughts!</p>
+                    )}
+
+                    {/* Inline Anonymous Reply Form */}
+                    <form onSubmit={(e) => handleAddComment(e, post.id)} className="flex items-center space-x-2 pt-1">
+                      <input
+                        type="text"
+                        placeholder="Add an anonymous reply..."
+                        value={commentInputs[post.id] || ""}
+                        onChange={(e) =>
+                          setCommentInputs({ ...commentInputs, [post.id]: e.target.value })
+                        }
+                        className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white placeholder-slate-400"
+                      />
+                      <button
+                        type="submit"
+                        className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shrink-0 shadow-2xs"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Reply</span>
+                      </button>
+                    </form>
+                  </div>
+                )}
               </article>
             );
           })}
