@@ -32,6 +32,17 @@ const JobAlertsPage = lazy(() => import("./pages/JobAlertsPage"));
 const SeoJobCategoryPage = lazy(() => import("./pages/SeoJobCategoryPage"));
 const UnsubscribePage = lazy(() => import("./pages/UnsubscribePage"));
 const OpportunityMapPage = lazy(() => import("./pages/OpportunityMapPage"));
+const JobDropPage = lazy(() => import("./pages/JobDropPage"));
+const JobBundlesPage = lazy(() => import("./pages/JobBundlesPage"));
+const HiringLeaderboardPage = lazy(() => import("./pages/HiringLeaderboardPage"));
+const CompaniesDirectoryPage = lazy(() => import("./pages/CompaniesDirectoryPage"));
+const PassportPage = lazy(() => import("./pages/PassportPage"));
+const ProjectProofPage = lazy(() => import("./pages/ProjectProofPage"));
+const MissionsPage = lazy(() => import("./pages/MissionsPage"));
+const SkillDnaPage = lazy(() => import("./pages/SkillDnaPage"));
+const CommunityPage = lazy(() => import("./pages/CommunityPage"));
+const OpportunityUnlockerPage = lazy(() => import("./pages/OpportunityUnlockerPage"));
+const OpportunityForecastPage = lazy(() => import("./pages/OpportunityForecastPage"));
 
 function PageLoading() {
   return (
@@ -72,10 +83,29 @@ export default function App() {
                   {/* Dedicated Job Detail Route */}
                   <Route path="/job/:jobId" element={<JobDetailPage />} />
 
-                  {/* Public Hiring Radar & Company Intelligence */}
+                  {/* Public Hiring Radar, Opportunity Map & Intelligence */}
                   <Route path="/opportunity-map" element={<OpportunityMapPage />} />
                   <Route path="/hiring-radar" element={<HiringRadarPage />} />
                   <Route path="/hiring-radar/company/:companySlug" element={<CompanyIntelligencePage />} />
+                  <Route path="/hiring-leaderboard" element={<HiringLeaderboardPage />} />
+                  <Route path="/job-drops" element={<JobDropPage />} />
+                  <Route path="/collections" element={<JobBundlesPage />} />
+                  <Route path="/collections/:collectionSlug" element={<JobBundlesPage />} />
+                  <Route path="/opportunity-forecast" element={<OpportunityForecastPage />} />
+                  <Route path="/companies" element={<CompaniesDirectoryPage />} />
+                  <Route path="/companies/:companySlug" element={<CompanyIntelligencePage />} />
+
+                  {/* Community & Anonymous Discussions */}
+                  <Route path="/community" element={<CommunityPage />} />
+                  <Route path="/community/:postId" element={<CommunityPage />} />
+
+                  {/* Candidate Identity, Proof & Advancement Tools */}
+                  <Route path="/passport" element={<PassportPage />} />
+                  <Route path="/passport/:id" element={<PassportPage />} />
+                  <Route path="/project-proof" element={<ProjectProofPage />} />
+                  <Route path="/missions" element={<MissionsPage />} />
+                  <Route path="/skill-dna" element={<SkillDnaPage />} />
+                  <Route path="/opportunity-unlocker" element={<OpportunityUnlockerPage />} />
 
                   {/* Editorial Career Guides */}
                   <Route path="/career-guides" element={<CareerGuidesPage />} />

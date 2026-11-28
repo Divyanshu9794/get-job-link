@@ -283,6 +283,14 @@ export function isFresherExperience(rawExp) {
 }
 
 /**
+ * Checks whether a job object denotes a fresher / entry-level position.
+ */
+export function isFresherJob(job) {
+  if (!job) return false;
+  return isFresherExperience(job.experience);
+}
+
+/**
  * Checks whether a job's experience level matches an experience filter value.
  * Valid filter values: "fresher", "1-3", "3-5", "5+".
  */
